@@ -1,6 +1,6 @@
 ## Preview
 
-Willkommen be <em>iOAN, dem System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</em> von Vincent Dusanek. Das System wurde läuft auf einer klassischen LNMP-Struktur: 
+Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</em> von Vincent Dusanek. Das System wurde läuft auf einer klassischen LNMP-Struktur: 
 <ul>
     <li>Ubuntu 24.04</li>
     <li>Nginx</li>
