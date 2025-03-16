@@ -9,22 +9,22 @@
                 <p class="text-xs font-semibold tracking-wide text-gray-200 uppercase">Informationen</p>
                 <ul class="space-y-1">
                     <li>
-                        <p class="text-gray-300 transition-colors duration-200 font-normal">Version 0.1: 07/2024</p>
-                        <p class="text-gray-300 transition-colors duration-200 font-normal mt-2"><em><strong>LOAN | Das Ausleihsystem des Zentrums für digitales Lehren und Lernen</strong></em> ist eine Plattform des <a href="https://digillab.uni-augsburg.de" class="hover:underline" target="_blank">DigiLLab der Uni Augsburg</a>, um Gegenstände zu inventarisieren.</p>
-                        <p class="text-gray-300 transition-colors duration-200 font-normal mt-2 mr-2"><em><strong>LOAN | Das Ausleihsystem des Zentrums für digitales Lehren und Lernen</strong></em> von <a href="https://sites.google.com/view/vincent-dusanek/about" class="hover:underline" target="_blank"><strong>Vincent Dusanek</strong></a> für <strong>DigiLLab</strong>, 2024. MIT-Lizenz.</p>
+                        <p class="text-gray-300 transition-colors duration-200 font-normal">Version 1.0: 03/2025</p>
+                        <p class="text-gray-300 transition-colors duration-200 font-normal mt-2"><em><strong>LOAN | Das System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</strong></em> ist eine Plattform von <a href="https://github.com/dusanvin" class="hover:underline" target="_blank">Vincent Dusanek</a>, um Gegenstände zu inventarisieren.</p>
+                        <p class="text-gray-300 transition-colors duration-200 font-normal mt-2 mr-2"><em><strong>LOAN | Das System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</strong></em> von <a href="https://github.com/dusanvin" class="hover:underline" target="_blank"><strong>Vincent Dusanek</strong></a>, 2024. MIT-Lizenz.</p>
                     </li>
                 </ul>
             </li>
             <!-- Informationen -->
             <!-- Organisation -->
             <li class="space-y-2 sm:space-y-3 row-span-2 px-4">
-                <p class="text-xs font-semibold tracking-wide text-gray-200 uppercase">Organisation</p>
+                <p class="text-xs font-semibold tracking-wide text-gray-200 uppercase">Service</p>
                 <ul class="space-y-1">
                     <li>
-                        <a class="text-gray-300 hover:text-white transition-colors duration-200 font-normal" href="https://digillab.uni-augsburg.de" target="_blank">DigiLLab</a>
+                        <a class="text-gray-300 hover:text-white transition-colors duration-200 font-normal" href="{{ url('/product') }}" target="_blank">Produkt</a>
                     </li>
                     <li>
-                        <a class="text-gray-300 hover:text-white transition-colors duration-200 font-normal" href="https://www.uni-augsburg.de/de/" target="_blank">Universität Augsburg</a>
+                        <a class="text-gray-300 hover:text-white transition-colors duration-200 font-normal" href="https://github.com/dusanvin/LOAN" target="_blank">GitHub</a>
                     </li>
                 </ul>
             </li>
@@ -34,10 +34,10 @@
                 <p class="text-xs font-semibold tracking-wide text-gray-200 uppercase">Über</p>
                 <ul class="space-y-1">
                     <li>
-                        <a class="text-gray-300 hover:text-white transition-colors duration-200 font-normal" href="https://www.uni-augsburg.de/de/impressum/" target="_blank">Impressum</a>
+                        <a class="text-gray-300 hover:text-white transition-colors duration-200 font-normal" href="{{ url('/impressum') }}" target="_blank">Impressum</a>
                     </li>
                     <li>
-                        <a class="text-gray-300 hover:text-white transition-colors duration-200 font-normal" href="https://www.uni-augsburg.de/de/impressum/datenschutz/" target="_blank">Datenschutz</a>
+                        <a class="text-gray-300 hover:text-white transition-colors duration-200 font-normal" href="{{ url('/datenschutz') }}" target="_blank">Datenschutz</a>
                     </li>
                 </ul>
             </li>
@@ -47,7 +47,7 @@
                 <p class="text-xs font-semibold tracking-wide text-gray-200 uppercase">Allgemein</p>
                 <ul class="space-y-1">
                     <li>
-                        <a class="text-gray-300 hover:text-white transition-colors duration-200 font-normal" href="mailto:team@digillab.uni-augsburg.de">Kontakt</a>
+                        <a class="text-gray-300 hover:text-white transition-colors duration-200 font-normal" href="mailto:vincent.dusanek@gmail.com">Kontakt</a>
                     </li>
                 </ul>
             </li>

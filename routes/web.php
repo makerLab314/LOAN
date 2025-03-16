@@ -61,4 +61,14 @@ Route::middleware(['auth', 'role:administration'])->group(function () {
     Route::get('/log', [DeviceController::class, 'log'])->name('devices.log');
 });
 
+Route::get('/impressum', function () {
+    return view('layouts.impressum');
+});
+Route::get('/datenschutz', function () {
+    return view('layouts.datenschutz');
+});
+Route::get('/product', function () {
+    return view('layouts.product');
+});
+
 require __DIR__.'/auth.php';
