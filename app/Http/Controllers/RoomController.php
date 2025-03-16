@@ -85,13 +85,14 @@ class RoomController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
             'location' => 'required|string|max:255',
+            'new_column' => 'nullable|string|max:255', // Jetzt ist es optional
         ]);
 
         Room::create([
             'name' => $request->name,
             'description' => $request->description,
             'location' => $request->location,
-            'new_column' => null,
+            'new_column' => $request->new_column ?? 'Standardwert', // Standardwert setzen oder NULL erlauben
         ]);
 
         return redirect()->route('rooms.index')->with('status', 'Raum erfolgreich hinzugefügt!');
