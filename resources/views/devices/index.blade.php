@@ -18,7 +18,8 @@
 </nav>
 
 <h1 class="text-2xl font-bold mb-4">Geräte</h1>
-<p class="flex items-center text-sm">Eine Übersicht über alle Geräte. Möchtest du ein <span class="font-semibold mx-1">Gerät verleihen oder zurückgeben?</span> Klicke in der entsprechenden Spalte auf den Button <span class="mx-1 bg-blackshadow-md bg-gray-100 text-gray-800 font-bold py-2 px-4 rounded">Verleihen</span> oder <span class="mx-1 shadow-md bg-gray-900 hover:bg-black text-white font-bold py-2 px-4 rounded">Zurückgeben</span><p>
+<p class="block items-center text-sm mb-2">Eine Übersicht über alle Geräte. Möchtest du ein <span class="font-semibold mx-1">Gerät verleihen oder zurückgeben?</span> Klicke in der entsprechenden Spalte auf den Button <span class="mx-1 bg-blackshadow-md bg-gray-100 text-gray-800 font-bold py-2 px-4 rounded hidden xl:inline">Verleihen</span><span class="xl:hidden">V (für Verleihen)</span> oder <span class="mx-1 shadow-md bg-gray-900 hover:bg-black text-white font-bold py-2 px-4 rounded hidden xl:inline">Zurückgeben</span><span class="xl:hidden">Z (für Zurückgeben).</span>
+
 <p class="mb-2 flex items-center text-sm">
     <a href="{{ route('devices.create') }}" class="hover:underline text-yellow-600 flex items-center">
     Du möchtest dem System ein Gerät hinzufügen? Folge mir!
@@ -37,7 +38,7 @@
 @endif
 
 <!-- Tabs for categories -->
-<div class="container mx-auto flex items-center">
+<div class="lg:container mx-auto flex items-center">
     @php
         $groupedDevices = $devices->groupBy('group');
     @endphp
@@ -148,7 +149,7 @@
     @endif
 </div>
 
-<div class="container mx-auto flex items-center mb-8 p-4 pt-8 bg-gray-600 rounded-tr rounded-b">
+<div class="lg:container mx-auto flex items-center mb-8 p-4 pt-8 bg-gray-600 rounded-tr rounded-b">
     <div id="customMessage" style="display: none;" class="text-white text-sm ml-4 my-4">
         <h3 class="text-lg font-bold mb-2">Hinweis</h3>
         Wende dich an die Administration, wenn eine weitere Kategorie hinzugefügt werden soll.
@@ -159,7 +160,7 @@
                 <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm">Bild</th>
                 <th class="border-b-2 px-4 py-2 border-gray-500 w-1/4 font-medium text-sm">Name & Label</th>
                 <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm">Beschreibung</th>
-                <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm">Kategorie</th>
+                <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm"><span class="hidden lg:inline">Kategorie</span></th>
                 <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm">Status</th>
                 @foreach($devices as $device)
                 @if ($device->borrower_name)
@@ -177,7 +178,7 @@
             @foreach($devices as $device)
                 <tr class="device-row" data-group="{{ $device->group }}">
                     <td class="border-b px-4 py-2 border-gray-600">
-                        <img src="{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}" alt="{{ $device->title }}" class="w-16 h-16 object-cover cursor-pointer rounded border-2 hover:border-gray-400" onclick="openImageModal('{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}')">
+                        <img src="{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}" alt="{{ $device->title }}" class="w-8 lg:w-16 h-8 lg:h-16 object-cover cursor-pointer rounded border-2 hover:border-gray-400" onclick="openImageModal('{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}')">
                     </td>
                     <td class="border-b px-4 py-2 border-gray-600 text-sm break-words">
                         <a href="{{ route('devices.show', $device->id) }}" class="text-gray-300 hover:underline hover:text-white">{{ $device->title }}</a>
@@ -214,19 +215,27 @@
                     <td class="border-b px-4 py-2 border-gray-600 text-sm text-right">
                         <div class="flex justify-end items-center space-x-0">
                             @if ($device->status == 'available')
-                                <button onclick="openLoanModal({{ $device->id }})" class="shadow-md bg-gray-100 hover:bg-white text-gray-800 font-bold py-2 px-4 rounded" style="min-width: 200px;">
-                                    Verleihen
+                                <button onclick="openLoanModal({{ $device->id }})" class="shadow-md bg-gray-100 hover:bg-white text-gray-800 font-bold py-2 px-4 rounded">
+                                    <!-- Text für große Bildschirme (ab xl) -->
+                                    <span class="hidden xl:inline">Verleihen</span>
+                                    <span class="xl:hidden">V</span>
                                 </button>
                             @else
                                 <form id="return-form-{{ $device->id }}" action="{{ route('devices.return') }}" method="POST">
                                     @csrf
                                     <input type="hidden" name="device_id" value="{{ $device->id }}">
-                                    <button type="button" onclick="confirmReturn({{ $device->id }}, '{{ $device->title }}', '{{ $device->description }}')" class="shadow-md bg-gray-900 hover:bg-black text-white font-bold py-2 px-4 rounded" style="min-width: 200px;">
-                                        Zurückgeben
+                                    <button type="button" onclick="confirmReturn({{ $device->id }}, '{{ $device->title }}', '{{ $device->description }}')" 
+                                        class="shadow-md bg-gray-900 hover:bg-black text-white font-bold py-2 px-4 rounded">
+                                        
+                                        <!-- Text für große Bildschirme (ab xl) -->
+                                        <span class="hidden xl:inline">Zurückgeben</span>
+                                        <span class="xl:hidden">Z</span>
+
+                                          
                                     </button>
                                 </form>
                             @endif
-                            <a href="{{ route('devices.edit', $device) }}" class="py-2 pl-6 pr-2 rounded text-white">
+                            <a href="{{ route('devices.edit', $device) }}" class="py-2 pl-2 lg:pl-6 pr-2 rounded text-white">
                                 <svg height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
                                     <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
                                     <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />

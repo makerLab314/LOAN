@@ -9,7 +9,10 @@
                 <p class="text-xs font-semibold tracking-wide text-gray-200 uppercase">Informationen</p>
                 <ul class="space-y-1">
                     <li>
-                        <p class="text-gray-300 transition-colors duration-200 font-normal">Version 1.0: 03/2025</p>
+                        <a href="{{ route('devices.overview') }}">
+                            <img src="{{ asset('img/loan-logo.png') }}" alt="Logo" class="w-[200px] h-auto mt-6 mb-6 mx-auto" style="width: 210px;">
+                        </a>
+                        <p class="text-gray-300 transition-colors duration-200 font-normal">Version 1.1: 03/2025</p>
                         <p class="text-gray-300 transition-colors duration-200 font-normal mt-2"><em><strong>LOAN | Das System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</strong></em> ist eine Plattform von <a href="https://github.com/dusanvin" class="hover:underline" target="_blank">Vincent Dusanek</a>, um Gegenstände zu inventarisieren.</p>
                         <p class="text-gray-300 transition-colors duration-200 font-normal mt-2 mr-2"><em><strong>LOAN | Das System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</strong></em> von <a href="https://github.com/dusanvin" class="hover:underline" target="_blank"><strong>Vincent Dusanek</strong></a>, 2024. MIT-Lizenz.</p>
                     </li>

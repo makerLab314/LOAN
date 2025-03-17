@@ -9,9 +9,9 @@
 <body class="bg-white">
     <!-- Logo Leiste -->
     <div class="bg-gray-600 p-4">
-        <div class="container mx-auto flex items-center justify-between">
-            <a href="{{ route('devices.overview') }}" target="_blank">
-                <img src="{{ asset('img/loan-logo.png') }}" alt="Logo" class="w-[200px] h-auto mt-4 mb-4" style="margin-left: -22px; width: 268px;">
+        <div class="lg:container mx-auto flex items-center justify-between">
+            <a href="{{ route('devices.overview') }}">
+                <img src="{{ asset('img/loan-logo.png') }}" alt="Logo" class="w-[200px] h-auto mt-6 mb-6" style="width: 210px;">
             </a>
             <div class="flex items-center">
                 @auth
@@ -41,7 +41,7 @@
         </div>
     </div>
     <nav class="bg-gray-600">
-        <div class="container mx-auto flex items-center">
+        <div class="lg:container mx-auto flex items-center">
             @auth
                 <a href="{{ route('devices.overview') }}" class="rounded-t p-4 text-sm mr-2 flex items-center hover:text-white {{ Route::currentRouteName() == 'devices.overview' ? 'text-gray-800 bg-white hover:text-gray-800' : 'text-gray-300 ' }}">
                     <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-2">
@@ -103,7 +103,7 @@
             @endauth
         </div>
     </nav>
-    <div class="container mx-auto mt-8 min-h-screen">
+    <div class="mx-auto mt-8 min-h-screen px-4 lg:px-0 lg:container">
         @yield('content')
     </div>
     @include('layouts.footer')
