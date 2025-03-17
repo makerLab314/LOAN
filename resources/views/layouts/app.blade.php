@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOAN | Zentrum für digitales Lehren und Lernen</title>
+    <title>LOAN | Das System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</title>
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
 <body class="bg-white">
@@ -11,7 +11,7 @@
     <div class="bg-gray-600 p-4">
         <div class="container mx-auto flex items-center justify-between">
             <a href="{{ route('devices.overview') }}" target="_blank">
-                <img src="{{ asset('img/logo.png') }}" alt="Logo" class="h-24 mr-4" style="margin-left: -22px;">
+                <img src="{{ asset('img/loan-logo.png') }}" alt="Logo" class="w-[200px] h-auto mt-4 mb-4" style="margin-left: -22px; width: 268px;">
             </a>
             <div class="flex items-center">
                 @auth
