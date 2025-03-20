@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOAN | Das System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</title>
+    <title>LOAN | Das System zur Geräteausleihe</title>
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
-<body class="bg-white">
+<body class="bg-white"
+    @if(Route::currentRouteName() === 'login' || request()->is('/'))
+        style="background-image: url('https://images.pexels.com/photos/1410119/pexels-photo-1410119.jpeg'); background-size: cover; background-position: center;"
+    @endif
+>
     <!-- Logo Leiste -->
     <div class="bg-gray-600 p-4">
         <div class="lg:container mx-auto flex items-center justify-between">
