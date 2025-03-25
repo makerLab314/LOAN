@@ -4,9 +4,9 @@
 <div class="container mx-auto mt-8 min-h-screen flex justify-center items-center">
     <div class="w-full max-w-md">
         <h2 class="text-2xl font-bold mb-6 text-center text-white">Login</h2>
-        <div class="mb-8 text-sm text-center px-2 text-white">
-            Willkommen bei<a href="{{ url('/product') }}" class="hover:underline text-yellow-600 pl-1 mb-1">LOAN | Das System zur Geräteausleihe</a> für wissenschaftliche und medienpädagogische Einrichtungen
-            <div class="flex items-center mt-6 p-4 text-sm text-gray-100 rounded-lg bg-gray-600 dark:bg-gray-800 dark:text-gray-300 text-center" role="alert">
+        <div class="mb-8 text-sm text-center px-2">
+            Willkommen bei<a href="{{ url('/product') }}" class="hover:underline text-yellow-700 pl-1 mb-1">LOAN | Das System zur Geräteausleihe</a> für wissenschaftliche und medienpädagogische Einrichtungen
+            <div class="flex items-center mt-6 p-4 text-sm text-gray-800 rounded-lg bg-gray-200 dark:bg-gray-800 dark:text-gray-300 text-center" role="alert">
                 <svg class="flex-shrink-0 w-4 h-4 me-3 mr-2 hidden md:inline" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                   <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
                 </svg>
@@ -19,11 +19,11 @@
         <form method="POST" action="{{ route('login') }}">
             @csrf
             <div class="mb-4 mx-2">
-                <label for="email" class="block  text-white text-sm font-bold mb-2">Email:</label>
+                <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
                 <input type="email" name="email" id="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
             </div>
             <div class="mb-6 mx-2">
-                <label for="password" class="block  text-white text-sm font-bold mb-2">Password:</label>
+                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password:</label>
                 <input type="password" name="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" required>
             </div>
             <div class="flex items-center justify-between mx-2">
@@ -32,7 +32,7 @@
                 </button>
             </div>
         </form>
-        <div class="text-xs text-right hover:underline text-yellow-600 pr-2"><a href="mailto:vincent.dusanek@gmail.com">Passwort vergessen?</a></div>
+        <div class="text-xs text-right hover:underline text-yellow-700 pr-2"><a href="mailto:vincent.dusanek@gmail.com">Passwort vergessen?</a></div>
     </div>
 </div>
 @endsection

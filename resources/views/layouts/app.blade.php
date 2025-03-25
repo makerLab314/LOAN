@@ -6,11 +6,7 @@
     <title>LOAN | Das System zur Geräteausleihe</title>
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 </head>
-<body class="bg-white"
-    @if(Route::currentRouteName() === 'login' || request()->is('/'))
-        style="background-image: url('https://images.pexels.com/photos/1410119/pexels-photo-1410119.jpeg'); background-size: cover; background-position: center;"
-    @endif
->
+<body class="bg-white">
     <!-- Logo Leiste -->
     <div class="bg-gray-600 p-4">
         <div class="lg:container mx-auto flex items-center justify-between">
