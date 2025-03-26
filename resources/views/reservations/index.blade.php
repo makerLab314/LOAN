@@ -17,11 +17,15 @@
     </nav>
 
     <h1 class="text-2xl font-bold mb-4">Gebuchte Räume</h1>
-    <p class="flex items-center text-sm">Eine Übersicht über alle gebuchten Räume. Hast du Fragen bezüglich einer Raumbuchung? <span class="font-semibold ml-1">Kontaktiere bitte die Person, die den Raum gebucht hat.</span></p>
+    <p class="flex items-center text-sm mb-2">
+        Eine Übersicht über alle gebuchten Räume. Hast du Fragen bezüglich einer Raumbuchung?<span class="font-semibold ml-1">Kontaktiere bitte die Person, die den Raum gebucht hat.</span>
+    </p>
     <!-- Link zu archivierten Buchungen -->
-    <p class="mt-1 mb-8 flex items-center text-sm">
+    <p class="mb-4 flex items-center text-sm">
         Ein Raum gilt als archiviert, wenn die Buchung in der Vergangenheit liegt.
-        <a href="{{ route('reservations.archived') }}" class="ml-1 hover:underline text-yellow-600 flex items-center">
+    </p>
+    <p class="mb-8 flex items-center text-sm">
+        <a href="{{ route('reservations.archived') }}" class="hover:underline text-yellow-600 flex items-center">
             Möchtest du zu den archivierten Raumbuchungen? Folge mir!
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" height="18" width="18" class="ml-1">
                 <path fill-rule="evenodd" d="M19.902 4.098a3.75 3.75 0 0 0-5.304 0l-4.5 4.5a3.75 3.75 0 0 0 1.035 6.037.75.75 0 0 1-.646 1.353 5.25 5.25 0 0 1-1.449-8.45l4.5-4.5a5.25 5.25 0 1 1 7.424 7.424l-1.757 1.757a.75.75 0 1 1-1.06-1.06l1.757-1.757a3.75 3.75 0 0 0 0-5.304Zm-7.389 4.267a.75.75 0 0 1 1-.353 5.25 5.25 0 0 1 1.449 8.45l-4.5 4.5a5.25 5.25 0 1 1-7.424-7.424l1.757-1.757a.75.75 0 1 1 1.06 1.06l-1.757 1.757a3.75 3.75 0 1 0 5.304 5.304l4.5-4.5a3.75 3.75 0 0 0-1.035-6.037.75.75 0 0 1-.354-1Z" clip-rule="evenodd" />
@@ -31,10 +35,38 @@
     </p>
 
     @if(session('status'))
-        <div class="bg-green-400 text-white p-4 font-semibold mb-4 rounded">
-            {{ session('status') }}
+        <div id="alert" role="alert" class="mb-8 rounded-md border border-gray-300 bg-white p-4 shadow-sm">
+            <div class="flex items-start gap-4">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 text-green-600">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                </svg>
+                <div class="flex-1">
+                    <strong class="font-medium text-gray-900"> Änderungen erfolgreich </strong>
+                    <p class="mt-0.5 text-sm text-gray-700">{{ session('status') }}</p>
+                </div>
+
+                <button
+                    onclick="document.getElementById('alert').style.display = 'none';"
+                    class="-m-3 rounded-full p-1.5 text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-700"
+                    type="button"
+                    aria-label="Dismiss alert"
+                >
+                    <span class="sr-only">Schließen</span>
+
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                    class="h-5"
+                >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
-    @endif
+    </div>
+@endif
 
     <!-- Tabs for rooms -->
     <div class="container mx-auto flex items-center">

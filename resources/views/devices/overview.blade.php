@@ -17,7 +17,13 @@
 </nav>
 
 <h1 class="text-2xl font-bold mb-4">Ausgeliehene Geräte</h1>
-<p class="block items-center text-sm mb-2">Eine Übersicht über alle ausgeliehenen Geräte.
+<p class="block items-center text-sm mb-2">
+    Eine Übersicht über alle ausgeliehenen Geräte.
+</p>
+<p class="mb-4 block items-center text-sm mb-2">
+    <strong>Hinweis: </strong>Überschreitet das heutige Datum das Enddatum eines verliehenen Geräts? Kontaktiere bitte die Person, an die das Gerät verliehen wurde.
+</p>
+<p class="block items-center text-sm mb-8">
     <a href="{{ route('devices.index') }}" class="hover:underline text-yellow-600 flex items-center">
         Du möchtest zur Geräteübersicht? Folge mir!
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" height="18" width="18" class="ml-1">
@@ -25,7 +31,6 @@
         </svg>
     </a>
 </p>
-<p class="mt-1 mb-8 block items-center text-sm mb-2">Überschreitet das heutige Datum das Enddatum eines verliehenen Geräts?<span class="font-semibold ml-1">Kontaktiere bitte die Person, an die das Gerät verliehen wurde.</span></p>
 
 <!-- Tabs for categories -->
 <div class="container mx-auto flex items-center">
@@ -140,8 +145,36 @@
 </div>
 
 @if(session('status'))
-    <div class="bg-green-400 text-white p-4 font-semibold mb-4 rounded">
-        {{ session('status') }}
+    <div id="alert" role="alert" class="mb-8 rounded-md border border-gray-300 bg-white p-4 shadow-sm">
+        <div class="flex items-start gap-4">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 text-green-600">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+            </svg>
+            <div class="flex-1">
+                <strong class="font-medium text-gray-900"> Änderungen erfolgreich </strong>
+                <p class="mt-0.5 text-sm text-gray-700">{{ session('status') }}</p>
+            </div>
+
+            <button
+                onclick="document.getElementById('alert').style.display = 'none';"
+                class="-m-3 rounded-full p-1.5 text-gray-500 transition-colors hover:bg-gray-50 hover:text-gray-700"
+                type="button"
+                aria-label="Dismiss alert"
+            >
+                <span class="sr-only">Schließen</span>
+
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    class="h-5"
+                >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
     </div>
 @endif
 <div class="container mx-auto flex items-center mb-8 p-4 pt-8 bg-gray-600 rounded-tr rounded-b">
