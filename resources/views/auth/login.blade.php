@@ -3,7 +3,7 @@
 @section('content')
 <div class="container mx-auto mt-8 min-h-screen flex justify-center items-center">
     <div class="w-full max-w-md">
-        <h2 class="text-2xl font-bold mb-6 text-center text-white">Login</h2>
+        <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
         <div class="mb-8 text-sm text-center px-2">
             Willkommen bei<a href="{{ url('/product') }}" class="hover:underline text-yellow-700 pl-1 mb-1">LOAN | Das System zur Geräteausleihe</a> für wissenschaftliche und medienpädagogische Einrichtungen
             <div class="flex items-center mt-6 p-4 text-sm text-gray-800 rounded-lg bg-gray-200 dark:bg-gray-800 dark:text-gray-300 text-center" role="alert">
