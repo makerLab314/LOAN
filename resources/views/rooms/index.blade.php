@@ -15,8 +15,12 @@
     <span class="text-gray-500">Räume</span>
 </nav>
 <h1 class="text-2xl font-bold mb-4">Räume</h1>
-<p class="flex items-center text-sm mb-2">
-    Eine Übersicht über alle Räume. Möchtest du einen <span class="font-semibold">Raum reservieren?</span> Klicke in der entsprechenden Spalte auf den Button <span class="ml-1 bg-blackshadow-md bg-gray-100 text-gray-800 font-bold py-2 px-4 rounded">Reservieren</span><p>
+<p class="block items-center text-sm mb-2">
+    Eine Übersicht über alle Räume. Möchtest du einen <span class="font-semibold">Raum reservieren?</span> Klicke in der entsprechenden Spalte auf den Button <span class="ml-1 bg-blackshadow-md bg-gray-100 text-gray-800 font-bold py-2 px-4 rounded">Reservieren</span>
+<p>
+<p class="mb-4 block items-center text-sm">
+    <strong>Hinweis: </strong>Beschreibe den Zweck des Raums genau.
+</p>
 <p class="mb-8 flex items-center text-sm">
     <a href="{{ route('rooms.create') }}" class="hover:underline text-yellow-600 flex items-center">
     Du möchtest dem System einen Raum hinzufügen? Folge mir!

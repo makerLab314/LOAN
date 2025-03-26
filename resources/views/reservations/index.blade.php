@@ -22,7 +22,7 @@
     </p>
     <!-- Link zu archivierten Buchungen -->
     <p class="mb-4 flex items-center text-sm">
-        Ein Raum gilt als archiviert, wenn die Buchung in der Vergangenheit liegt.
+        <span class="mr-1"><strong>Hinweis: </strong></span> Ein Raum gilt als archiviert, wenn die Buchung in der Vergangenheit liegt.
     </p>
     <p class="mb-8 flex items-center text-sm">
         <a href="{{ route('reservations.archived') }}" class="hover:underline text-yellow-600 flex items-center">
