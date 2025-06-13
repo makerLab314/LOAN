@@ -18,3 +18,30 @@ und wurde mit <a href="https://laravel.com" target="_blank">Laravel</a> sowie <a
 ### Main Interface
 
 <img src="https://digillab.uni-augsburg.de/wp-content/uploads/2024/07/lend_interace.png">
+
+## Run locally
+
+Using docker, one can run this app locally using php-fpm, redis and mariadb.
+
+### APP_KEY creation
+
+The laravel app needs an `APP_KEY` which can be created like that:
+
+`echo "APP_KEY=base64:$(openssl rand -base64 32)" >> .env`
+and should be added to the compose.yml
+
+### Setup service
+
+The service can be set up using
+
+`docker compose up -d`
+
+Then migrate the database as follows:
+
+`docker compose run loan php artisan migrate`
+
+### Registration
+
+Go to http://localhost:8080/register and create a new user.
+
+You can then log in and start using the app.
