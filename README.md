@@ -1,10 +1,10 @@
 ## Preview
 
-Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</em> von Vincent Dusanek. Das System läuft auf einer klassischen LNMP-Struktur: 
+Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</em> von Vincent Dusanek. Das System läuft auf einer LNPP-Struktur: 
 <ul>
     <li>Ubuntu 24.04</li>
     <li>Nginx</li>
-    <li>MariaDB</li>
+    <li>Postgres</li>
     <li>PHP 8.3</li>
 </ul>
 und wurde mit <a href="https://laravel.com" target="_blank">Laravel</a> sowie <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a> programmiert und ist unter einer MIT Lizenz (https://opensource.org/licenses/MIT) verfügbar. Um Zugang zu einem Testaccount unter <a href="http://loan.vdus.de" target="_blank">http://loan.vdus.de</a> zu erhalten, kontaktieren Sie mich bitte unter vincent.dusanek[at]gmail.com.
