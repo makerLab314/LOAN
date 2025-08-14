@@ -7,6 +7,10 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\RoomController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/logs', function () {
+    return view('layouts.logs');
+});
+
 Route::get('/', function () {
     if (Auth::check()) {
         return redirect()->route('devices.overview');

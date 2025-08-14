@@ -29,6 +29,9 @@
                     <li>
                         <a class="text-gray-300 hover:text-white transition-colors duration-200 font-normal" href="https://github.com/dusanvin/LOAN" target="_blank">GitHub</a>
                     </li>
+                    <li>
+                        <a class="text-gray-300 hover:text-white transition-colors duration-200 font-normal" href="{{ url('/logs') }}" target="_blank">Log</a>
+                    </li>
                 </ul>
             </li>
             <!-- Organisation -->
