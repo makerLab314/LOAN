@@ -62,11 +62,11 @@
 @endphp
 
 <!-- GRAUER BLOCK: Toolbar + Tabelle -->
-<div class="container mx-auto flex items-center mb-8 p-4 pt-8 bg-gray-600 rounded-tr rounded-b">
+<div class="container mx-auto flex items-center mb-8 p-4 pt-4 bg-gray-600 rounded-tr rounded-b">
     <div class="w-full">
 
         <!-- Toolbar: Standort + Status links, Suche rechts -->
-        <div class="mb-6 flex flex-wrap items-center gap-2">
+        <div class="mb-4 flex flex-wrap items-center gap-2">
             <!-- LINKS -->
             <div class="flex items-center gap-2">
                 <!-- Standort-Dropdown -->
@@ -76,7 +76,7 @@
                             class="inline-flex w-96 justify-between items-center rounded-md bg-gray-500 px-4 py-2 text-sm text-white shadow-sm hover:bg-gray-400 focus:outline-none"
                             aria-haspopup="true" aria-expanded="false"
                             onclick="toggleLocationMenu()">
-                        <span id="locationButtonLabel">Standort: Alle</span>
+                        <span id="locationButtonLabel">Standort</span>
                         <svg class="h-5 w-5 ml-3" xmlns="http://www.w3.org/2000/svg" fill="none"
                              viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -129,7 +129,7 @@
                 <div class="relative">
                     <input id="searchInput" type="text"
                            placeholder="Suchen: Name, Standort oder Beschreibung…"
-                           class="w-80 rounded-md bg-gray-800 placeholder-gray-500 text-gray-200 px-4 py-2 text-sm
+                           class="w-80 rounded-md bg-gray-700 placeholder-gray-400 text-gray-200 px-4 py-2 text-sm
                                   border border-gray-700 focus:outline-none focus:ring-0 focus:ring-transparent focus:border-gray-700"
                            autocomplete="off" />
                     <button type="button" id="clearSearch"
@@ -280,7 +280,7 @@ document.addEventListener('click', (e) => {
         e.preventDefault();
         const val = item.dataset.location || '';
         roomFilters.location = val;
-        document.getElementById('locationButtonLabel').textContent = `Standort: ${val || 'Alle'}`;
+        document.getElementById('locationButtonLabel').textContent = `${val || 'Alle'}`;
         closeLocationMenu();
         applyRoomFilters();
     }
@@ -344,7 +344,7 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeStatu
 
 // ---------- Init ----------
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('locationButtonLabel').textContent = 'Standort: Alle';
+    document.getElementById('locationButtonLabel').textContent = 'Standort';
     document.getElementById('statusButtonLabel').textContent = 'Status';
     applyRoomFilters();
 });

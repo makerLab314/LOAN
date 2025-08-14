@@ -87,7 +87,7 @@
 <div class="lg:container mx-auto flex items-center mb-8 p-4 pt-4 bg-gray-600 rounded-tr rounded-b">
     <div class="w-full">
         <!-- Toolbar: Dropdowns links, Suche rechts -->
-        <div class="mb-6 flex flex-wrap items-center gap-2">
+        <div class="mb-4 flex flex-wrap items-center gap-2">
         <!-- LINKS: Geräte + Status -->
         <div class="flex items-center gap-2">
             <!-- Geräte-Dropdown -->
@@ -122,7 +122,7 @@
             <div class="relative inline-block text-left">
             <button id="statusButton"
                     type="button"
-                    class="inline-flex w-40 ml-2 justify-between items-center rounded-md bg-gray-500 px-4 py-2 text-sm text-gray-100 shadow-sm hover:bg-gray-400 focus:outline-none"
+                    class="inline-flex w-40 justify-between items-center rounded-md bg-gray-500 px-4 py-2 text-sm text-gray-100 shadow-sm hover:bg-gray-400 focus:outline-none"
                     aria-haspopup="true"
                     aria-expanded="false"
                     onclick="toggleStatusMenu()">
@@ -150,7 +150,7 @@
                 id="searchInput"
                 type="text"
                 placeholder="Suchen: Name oder Beschreibung…"
-                class="w-80 rounded-md bg-gray-800 placeholder-gray-500 text-gray-200 px-4 py-2 text-sm
+                class="w-80 rounded-md bg-gray-700 placeholder-gray-400 text-gray-200 px-4 py-2 text-sm
                     border border-gray-700 focus:outline-none focus:ring-0 focus:ring-transparent focus:border-gray-700"
                 autocomplete="off"
             />
