@@ -95,33 +95,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Status-Dropdown -->
-                <div class="relative inline-block text-left">
-                    <button id="statusButton"
-                            type="button"
-                            class="inline-flex w-40 justify-between items-center rounded-md bg-gray-500 px-4 py-2 text-sm text-gray-100 shadow-sm hover:bg-gray-400 focus:outline-none"
-                            aria-haspopup="true" aria-expanded="false"
-                            onclick="toggleStatusMenu()">
-                        <span id="statusButtonLabel">Status</span>
-                        <svg class="h-5 w-5 ml-3" xmlns="http://www.w3.org/2000/svg" fill="none"
-                             viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M19 9l-7 7-7-7"/>
-                        </svg>
-                    </button>
-                    <div id="statusMenu"
-                         class="hidden absolute z-20 mt-2 w-40 origin-top-left rounded-md bg-gray-500 shadow-lg ring-1 ring-black ring-opacity-5">
-                        <div class="py-1" role="menu" aria-orientation="vertical">
-                            <a href="#" class="status-item block px-4 py-2 text-sm text-gray-100 hover:bg-gray-400"
-                               data-status="all">Alle</a>
-                            <a href="#" class="status-item block px-4 py-2 text-sm text-gray-100 hover:bg-gray-400"
-                               data-status="available">Verfügbar</a>
-                            <a href="#" class="status-item block px-4 py-2 text-sm text-gray-100 hover:bg-gray-400"
-                               data-status="reserved">Reserviert</a>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <!-- RECHTS: Suche -->
