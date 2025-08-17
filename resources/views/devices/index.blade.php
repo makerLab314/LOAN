@@ -183,7 +183,7 @@
                         <th class="border-b-2 px-4 py-2 border-gray-500 w-1/4 font-medium text-sm">Leihnehmende</th>
                         @break
                     @else
-                        <td class="border-b-2 px-4 py-2 border-gray-500 text-xs w-1/4 text-white"></td>
+                        <td class="border-b-2 px-4 py-2 border-gray-500 text-xs w-1/4 text-white">Leihnehmende</td>
                         @break
                     @endif
                     @endforeach
