@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Device;
 use App\Models\DeviceHistory;
+use App\Models\DeviceReservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
@@ -72,8 +73,22 @@ class DeviceController extends Controller
 
     public function overview()
     {
-        $devices = Device::where('status', 'loaned')->get();
-        return view('devices.overview', compact('devices'));
+        // bereits vorhandene Logik für geliehene Geräte:
+        $devices = Device::query()
+            ->where('status', 'loaned')
+            ->orderBy('group')
+            ->orderBy('title')
+            ->get();
+
+        // NEU: Vormerkungen laden (alles, was nicht cancelled ist, optional nur zukünftig)
+        $reservations = DeviceReservation::query()
+            ->with(['device:id,title,group,image,description', 'user:id,name'])
+            ->where('status', '!=', 'cancelled')
+            // ->where('end_at', '>=', now()) // falls du ausschließlich künftige Vormerkungen sehen willst, entkommentieren
+            ->orderBy('start_at')
+            ->get();
+
+        return view('devices.overview', compact('devices', 'reservations'));
     }
 
     public function create()

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\DeviceReservationController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\RoomController;
@@ -29,6 +30,9 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/devices/overview', [DeviceController::class, 'overview'])->name('devices.overview');
+    Route::get('/devices/{device}/reserve',  [DeviceReservationController::class, 'create'])->name('devices.reservations.create');
+    Route::post('/devices/{device}/reserve', [DeviceReservationController::class, 'store'])->name('devices.reservations.store');
+
 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');

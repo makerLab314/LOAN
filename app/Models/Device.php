@@ -20,4 +20,9 @@ class Device extends Model
         'loan_end_date',
         // weitere Felder
     ];
+    public function reservations()
+    {
+        return $this->hasMany(\App\Models\DeviceReservation::class);
+    }
+
 }

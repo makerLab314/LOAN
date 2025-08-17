@@ -4,7 +4,7 @@
 
 @section('content')
 
-<!-- Breadcrumbs -->
+
 <nav id="breadcrumb-nav" class="flex text-sm mb-8" aria-label="Breadcrumb">
     <a href="{{ url('/') }}" class="text-yellow-600 hover:underline flex items-center">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 mr-1">
@@ -232,6 +232,116 @@
         </tbody>
     </table>
 </div>
+{{-- ===================== NEU: Vorgemerkte Geräte ===================== --}}
+<h2 class="text-2xl font-bold mt-12 mb-4">Vorgemerkte Geräte</h2>
+<p class="block items-center text-sm mb-4">
+    Hier siehst du alle geplanten Vormerkungen (Start/Ende & Person).
+</p>
+
+@php
+    // Gruppen aus den reservierten Geräten ableiten
+    $reservedGroups = collect($reservations)->map(fn($r) => optional($r->device)->group)->filter()->unique()->values();
+@endphp
+
+<div class="container mx-auto flex items-center">
+    @if ($reservations->isNotEmpty())
+        <button id="tab-resv-" onclick="filterReservations('', 'Alle')" class="tab-resv-button rounded-t p-4 text-sm mr-2 flex items-center bg-gray-600 text-white">
+            {{-- Icon kann gleich bleiben --}}
+            <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="mr-3">
+                <path fill-rule="evenodd" d="M1.5 9.832v1.793c0 1.036.84 1.875 1.875 1.875h17.25c1.035 0 1.875-.84 1.875-1.875V9.832a3 3 0 0 0-.722-1.952l-3.285-3.832A3 3 0 0 0 16.215 3h-8.43a3 3 0 0 0-2.278 1.048L2.222 7.88A3 3 0 0 0 1.5 9.832ZM7.785 4.5a1.5 1.5 0 0 0-1.139.524L3.881 8.25h3.165a3 3 0 0 1 2.496 1.336l.164.246a1.5 1.5 0 0 0 1.248.668h2.092a1.5 1.5 0 0 0 1.248-.668l.164-.246a3 3 0 0 1 2.496-1.336h3.165l-2.765-3.226a1.5 1.5 0 0 0-1.139-.524h-8.43Z" clip-rule="evenodd"></path>
+                <path d="M2.813 15c-.725 0-1.313.588-1.313 1.313V18a3 3 0 0 0 3 3h15a3 3 0 0 0 3-3v-1.688c0-.724-.588-1.312-1.313-1.312h-4.233a3 3 0 0 0-2.496 1.336l-.164.246a1.5 1.5 0 0 1-1.248.668h-2.092a1.5 1.5 0 0 1-1.248-.668l-.164-.246A3 3 0 0 0 7.046 15H2.812Z"></path>
+            </svg>
+            Alle
+        </button>
+    @endif
+
+    @foreach ($reservedGroups as $grp)
+        @php
+            // Anzeige-Label wie oben bei ausgeliehenen (VRAR->VR/AR etc.)
+            $label = match($grp) {
+                'VRAR' => 'VR/AR', 'Videokonferenzsystem' => 'Videokonferenzsysteme',
+                'Microcontroller' => 'Microcontroller', default => $grp
+            };
+        @endphp
+        <button id="tab-resv-{{ $grp }}" onclick="filterReservations('{{ $grp }}', '{{ $label }}')" class="tab-resv-button rounded-t p-4 text-sm mr-2 flex items-center hover:text-black text-gray-700 bg-gray-200">
+            {{-- Optional eigenes Icon je Gruppe --}}
+            <span class="mr-2">•</span>{{ $label }}
+        </button>
+    @endforeach
+</div>
+
+<div class="container mx-auto flex items-center mb-8 p-4 pt-8 bg-gray-600 rounded-tr rounded-b">
+    <div id="customMessageResv" style="display: none;" class="text-white text-sm ml-4 my-4">
+        <h3 class="text-lg font-bold mb-2">Hinweis</h3>
+        Wende dich an die Administration, wenn eine weitere Kategorie hinzugefügt werden soll.
+    </div>
+
+    <table id="reservationTable" class="w-full bg-gray-700 text-white rounded-lg table-fixed text-left">
+        <thead>
+            <tr>
+                <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm">Bild</th>
+                <th class="border-b-2 px-4 py-2 border-gray-500 w-1/4 font-medium text-sm">Gerät & Label</th>
+                <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm">Zeitraum</th>
+                <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm">Kategorie</th>
+                <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm">Status</th>
+                <th class="border-b-2 px-4 py-2 border-gray-500 w-1/4 font-medium text-sm">Vorgemerkt durch</th>
+            </tr>
+        </thead>
+        <tbody id="reservationTableBody">
+            @forelse($reservations as $res)
+                @php
+                    $dev = $res->device;
+                @endphp
+                @if ($dev)
+                    <tr class="reservation-row text-gray-300" data-group="{{ $dev->group }}">
+                        <td class="border-b px-4 py-2 border-gray-600">
+                            <img src="{{ $dev->image ? Storage::url($dev->image) : asset('img/filler.png') }}" alt="{{ $dev->title }}" class="w-16 h-16 object-cover cursor-pointer rounded border-2 hover:border-gray-400" onclick="openImageModal('{{ $dev->image ? Storage::url($dev->image) : asset('img/filler.png') }}')">
+                        </td>
+                        <td class="border-b px-4 py-2 border-gray-600 text-sm break-words">
+                            <a href="{{ route('devices.show', $dev->id) }}" class="text-gray-300 hover:underline hover:text-white">{{ $dev->title }}</a>
+                            @if(!empty($dev->description))
+                                <div class="text-xs text-gray-400 mt-1">{{ Str::limit($dev->description, 120) }}</div>
+                            @endif
+                        </td>
+                        <td class="border-b px-4 py-2 border-gray-600 text-sm break-words">
+                            {{ $res->start_at->timezone(config('app.timezone'))->format('d.m.Y H:i') }}
+                            –
+                            {{ $res->end_at->timezone(config('app.timezone'))->format('d.m.Y H:i') }}
+                        </td>
+                        <td class="border-b px-4 py-2 border-gray-600 text-sm break-words">
+                            @switch($dev->group)
+                                @case('VRAR') VR-/AR-Brille @break
+                                @case('Videokonferenzsystem') Videokonf. @break
+                                @case('Microcontroller') Microcontr. @break
+                                @default {{ $dev->group }}
+                            @endswitch
+                        </td>
+                        <td class="border-b px-4 py-2 border-gray-600 text-xs">
+                            <span class="text-white
+                                {{ $res->status === 'approved' ? 'bg-green-600' : ($res->status === 'pending' ? 'bg-yellow-600' : 'bg-gray-500') }}
+                                rounded p-2 inline-flex">
+                                {{ ucfirst($res->status) }}
+                            </span>
+                        </td>
+                        <td class="border-b px-4 py-2 border-gray-600 text-xs text-white">
+                            {{ $res->user?->name ?? 'Unbekannt' }}
+                            @if(!empty($res->purpose))
+                                <div class="text-xs text-gray-300 mt-1">„{{ Str::limit($res->purpose, 100) }}“</div>
+                            @endif
+                        </td>
+                    </tr>
+                @endif
+            @empty
+                <tr>
+                    <td colspan="6" class="px-4 py-6 text-center text-gray-300">Keine Vormerkungen vorhanden.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
+{{-- ===================== /NEU ===================== --}}
+
+
 
 <!-- Modal -->
 <div id="imageModal" class="fixed inset-0 bg-gray-900 bg-opacity-75 hidden flex justify-center items-center z-10" onclick="closeImageModal()">
@@ -303,5 +413,57 @@
         filterDevices('', 'Alle');
     });
 </script>
+
+<script>
+    function filterReservations(group, groupName) {
+        const rows = document.querySelectorAll('.reservation-row');
+        const tabs = document.querySelectorAll('.tab-resv-button');
+        const table = document.getElementById('reservationTable');
+        const message = document.getElementById('customMessageResv');
+
+        if (group === 'Neu') { // falls du später „Neu“ hinzufügen willst
+            table.style.display = 'none';
+            message.style.display = 'block';
+        } else {
+            table.style.display = '';
+            message.style.display = 'none';
+
+            rows.forEach(row => {
+                if (group === '' || row.dataset.group === group) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        tabs.forEach(tab => {
+            tab.classList.remove('bg-gray-600', 'text-white');
+            tab.classList.add('text-gray-700', 'hover:text-black');
+        });
+
+        const activeTab = document.getElementById(`tab-resv-${group}`) || document.getElementById('tab-resv-');
+        if (activeTab) {
+            activeTab.classList.add('bg-gray-600', 'text-white');
+            activeTab.classList.remove('text-gray-700', 'hover:text-black');
+        }
+
+        // Breadcrumb dezent ergänzen (optional)
+        const breadcrumb = document.getElementById('breadcrumb-current');
+        if (breadcrumb) {
+            // Wir hängen „/ Vorgemerkte Geräte“ nur an, ohne die Leih-Ansicht zu überschreiben
+            // (Oder du ersetzt den Text – Geschmackssache)
+            breadcrumb.textContent = `Ausgeliehene Geräte / Vorgemerkte Geräte / ${groupName}`;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Deine bestehende Initialisierung:
+        filterDevices('', 'Alle');
+        // Und neu:
+        filterReservations('', 'Alle');
+    });
+</script>
+
 
 @endsection

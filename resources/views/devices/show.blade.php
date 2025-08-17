@@ -79,7 +79,7 @@
                     <span class="text-gray-400">{{ \Carbon\Carbon::parse($history->created_at)->format('d.m.Y H:i') }}: </span>
                     <span class="text-green-400">
                         {{ $history->action === 'loaned' ? 'Geliehen von' : 'Entgegengenommen und eingetragen durch' }}
-                    </span> 
+                    </span>
                     <span class="text-yellow-400">{{ $history->user_name }}</span>
                     (verliehen von <span class="text-blue-400">{{ $history->action_by }}</span>)
                 </p>
@@ -99,7 +99,6 @@
             <img id="modalImage" src="" alt="Image" class="max-w-screen-md max-h-screen-md rounded-lg">
         </div>
     </div>
-
 </div>
 
 <style>

@@ -220,6 +220,10 @@
                         @endif
                         <td class="border-b px-4 py-2 border-gray-600 text-sm text-right">
                             <div class="flex justify-end items-center space-x-0">
+                                <a href="{{ route('devices.reservations.create', $device) }}"
+                                    class="inline-flex items-center px-3 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-sm font-medium">
+                                    Vormerken
+                                </a>
                                 @if ($device->status == 'available')
                                     <button onclick="openLoanModal({{ $device->id }})" class="shadow-md bg-gray-100 hover:bg-white text-gray-800 font-bold py-2 px-4 rounded">
                                         <span class="hidden xl:inline">Verleihen</span>
