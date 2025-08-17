@@ -32,6 +32,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/devices/overview', [DeviceController::class, 'overview'])->name('devices.overview');
     Route::get('/devices/{device}/reserve',  [DeviceReservationController::class, 'create'])->name('devices.reservations.create');
     Route::post('/devices/{device}/reserve', [DeviceReservationController::class, 'store'])->name('devices.reservations.store');
+    Route::delete('/devices/reservations/{reservation}', [DeviceReservationController::class, 'destroy'])
+    ->name('devices.reservations.destroy')
+    ->middleware('auth');
 
 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');

@@ -82,5 +82,21 @@ class DeviceReservationController extends Controller
             ->route('devices.show', $device) // passe an, falls deine Show‑Route anders heißt
             ->with('success', 'Gerät wurde erfolgreich vorgemerkt.');
     }
+    public function destroy(DeviceReservation $reservation)
+    {
+        // Nur der Ersteller darf seine Vormerkung widerrufen
+        if ($reservation->user_id !== auth()->id()) {
+            abort(403, 'Unbefugt');
+        }
+
+        // Entweder löschen...
+        // $reservation->delete();
+
+        // ...oder Status auf "cancelled" setzen (empfohlen, falls du Historie behalten willst):
+        $reservation->update(['status' => 'cancelled']);
+
+        return back()->with('status', 'Die Vormerkung wurde widerrufen.');
+    }
+
 }
 
