@@ -41,9 +41,7 @@
 @endif
 
 <h1 class="text-2xl font-bold mb-4">Gebuchte Geräte</h1>
-<p class="block items-center text-sm mb-2">
-    Eine Übersicht aller aktuell <strong>verliehenen</strong> und <strong>vorgemerkten</strong> Geräte.
-</p>
+<p class="block items-center text-sm mb-2">Eine Übersicht aller aktuell <strong>verliehenen</strong> und <strong>vorgemerkten</strong> Geräte. Störniere ein Vormerkung, bevor du ein Gerät verleihst. Klicke in der entsprechenden Spalte auf den Button <span class="mx-1 shadow-md bg-gray-800 text-white font-bold py-2 px-4 rounded hidden xl:inline text-xs">Zurückgeben</span><span class="xl:hidden">Z (für Zurückgeben).</span>, um es erneut zu verleihen.</p>
 <p class="mb-4 block items-center text-sm">
     <strong>Hinweis:</strong> Wenn das heutige Datum das Enddatum eines verliehenen Geräts überschreitet, kontaktiere bitte die Leihnehmenden.
 </p>
@@ -262,7 +260,7 @@
                                     <form action="{{ route('devices.reservations.destroy', $res) }}" method="POST" onsubmit="return confirm('Willst du die Vormerkung wirklich widerrufen?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="shadow-md bg-gray-200 hover:bg-white text-gray-800 font-bold py-2 px-4 rounded text-xs" title="Vormerkung widerrufen">
+                                        <button type="submit" class="inline-flex items-center mr-2 px-3 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium" title="Vormerkung widerrufen">
                                             Stornieren
                                         </button>
                                     </form>
