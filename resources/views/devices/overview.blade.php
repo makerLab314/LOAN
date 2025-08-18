@@ -119,7 +119,7 @@
                         class="hidden absolute z-20 mt-2 w-44 origin-top-left rounded-md bg-gray-500 shadow-lg ring-1 ring-black ring-opacity-5">
                         <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="typeButton">
                             <a href="#" class="type-item block px-4 py-2 text-sm text-gray-100 hover:bg-gray-400" data-type="all">Alle</a>
-                            <a href="#" class="type-item block px-4 py-2 text-sm text-gray-100 hover:bg-gray-400" data-type="loaned">Ausgeliehen</a>
+                            <a href="#" class="type-item block px-4 py-2 text-sm text-gray-100 hover:bg-gray-400" data-type="loaned">Verliehen</a>
                             <a href="#" class="type-item block px-4 py-2 text-sm text-gray-100 hover:bg-gray-400" data-type="reserved">Vorgemerkt</a>
                         </div>
                     </div>
