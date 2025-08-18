@@ -45,7 +45,7 @@
                     </div>
 
                     <div class="mb-4">
-                        <label for="description" class="block text-gray-300 text-sm font-semibold mb-2">Beschreibung (z.B. Aufbewahrungsort):</label>
+                        <label for="description" class="block text-gray-300 text-sm font-semibold mb-2">Beschreibung & Details:</label>
                         <textarea rows="2" name="description" id="description" class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight" disabled>{{ $device->description }}</textarea>
                     </div>
 

@@ -42,7 +42,7 @@
         </div>
 
         <div class="mb-4">
-            <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Beschreibung (Aufbewahrungsort wie Schranknummer/Fach, z.B. <em>1/F</em>):</label>
+            <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Beschreibung und Details (Aufbewahrungsort wie Schranknummer/Fach, z.B. <em>1/F</em> & Besonderheiten):</label>
             <textarea rows="4" name="description" id="description" class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight">{{ old('description', $device->description) }}</textarea>
         </div>
 
