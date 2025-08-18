@@ -41,9 +41,9 @@
 @endif
 
 <h1 class="text-2xl font-bold mb-4">Gebuchte Geräte</h1>
-<p class="block items-center text-sm mb-2">Eine Übersicht aller aktuell <strong>verliehenen</strong> und <strong>vorgemerkten</strong> Geräte. Störniere ein Vormerkung, bevor du ein Gerät verleihst. Klicke in der entsprechenden Spalte auf den Button <span class="mx-1 shadow-md bg-gray-800 text-white font-bold py-2 px-4 rounded hidden xl:inline text-xs">Zurückgeben</span><span class="xl:hidden">Z (für Zurückgeben).</span>, um es erneut zu verleihen.</p>
+<p class="block items-center text-sm mb-2">Eine Übersicht aller aktuell <strong>verliehenen</strong> und <strong>vorgemerkten</strong> Geräte. Störniere ein Vormerkung, bevor du ein Gerät verleihst. Sollte ein Gerät in einwandfreiem Zustand zurück gebracht werden, musst du es annehmen, um es erneut zu verleihen.</p> 
 <p class="mb-4 block items-center text-sm">
-    <strong>Hinweis:</strong> Wenn das heutige Datum das Enddatum eines verliehenen Geräts überschreitet, kontaktiere bitte die Leihnehmenden.
+    <strong>Hinweis:</strong> Wenn das heutige Datum das Enddatum eines verliehenen Geräts überschreitet, kontaktiere bitte die Person, an die das Gerät verliehen wurde.
 </p>
 <p class="block items-center text-sm mb-8">
     <a href="{{ route('devices.index') }}" class="hover:underline text-yellow-600 flex items-center">
@@ -76,7 +76,7 @@
 @endphp
 
 <!-- Filter & Tabelle (eine Tabelle für beide Typen) -->
-<div class="lg:container mx-auto flex items-center mb-8 p-4 pt-4 bg-gray-600 rounded-tr rounded-b">
+<div class="lg:container mx-auto flex items-center mb-8 p-4 pt-4 bg-gray-600 rounded">
     <div class="w-full">
         <!-- Toolbar: Dropdowns links, Suche rechts -->
         <div class="mb-4 flex flex-wrap items-center gap-2">
@@ -199,11 +199,11 @@
                             </td>
                             <td class="border-b px-4 py-2 border-gray-600 text-sm text-right">
                                 <form action="{{ route('devices.return') }}" method="POST" class="inline-block"
-                                    onsubmit="return confirm('Wurde {{ $device->title }} vollständig und korrekt zurückgegeben?');">
+                                    onsubmit="return confirm('Wurde {{ $device->title }} vollständig und korrekt angenommen?');">
                                     @csrf
                                     <input type="hidden" name="device_id" value="{{ $device->id }}">
-                                    <button type="submit" class="shadow-md bg-gray-800 hover:bg-black text-white font-bold py-2 px-4 rounded text-xs" title="Gerät zurücknehmen">
-                                        Zurückgeben
+                                    <button type="submit" class="mx-1 bg-gray-200 hover:bg-white text-black font-bold py-2 px-4 rounded text-xs" title="Gerät annehmne">
+                                        Annehmen 
                                     </button>
                                 </form>
                             </td>
@@ -260,7 +260,7 @@
                                     <form action="{{ route('devices.reservations.destroy', $res) }}" method="POST" onsubmit="return confirm('Willst du die Vormerkung wirklich widerrufen?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center mr-2 px-3 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium" title="Vormerkung widerrufen">
+                                        <button type="submit" class="inline-flex items-center mr-2 px-4 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium" title="Vormerkung widerrufen">
                                             Stornieren
                                         </button>
                                     </form>

@@ -62,7 +62,7 @@
 @endphp
 
 <!-- GRAUER BLOCK: Toolbar + Tabelle -->
-<div class="container mx-auto flex items-center mb-8 p-4 pt-4 bg-gray-600 rounded-tr rounded-b">
+<div class="container mx-auto flex items-center mb-8 p-4 pt-4 bg-gray-600 rounded">
     <div class="w-full">
 
         <!-- Toolbar: Standort + Status links, Suche rechts -->

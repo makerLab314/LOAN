@@ -18,7 +18,7 @@
 </nav>
 
 <h1 class="text-2xl font-bold mb-4">Geräte</h1>
-<p class="block items-center text-sm mb-2">Eine Übersicht über alle Geräte. Möchtest du ein <span class="font-semibold">Gerät verleihen oder zurückgeben?</span> Klicke in der entsprechenden Spalte auf den Button <span class="mx-1 bg-blackshadow-md bg-gray-100 text-gray-800 font-bold py-2 px-4 rounded hidden xl:inline">Verleihen</span><span class="xl:hidden">V (für Verleihen)</span> oder <span class="mx-1 shadow-md bg-gray-900 hover:bg-black text-white font-bold py-2 px-4 rounded hidden xl:inline">Zurückgeben</span><span class="xl:hidden">Z (für Zurückgeben).</span>
+<p class="block items-center text-sm mb-2">Eine Übersicht über alle Geräte. Möchtest du ein <span class="font-semibold">Gerät verleihen oder vormerken?</span> Klicke in der entsprechenden Spalte auf den Button <span class="mx-1 bg-gray-300 text-gray-900 font-bold py-2 px-4 rounded text-xs">Verleihen</span><span class="xl:hidden">V (für Verleihen)</span> oder <span class="inline-flex items-center px-4 py-2 rounded bg-gray-600 text-white text-xs font-medium mx-1">Vormerken</span><span class="xl:hidden">V (für Vormerken).</span>
 <p class="mb-4 text-sm">
     <strong>Hinweis: </strong>Bitte vermerke Gerätezubehör ebenfalls in der Kategorie des entsprechenden Geräts (z.B. Kamerazubehör unter Kameras).
 </p>
@@ -84,7 +84,7 @@
 @endphp
 
 <!-- GRAUER BLOCK mit Dropdown + Tabelle -->
-<div class="lg:container mx-auto flex items-center mb-8 p-4 pt-4 bg-gray-600 rounded-tr rounded-b">
+<div class="lg:container mx-auto flex items-center mb-8 p-4 pt-4 bg-gray-600 rounded">
     <div class="w-full">
         <!-- Toolbar: Dropdowns links, Suche rechts -->
         <div class="mb-4 flex flex-wrap items-center gap-2">
@@ -164,12 +164,6 @@
             </div>
         </div>
         </div>
-
-
-
-
-
-
         <table class="w-full bg-gray-700 text-white rounded-lg table-fixed text-left">
             <thead>
                 <tr>
@@ -180,10 +174,10 @@
                     <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm">Status</th>
                     @foreach($devices as $device)
                     @if ($device->borrower_name)
-                        <th class="border-b-2 px-4 py-2 border-gray-500 w-1/4 font-medium text-sm">Leihnehmende</th>
+                        <th class="border-b-2 px-4 py-2 border-gray-500 w-1/4 font-medium text-sm">Person / Zeitraum</th>
                         @break
                     @else
-                        <td class="border-b-2 px-4 py-2 border-gray-500 w-1/4 font-medium text-sm">Leihnehmende</td>
+                        <td class="border-b-2 px-4 py-2 border-gray-500 w-1/4 font-medium text-sm">Person / Zeitraum</td>
                         @break
                     @endif
                     @endforeach
@@ -221,7 +215,7 @@
                         <td class="border-b px-4 py-2 border-gray-600 text-sm text-left">
                             <div class="flex justify-end items-center">
                                 @if ($device->status == 'available')
-                                    <button onclick="openLoanModal({{ $device->id }})" class="mr-2 shadow-md bg-gray-200 hover:bg-white text-gray-800 font-bold py-2 px-4 rounded text-xs">
+                                    <button onclick="openLoanModal({{ $device->id }})" class="mr-2 bg-gray-300 hover:bg-white hover:text-black text-gray-900 font-bold py-2 px-4 rounded text-xs">
                                         <span class="hidden xl:inline">Verleihen</span>
                                         <span class="xl:hidden">V</span>
                                     </button>
@@ -237,7 +231,7 @@
                                     </form>
                                 @endif
                                 <a href="{{ route('devices.reservations.create', $device) }}"
-                                    class="inline-flex items-center px-3 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium">
+                                    class="inline-flex items-center px-4 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium">
                                     Vormerken
                                 </a>
                                 <a href="{{ route('devices.edit', $device) }}" class="py-2 pl-2 lg:pl-6 pr-2 rounded text-gray-300 hover:text-white">
