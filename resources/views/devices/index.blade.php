@@ -18,7 +18,7 @@
 </nav>
 
 <h1 class="text-2xl font-bold mb-4">Geräte</h1>
-<p class="block items-center text-sm mb-2">Eine Übersicht über alle Geräte. Möchtest du ein <span class="font-semibold">Gerät verleihen oder vormerken?</span> Klicke in der entsprechenden Spalte auf den Button <span class="mx-1 bg-gray-300 text-gray-900 font-bold py-2 px-4 rounded text-xs">Verleihen</span><span class="xl:hidden">V (für Verleihen)</span> oder <span class="inline-flex items-center px-4 py-2 rounded bg-gray-600 text-white text-xs font-medium mx-1">Vormerken</span><span class="xl:hidden">V (für Vormerken).</span>
+<p class="block items-center text-sm mb-2">Eine Übersicht über alle Geräte. Möchtest du ein <span class="font-semibold">Gerät verleihen oder vormerken?</span> Klicke in der entsprechenden Spalte auf den Button <span class="mx-1 bg-gray-200 text-gray-900 font-bold py-2 px-4 rounded text-xs">Verleihen</span><span class="xl:hidden">V (für Verleihen)</span> oder <span class="inline-flex items-center px-4 py-2 rounded bg-gray-600 text-white text-xs font-medium mx-1">Vormerken</span><span class="xl:hidden">V (für Vormerken).</span>
 <p class="mb-4 text-sm">
     <strong>Hinweis: </strong>Bitte vermerke Gerätezubehör ebenfalls in der Kategorie des entsprechenden Geräts (z.B. Kamerazubehör unter Kameras).
 </p>

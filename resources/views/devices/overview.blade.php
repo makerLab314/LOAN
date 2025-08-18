@@ -191,7 +191,7 @@
                             <td class="border-b px-4 py-2 border-gray-600 text-xs">
                                 <span class="text-white bg-yellow-600 rounded-full py-1 px-2 inline-flex">Verliehen</span>
                             </td>
-                            <td class="border-b px-4 py-2 border-gray-600 text-xs text-white">
+                            <td class="border-b px-4 py-2 border-gray-600 text-xs text-gray-300">
                                 {{ $device->borrower_name }}
                                 @if(!empty($device->loan_end_date))
                                     bis {{ \Carbon\Carbon::parse($device->loan_end_date)->format('d.m.Y') }}
@@ -202,7 +202,7 @@
                                     onsubmit="return confirm('Wurde {{ $device->title }} vollständig und korrekt angenommen?');">
                                     @csrf
                                     <input type="hidden" name="device_id" value="{{ $device->id }}">
-                                    <button type="submit" class="mx-1 bg-gray-200 hover:bg-white text-black font-bold py-2 px-4 rounded text-xs" title="Gerät annehmne">
+                                    <button type="submit" class="mx-1 bg-gray-200 hover:bg-white text-black font-bold py-2 px-4 rounded text-xs" title="Gerät annehmnen">
                                         Annehmen 
                                     </button>
                                 </form>
@@ -248,12 +248,12 @@
                                 @endif
                             </td>
                             <td class="border-b px-4 py-2 border-gray-600 text-xs text-white">
-                                {{ $res->user?->name ?? 'Unbekannt' }}
-                                <div class="text-xs text-gray-300 mt-1">
-                                    {{ $res->start_at->timezone(config('app.timezone'))->format('d.m.Y H:i') }}
-                                    –
-                                    {{ $res->end_at->timezone(config('app.timezone'))->format('d.m.Y H:i') }}
+                                <div class="text-xs text-gray-300 mb-1">
+                                    {{ $res->start_at->timezone(config('app.timezone'))->format('d.m.Y, H:i') }} Uhr
+                                     bis
+                                    {{ $res->end_at->timezone(config('app.timezone'))->format('d.m.Y, H:i') }} Uhr
                                 </div>
+                                {{ $res->purpose ?? 'Keine Beschreibung vorhanden' }}
                             </td>
                             <td class="border-b px-4 py-2 border-gray-600 text-sm text-right">
                                 @if($res->status === 'pending' && $res->user_id === auth()->id())

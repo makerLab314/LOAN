@@ -49,7 +49,7 @@
         </div>
 
         <div class="mb-4">
-            <label for="purpose" class="block text-gray-700 text-sm font-bold mb-2">Zweck (max. 255 Zeichen):</label>
+            <label for="purpose" class="block text-gray-700 text-sm font-bold mb-2">Person / Kontext (max. 255 Zeichen):</label>
             <textarea name="purpose" id="purpose" rows="3" maxlength="255"
                       class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
                       placeholder="In welchem Kontext wird das Gerät verliehen?">{{ old('purpose') }}</textarea>

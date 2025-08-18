@@ -129,7 +129,7 @@
                                 <form action="{{ route('reservations.cancel', $reservation) }}" method="POST" onsubmit="return confirm('Möchten Sie diese Reservierung wirklich stornieren?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="shadow-md bg-gray-900 hover:bg-black text-white font-bold py-2 px-4 rounded text-sm">
+                                    <button type="submit" class="inline-flex items-center mr-2 px-4 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium">
                                         Stornieren
                                     </button>
                                 </form>

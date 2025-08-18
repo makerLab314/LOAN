@@ -140,7 +140,7 @@
                     <td class="border-b px-4 py-2 border-gray-600 break-words text-gray-300 text-sm">{{ $room->description }}</td>
                     <td class="border-b px-4 py-2 border-gray-600 text-sm text-right">
                         <div class="flex justify-end items-center space-x-2">
-                            <a href="{{ route('rooms.reserve', $room) }}" class="shadow-md bg-gray-100 hover:bg-white text-gray-800 font-bold py-2 px-4 rounded">
+                            <a href="{{ route('rooms.reserve', $room) }}" class="bg-gray-300 hover:bg-white hover:text-black text-gray-900 font-bold py-2 px-4 rounded text-xs">
                                 Reservieren
                             </a>
                             <a href="{{ route('rooms.edit', $room) }}" class="py-2 pl-6 pr-2 rounded text-white">
