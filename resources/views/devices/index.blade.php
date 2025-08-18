@@ -183,7 +183,7 @@
                         <th class="border-b-2 px-4 py-2 border-gray-500 w-1/4 font-medium text-sm">Leihnehmende</th>
                         @break
                     @else
-                        <td class="border-b-2 px-4 py-2 border-gray-500 text-xs w-1/4 text-white">Leihnehmende</td>
+                        <td class="border-b-2 px-4 py-2 border-gray-500 w-1/4 font-medium text-sm">Leihnehmende</td>
                         @break
                     @endif
                     @endforeach
@@ -209,7 +209,7 @@
                             @endswitch
                         </td>
                         <td class="border-b px-4 py-2 border-gray-600 text-xs">
-                            <span class="text-white {{ $device->status == 'available' ? 'bg-green-600' : 'bg-yellow-600' }} rounded p-2 inline-flex">
+                            <span class="text-white {{ $device->status == 'available' ? 'bg-green-600' : 'bg-yellow-600' }} rounded-full py-1 px-2 inline-flex">
                                 {{ $device->status == 'available' ? 'Verfügbar' : 'Verliehen' }}
                             </span>
                         </td>

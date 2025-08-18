@@ -189,7 +189,7 @@
                                 @endswitch
                             </td>
                             <td class="border-b px-4 py-2 border-gray-600 text-xs">
-                                <span class="text-white bg-yellow-600 rounded p-2 inline-flex">Verliehen</span>
+                                <span class="text-white bg-yellow-600 rounded-full py-1 px-2 inline-flex">Verliehen</span>
                             </td>
                             <td class="border-b px-4 py-2 border-gray-600 text-xs text-white">
                                 {{ $device->borrower_name }}
@@ -240,11 +240,11 @@
                             </td>
                             <td class="border-b px-4 py-2 border-gray-600 text-xs">
                                 @if($res->status === 'approved')
-                                    <span class="text-white bg-purple-600 rounded p-2 inline-flex">Vorgemerkt</span>
+                                    <span class="text-white bg-purple-600 rounded-full py-1 px-2 inline-flex">Vorgemerkt</span>
                                 @elseif($res->status === 'pending')
-                                    <span class="text-white bg-purple-600 rounded p-2 inline-flex">Vorgemerkt</span>
+                                    <span class="text-white bg-purple-600 rounded-full py-1 px-2 inline-flex">Vorgemerkt</span>
                                 @else
-                                    <span class="text-white bg-purple-500 rounded p-2 inline-flex">{{ ucfirst($res->status) }}</span>
+                                    <span class="text-white bg-purple-500 rounded-full py-1 px-2 inline-flex">{{ ucfirst($res->status) }}</span>
                                 @endif
                             </td>
                             <td class="border-b px-4 py-2 border-gray-600 text-xs text-white">
