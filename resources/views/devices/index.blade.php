@@ -219,13 +219,9 @@
                             <td class="border-b px-4 py-2 border-gray-600 text-xs text-gray-300 "> </td>
                         @endif
                         <td class="border-b px-4 py-2 border-gray-600 text-sm text-left">
-                            <div class="flex justify-end items-center space-x-0">
-                                <a href="{{ route('devices.reservations.create', $device) }}"
-                                    class="inline-flex items-center mr-2 px-3 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium">
-                                    Vormerken
-                                </a>
+                            <div class="flex justify-end items-center">
                                 @if ($device->status == 'available')
-                                    <button onclick="openLoanModal({{ $device->id }})" class="shadow-md bg-gray-200 hover:bg-white text-gray-800 font-bold py-2 px-4 rounded text-xs">
+                                    <button onclick="openLoanModal({{ $device->id }})" class="mr-2 shadow-md bg-gray-200 hover:bg-white text-gray-800 font-bold py-2 px-4 rounded text-xs">
                                         <span class="hidden xl:inline">Verleihen</span>
                                         <span class="xl:hidden">V</span>
                                     </button>
@@ -233,13 +229,17 @@
                                     <form id="return-form-{{ $device->id }}" action="{{ route('devices.return') }}" method="POST">
                                         @csrf
                                         <input type="hidden" name="device_id" value="{{ $device->id }}">
-                                        <button type="button" onclick="confirmReturn({{ $device->id }}, '{{ $device->title }}', '{{ $device->description }}')"
+                                        <!-- <button type="button" onclick="confirmReturn({{ $device->id }}, '{{ $device->title }}', '{{ $device->description }}')"
                                             class="shadow-md bg-gray-800 hover:bg-black text-white font-bold py-2 px-4 rounded text-xs">
                                             <span class="hidden xl:inline">Zurückgeben</span>
                                             <span class="xl:hidden">Z</span>
-                                        </button>
+                                        </button> -->
                                     </form>
                                 @endif
+                                <a href="{{ route('devices.reservations.create', $device) }}"
+                                    class="inline-flex items-center px-3 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium">
+                                    Vormerken
+                                </a>
                                 <a href="{{ route('devices.edit', $device) }}" class="py-2 pl-2 lg:pl-6 pr-2 rounded text-gray-300 hover:text-white">
                                     <svg height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
                                         <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
