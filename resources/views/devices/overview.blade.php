@@ -357,7 +357,7 @@ function applyFilters() {
     const breadcrumb = document.getElementById('current-category-breadcrumb');
     if (breadcrumb) {
         const label = filters.groupName || 'Alle';
-        const typeLabel = filters.type === 'all' ? 'Alle' : (filters.type === 'loaned' ? 'Ausgeliehen' : 'Vorgemerkt');
+        const typeLabel = filters.type === 'all' ? 'Alle' : (filters.type === 'loaned' ? 'Verliehen' : 'Vorgemerkt');
         breadcrumb.innerHTML = `<span class="mx-2 text-yellow-600">/</span><span class="text-gray-500">${label} / ${typeLabel}</span>`;
     }
 }
@@ -418,7 +418,7 @@ document.addEventListener('click', (e) => {
         filters.type = item.dataset.type; // 'all' | 'loaned' | 'reserved'
         document.getElementById('typeButtonLabel').textContent =
             (filters.type === 'all' ? 'Status' :
-                (filters.type === 'loaned' ? 'Ausgeliehen' : 'Vorgemerkt'));
+                (filters.type === 'loaned' ? 'Verliehen' : 'Vorgemerkt'));
         closeTypeMenu();
         applyFilters();
     }
