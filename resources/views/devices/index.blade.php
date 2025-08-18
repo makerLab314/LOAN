@@ -208,9 +208,9 @@
                             </span>
                         </td>
                         @if ($device->borrower_name)
-                            <td class="border-b px-4 py-2 border-gray-600 text-xs text-gray-300 ">{{ $device->borrower_name }} bis {{ \Carbon\Carbon::parse($device->loan_end_date)->format('d.m.Y') }}</td>
+                            <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300 ">Verliehen an {{ $device->borrower_name }} bis {{ \Carbon\Carbon::parse($device->loan_end_date)->format('d.m.Y') }}</td>
                         @else
-                            <td class="border-b px-4 py-2 border-gray-600 text-xs text-gray-300 "> </td>
+                            <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300 ">Momentan verfügbar</td>
                         @endif
                         <td class="border-b px-4 py-2 border-gray-600 text-sm text-left">
                             <div class="flex justify-end items-center">

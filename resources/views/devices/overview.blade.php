@@ -191,7 +191,7 @@
                             <td class="border-b px-4 py-2 border-gray-600 text-xs">
                                 <span class="text-white bg-yellow-600 rounded-full py-1 px-2 inline-flex">Verliehen</span>
                             </td>
-                            <td class="border-b px-4 py-2 border-gray-600 text-xs text-gray-300">
+                            <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300">
                                 {{ $device->borrower_name }}
                                 @if(!empty($device->loan_end_date))
                                     bis {{ \Carbon\Carbon::parse($device->loan_end_date)->format('d.m.Y') }}
@@ -247,8 +247,8 @@
                                     <span class="text-white bg-purple-500 rounded-full py-1 px-2 inline-flex">{{ ucfirst($res->status) }}</span>
                                 @endif
                             </td>
-                            <td class="border-b px-4 py-2 border-gray-600 text-xs text-white">
-                                <div class="text-xs text-gray-300 mb-1">
+                            <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300 ">
+                                <div class="text-sm text-gray-300 mb-1">
                                     {{ $res->start_at->timezone(config('app.timezone'))->format('d.m.Y, H:i') }} Uhr
                                      bis
                                     {{ $res->end_at->timezone(config('app.timezone'))->format('d.m.Y, H:i') }} Uhr
