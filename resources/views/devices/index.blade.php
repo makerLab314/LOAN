@@ -85,10 +85,10 @@
 
 
 
-<div class="mb-8 flex justify-end gap-3">
+<div class="mb-4 flex justify-end gap-3">
     <!-- Gerät hinzufügen -->
     <a href="{{ route('devices.create') }}"
-       class="inline-flex items-center px-4 py-2 rounded-md bg-gray-600 text-white text-sm font-medium hover:bg-yellow-600">
+       class="inline-flex items-center pl-3 pr-4 py-2 rounded-md bg-gray-600 text-white text-sm font-medium hover:bg-yellow-600">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
             <path fill-rule="evenodd" d="M12 4.5a.75.75 0 01.75.75v6h6a.75.75 0 010 1.5h-6v6a.75.75 0 01-1.5 0v-6h-6a.75.75 0 010-1.5h6v-6A.75.75 0 0112 4.5z" clip-rule="evenodd"/>
         </svg>
@@ -98,9 +98,10 @@
     <!-- Kategorien verwalten -->
     <a href="{{ route('categories.index') }}"
        class="inline-flex items-center px-4 py-2 rounded-md bg-gray-600 text-white text-sm font-medium bg-gray-700 hover:bg-gray-900">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 24 24" fill="currentColor">
-        <path fill-rule="evenodd" d="M10.5 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm0 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm0 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z" clip-rule="evenodd" />
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 mr-3">
+          <path fill-rule="evenodd" d="M3 5.25a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 5.25Zm0 4.5A.75.75 0 0 1 3.75 9h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 9.75Zm0 4.5a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75Zm0 4.5a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75Z" clip-rule="evenodd" />
         </svg>
+
 
         Kategorien verwalten
     </a>

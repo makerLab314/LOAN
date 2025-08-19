@@ -158,7 +158,7 @@
                     <th class="border-b-2 px-4 py-2 border-gray-500 w-40 font-medium text-sm"><span class="hidden lg:inline">Kategorie</span></th>
                     <th class="border-b-2 px-4 py-2 border-gray-500 w-32 font-medium text-sm">Status</th>
                     <th class="border-b-2 px-4 py-2 border-gray-500 w-96 font-medium text-sm">Person / Zeitraum</th>
-                    <th class="border-b-2 px-4 py-2 border-gray-500 w-64 font-medium text-sm">Aktionen</th>
+                    <th class="border-b-2 px-4 py-2 border-gray-500 w-64 font-medium text-sm"> </th>
                 </tr>
             </thead>
             <tbody id="mixTableBody">
