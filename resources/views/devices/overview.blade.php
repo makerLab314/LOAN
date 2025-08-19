@@ -249,9 +249,9 @@
                             </td>
                             <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300 ">
                                 <div class="text-sm text-gray-300 mb-1">
-                                    {{ $res->start_at->timezone(config('app.timezone'))->format('d.m.Y, H:i') }} Uhr
+                                    {{ $res->start_at->timezone(config('app.timezone'))->format('d.m.Y') }}
                                      bis
-                                    {{ $res->end_at->timezone(config('app.timezone'))->format('d.m.Y, H:i') }} Uhr
+                                    {{ $res->end_at->timezone(config('app.timezone'))->format('d.m.Y') }}
                                 </div>
                                 {{ $res->purpose ?? 'Keine Beschreibung vorhanden' }}
                             </td>

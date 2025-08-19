@@ -18,8 +18,15 @@
 </nav>
 
 <h1 class="text-2xl font-bold mb-4">Geräte</h1>
-<p class="block items-center text-sm mb-4">Eine Übersicht über alle Geräte. Klicke in der entsprechenden Spalte auf einen der Buttons, um ein Gerät zu verleihen oder vorzumerken.</p>
-
+<p class="block items-center text-sm mb-4">Eine Übersicht über alle Geräte. Klicke in der entsprechenden Spalte auf einen der Buttons, um ein <strong>Gerät zu verleihen oder vorzumerken</strong>.</p>
+<p class="block items-center text-sm mb-8">
+    <a href="{{ route('devices.overview') }}" class="hover:underline text-yellow-600 flex items-center">
+        Du möchtest zu den gebuchten Geräten? Folge mir!
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" height="18" width="18" class="ml-1">
+            <path fill-rule="evenodd" d="M19.902 4.098a3.75 3.75 0 0 0-5.304 0l-4.5 4.5a3.75 3.75 0 0 0 1.035 6.037.75.75 0 0 1-.646 1.353 5.25 5.25 0 0 1-1.449-8.45l4.5-4.5a5.25 5.25 0 1 1 7.424 7.424l-1.757 1.757a.75.75 0 1 1-1.06-1.06l1.757-1.757a3.75 3.75 0 0 0 0-5.304Zm-7.389 4.267a.75.75 0 0 1 1-.353 5.25 5.25 0 0 1 1.449 8.45l-4.5 4.5a5.25 5.25 0 1 1-7.424-7.424l1.757-1.757a.75.75 0 1 1 1.06 1.06l-1.757 1.757a3.75 3.75 0 1 0 5.304 5.304l4.5-4.5a3.75 3.75 0 0 0-1.035-6.037.75.75 0 0 1-.354-1Z" clip-rule="evenodd" />
+        </svg>
+    </a>
+</p>
 @if(session('status'))
     <div id="alert" role="alert" class="mb-8 rounded-md border border-gray-300 bg-white p-4 shadow-sm">
         <div class="flex items-start gap-4">
@@ -245,10 +252,12 @@
                                         </button> -->
                                     </form>
                                 @endif
-                                <a href="{{ route('devices.reservations.create', $device) }}"
-                                    class="inline-flex items-center px-4 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium">
-                                    Vormerken
-                                </a>
+                                {{-- NEU: --}}
+                                <button type="button"
+                                        onclick="openReservationModal({{ $device->id }})"
+                                        class="inline-flex items-center px-4 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium">
+                                Vormerken
+                                </button>
                                 <a href="{{ route('devices.edit', $device) }}" class="py-2 pl-2 lg:pl-6 pr-2 rounded text-gray-300 hover:text-white">
                                     <svg height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
                                         <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
@@ -323,6 +332,79 @@
         </div>
     </div>
 </div>
+
+<!-- Reservieren Modal -->
+<div id="reservationModal" class="fixed z-10 inset-0 overflow-y-auto hidden" aria-labelledby="reservation-title" role="dialog" aria-modal="true">
+  <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all
+                sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+        <div class="sm:flex sm:items-start">
+          <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+            <h3 class="text-lg leading-6 font-medium text-gray-900" id="reservation-title">
+              Gerät vormerken
+            </h3>
+
+            <div class="mt-2">
+              <form id="reservationForm"
+                    method="POST"
+                    data-action-template="{{ route('devices.reservations.store', ['device' => '__DEVICE_ID__']) }}">
+                @csrf
+                {{-- Falls du lieber mit hidden device_id arbeitest, kannst du das zusätzlich nutzen --}}
+                <input type="hidden" name="device_id" id="reservation_device_id">
+
+                <div class="mb-4">
+                  <label for="res_start_date" class="block text-gray-700 text-sm font-bold mb-2">Startdatum:</label>
+                  <input type="date" name="start_date" id="res_start_date"
+                         class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
+                         required>
+                </div>
+
+                <div class="mb-4">
+                  <label for="res_end_date" class="block text-gray-700 text-sm font-bold mb-2">Enddatum:</label>
+                  <input type="date" name="end_date" id="res_end_date"
+                         class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
+                         required>
+                </div>
+
+                <div class="mb-4">
+                  <label for="res_purpose" class="block text-gray-700 text-sm font-bold mb-2">
+                    Person / Kontext (max. 255 Zeichen):
+                  </label>
+                  <textarea name="purpose" id="res_purpose" rows="3" maxlength="255"
+                            class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
+                            placeholder="In welchem Kontext wird das Gerät verliehen?"></textarea>
+                  <p class="text-xs text-gray-500 mt-1">
+                    <strong>Beispiel:</strong> Prof.in Meier benötigt den Arduino für das Blockseminar „Interaktives Lernen mit Arduino“.
+                  </p>
+                </div>
+
+                {{-- Optional: Hidden Zeitfelder (werden im Backend trotzdem hart auf 08:00/17:00 gesetzt) --}}
+                <input type="hidden" name="start_time" value="08:00">
+                <input type="hidden" name="end_time" value="17:00">
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button" onclick="submitReservationForm()"
+                class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-gray-800 text-base font-medium text-white hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:ml-3 sm:w-auto sm:text-sm">
+          Vormerken
+        </button>
+        <button type="button" onclick="closeReservationModal()"
+                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-gray-100 text-base font-medium text-black hover:bg-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+          Abbrechen
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <style>
     .tab-button:focus {
@@ -530,4 +612,42 @@ document.addEventListener('DOMContentLoaded', () => {
   applyFilters(); // zeigt "Alle", Status "Alle", leere Suche
 });
 </script>
+
+<script>
+  function openReservationModal(deviceId) {
+    // Hidden device_id (falls genutzt)
+    const hid = document.getElementById('reservation_device_id');
+    if (hid) hid.value = deviceId;
+
+    // Action-URL mit Platzhalter ersetzen
+    const form = document.getElementById('reservationForm');
+    const tpl  = form.dataset.actionTemplate; // z.B. /devices/__DEVICE_ID__/reservations
+    form.action = tpl.replace('__DEVICE_ID__', deviceId);
+
+    // (Optional) Start/Ende defaulten (heute/morgen etc.)
+    const start = document.getElementById('res_start_date');
+    const end   = document.getElementById('res_end_date');
+    if (start && !start.value) {
+      const today = new Date();
+      start.value = today.toISOString().slice(0,10);
+    }
+    if (end && !end.value) {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      end.value = tomorrow.toISOString().slice(0,10);
+    }
+
+    document.getElementById('reservationModal').classList.remove('hidden');
+  }
+
+  function closeReservationModal() {
+    document.getElementById('reservationModal').classList.add('hidden');
+  }
+
+  function submitReservationForm() {
+    document.getElementById('reservationForm').submit();
+  }
+</script>
+
+
 @endsection

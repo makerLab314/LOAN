@@ -59,8 +59,7 @@
 
         <div class="mb-4">
             <label class="block text-sm font-medium mb-1">Kategorie</label>
-            <select name="category_id" class="w-full border rounded p-2" required>
-                <option value="">– bitte wählen –</option>
+            <select name="role" id="role" class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" required>
                 @foreach($categories as $cat)
                     <option value="{{ $cat->id }}" @selected(old('category_id', $device->category_id ?? null) == $cat->id)>
                         {{ $cat->name }}
