@@ -152,13 +152,13 @@
         <table class="w-full bg-gray-700 text-white rounded-lg table-fixed text-left">
             <thead>
                 <tr>
-                    <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm">Bild</th>
-                    <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm">Name & Label</th>
-                    <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm">Beschreibung</th>
-                    <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm"><span class="hidden lg:inline">Kategorie</span></th>
-                    <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm">Status</th>
-                    <th class="border-b-2 px-4 py-2 border-gray-500 w-1/4 font-medium text-sm">Person / Zeitraum</th>
-                    <th class="border-b-2 px-4 py-2 border-gray-500 w-1/8 font-medium text-sm"></th>
+                    <th class="border-b-2 px-4 py-2 border-gray-500 w-24 font-medium text-sm">Bild</th>
+                    <th class="border-b-2 px-4 py-2 border-gray-500 w-94 font-medium text-sm">Name & Label</th>
+                    <th class="border-b-2 px-4 py-2 border-gray-500 w-32 font-medium text-sm">Beschreibung</th>
+                    <th class="border-b-2 px-4 py-2 border-gray-500 w-40 font-medium text-sm"><span class="hidden lg:inline">Kategorie</span></th>
+                    <th class="border-b-2 px-4 py-2 border-gray-500 w-32 font-medium text-sm">Status</th>
+                    <th class="border-b-2 px-4 py-2 border-gray-500 w-96 font-medium text-sm">Person / Zeitraum</th>
+                    <th class="border-b-2 px-4 py-2 border-gray-500 w-64 font-medium text-sm">Aktionen</th>
                 </tr>
             </thead>
             <tbody id="mixTableBody">
@@ -202,7 +202,7 @@
                                     onsubmit="return confirm('Wurde {{ $device->title }} vollständig und korrekt angenommen?');">
                                     @csrf
                                     <input type="hidden" name="device_id" value="{{ $device->id }}">
-                                    <button type="submit" class="mx-1 bg-gray-200 hover:bg-white text-black font-bold py-2 px-4 rounded text-xs" title="Gerät annehmnen">
+                                    <button type="submit" class="bg-gray-200 hover:bg-white text-black font-bold py-2 px-4 rounded text-xs" title="Gerät annehmnen">
                                         Annehmen 
                                     </button>
                                 </form>
@@ -256,15 +256,21 @@
                                 {{ $res->purpose ?? 'Keine Beschreibung vorhanden' }}
                             </td>
                             <td class="border-b px-4 py-2 border-gray-600 text-sm text-right">
-                                @if($res->status === 'pending' && $res->user_id === auth()->id())
-                                    <form action="{{ route('devices.reservations.destroy', $res) }}" method="POST" onsubmit="return confirm('Willst du die Vormerkung wirklich widerrufen?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="inline-flex items-center mr-2 px-4 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium" title="Vormerkung widerrufen">
-                                            Stornieren
-                                        </button>
-                                    </form>
-                                @endif
+                                <div class="flex justify-end items-center">
+                                    <button onclick="openLoanModal({{ $device->id }})" class="mr-2 hover:bg-yellow-600 hover:text-white text-gray-200 font-bold py-2 px-4 rounded text-xs">
+                                        <span class="hidden xl:inline">Verleihen</span>
+                                        <span class="xl:hidden">V</span>
+                                    </button>
+                                    @if($res->status === 'pending' && $res->user_id === auth()->id())
+                                        <form action="{{ route('devices.reservations.destroy', $res) }}" method="POST" onsubmit="return confirm('Willst du die Vormerkung wirklich widerrufen?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="inline-flex items-center px-4 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium" title="Vormerkung widerrufen">
+                                                Stornieren
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @endif

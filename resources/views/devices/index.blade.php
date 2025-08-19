@@ -237,7 +237,7 @@
                         <td class="border-b px-4 py-2 border-gray-600 text-sm text-left">
                             <div class="flex justify-end items-center">
                                 @if ($device->status == 'available')
-                                    <button onclick="openLoanModal({{ $device->id }})" class="mr-2 bg-gray-300 hover:bg-white hover:text-black text-gray-900 font-bold py-2 px-4 rounded text-xs">
+                                    <button onclick="openLoanModal({{ $device->id }})" class="mr-2 hover:bg-yellow-600 hover:text-white text-gray-200 font-bold py-2 px-4 rounded text-xs">
                                         <span class="hidden xl:inline">Verleihen</span>
                                         <span class="xl:hidden">V</span>
                                     </button>
