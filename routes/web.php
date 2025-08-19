@@ -1,12 +1,16 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceReservationController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+
+
+Route::resource('categories', CategoryController::class)->middleware(['auth']); 
 
 Route::get('/logs', function () {
     return view('layouts.logs');

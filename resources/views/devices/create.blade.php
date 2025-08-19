@@ -58,18 +58,14 @@
         </div>
 
         <div class="mb-4">
-            <label for="group" class="block text-gray-700 text-sm font-bold mb-2">Kategorie:</label>
-            <select name="group" id="group" class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" required>
-                <option value="Stativ">Stativ</option>
-                <option value="Kamera">Kamera</option>
-                <option value="VRAR">VR-/AR-Brille</option>
-                <option value="Mikrofon">Mikrofon</option>
-                <option value="Videokonferenzsystem">Videokonferenzsystem</option>
-                <option value="Koffer">Koffer</option>
-                <option value="Laptop">Laptop</option>
-                <option value="Tablet">Tablet</option>
-                <option value="Microcontroller">Microcontroller</option>
-                <option value="Sonstiges">Sonstiges</option>
+            <label class="block text-sm font-medium mb-1">Kategorie</label>
+            <select name="category_id" class="w-full border rounded p-2" required>
+                <option value="">– bitte wählen –</option>
+                @foreach($categories as $cat)
+                    <option value="{{ $cat->id }}" @selected(old('category_id', $device->category_id ?? null) == $cat->id)>
+                        {{ $cat->name }}
+                    </option>
+                @endforeach
             </select>
         </div>
         <div class="mb-4">

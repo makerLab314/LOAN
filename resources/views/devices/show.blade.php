@@ -52,14 +52,14 @@
                     <div class="mb-4">
                         <label for="group" class="block text-gray-300 text-sm font-semibold mb-2">Kategorie:</label>
                         <select name="group" id="group" class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" disabled>
-                            <option value="Stativ" {{ $device->group == 'Stativ' ? 'selected' : '' }}>Stativ</option>
-                            <option value="Kamera" {{ $device->group == 'Kamera' ? 'selected' : '' }}>Kamera</option>
-                            <option value="VRAR" {{ $device->group == 'VRAR' ? 'selected' : '' }}>VR-/AR-Brille</option>
-                            <option value="Mikrofon" {{ $device->group == 'Mikrofon' ? 'selected' : '' }}>Mikrofon</option>
-                            <option value="Videokonferenzsystem" {{ $device->group == 'Videokonferenzsystem' ? 'selected' : '' }}>Videokonferenzsystem</option>
-                            <option value="Koffer" {{ $device->group == 'Koffer' ? 'selected' : '' }}>Koffer</option>
-                            <option value="Laptop" {{ $device->group == 'Laptop' ? 'selected' : '' }}>Laptop</option>
-                            <option value="Tablet" {{ $device->group == 'Tablet' ? 'selected' : '' }}>Tablet</option>
+                            <option value="Stativ" {{ $device->category->name ?? $device->group == 'Stativ' ? 'selected' : '' }}>Stativ</option>
+                            <option value="Kamera" {{ $device->category->name ?? $device->group == 'Kamera' ? 'selected' : '' }}>Kamera</option>
+                            <option value="VRAR" {{ $device->category->name ?? $device->group == 'VRAR' ? 'selected' : '' }}>VR-/AR-Brille</option>
+                            <option value="Mikrofon" {{ $device->category->name ?? $device->group == 'Mikrofon' ? 'selected' : '' }}>Mikrofon</option>
+                            <option value="Videokonferenzsystem" {{ $device->category->name ?? $device->group == 'Videokonferenzsystem' ? 'selected' : '' }}>Videokonferenzsystem</option>
+                            <option value="Koffer" {{ $device->category->name ?? $device->group == 'Koffer' ? 'selected' : '' }}>Koffer</option>
+                            <option value="Laptop" {{ $device->category->name ?? $device->group == 'Laptop' ? 'selected' : '' }}>Laptop</option>
+                            <option value="Tablet" {{ $device->category->name ?? $device->group == 'Tablet' ? 'selected' : '' }}>Tablet</option>
                         </select>
                     </div>
 

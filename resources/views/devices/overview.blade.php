@@ -167,7 +167,7 @@
                     @if ($device->status == 'loaned')
                         <tr class="mix-row text-gray-300"
                             data-type="loaned"
-                            data-group="{{ $device->group }}">
+                            data-group="{{ $device->category->name ?? $device->group }}">
                             <td class="border-b px-4 py-2 border-gray-600">
                                 <img src="{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}"
                                      alt="{{ $device->title }}"
@@ -181,11 +181,11 @@
                                 {{ $device->description }}
                             </td>
                             <td class="border-b px-4 py-2 border-gray-600 text-sm break-words">
-                                @switch($device->group)
+                                @switch($device->category->name ?? $device->group)
                                     @case('VRAR') VR-/AR-Brille @break
                                     @case('Videokonferenzsystem') Videokonf. @break
                                     @case('Microcontroller') Microcontr. @break
-                                    @default {{ $device->group }}
+                                    @default {{ $device->category->name ?? $device->group }}
                                 @endswitch
                             </td>
                             <td class="border-b px-4 py-2 border-gray-600 text-xs">

@@ -18,18 +18,7 @@
 </nav>
 
 <h1 class="text-2xl font-bold mb-4">Geräte</h1>
-<p class="block items-center text-sm mb-2">Eine Übersicht über alle Geräte. Möchtest du ein <span class="font-semibold">Gerät verleihen oder vormerken?</span> Klicke in der entsprechenden Spalte auf den Button <span class="mx-1 bg-gray-200 text-gray-900 font-bold py-2 px-4 rounded text-xs">Verleihen</span><span class="xl:hidden">V (für Verleihen)</span> oder <span class="inline-flex items-center px-4 py-2 rounded bg-gray-600 text-white text-xs font-medium mx-1">Vormerken</span><span class="xl:hidden">V (für Vormerken).</span>
-<p class="mb-4 text-sm">
-    <strong>Hinweis: </strong>Bitte vermerke Gerätezubehör ebenfalls in der Kategorie des entsprechenden Geräts (z.B. Kamerazubehör unter Kameras).
-</p>
-<p class="mb-8 flex items-center text-sm">
-    <a href="{{ route('devices.create') }}" class="hover:underline text-yellow-600 flex items-center">
-    Du möchtest dem System ein Gerät hinzufügen? Folge mir!
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" height="18" width="18" class="ml-1">
-            <path fill-rule="evenodd" d="M19.902 4.098a3.75 3.75 0 0 0-5.304 0l-4.5 4.5a3.75 3.75 0 0 0 1.035 6.037.75.75 0 0 1-.646 1.353 5.25 5.25 0 0 1-1.449-8.45l4.5-4.5a5.25 5.25 0 1 1 7.424 7.424l-1.757 1.757a.75.75 0 1 1-1.06-1.06l1.757-1.757a3.75 3.75 0 0 0 0-5.304Zm-7.389 4.267a.75.75 0 0 1 1-.353 5.25 5.25 0 0 1 1.449 8.45l-4.5 4.5a5.25 5.25 0 1 1-7.424-7.424l1.757-1.757a.75.75 0 1 1 1.06 1.06l-1.757 1.757a3.75 3.75 0 1 0 5.304 5.304l4.5-4.5a3.75 3.75 0 0 0-1.035-6.037.75.75 0 0 1-.354-1Z" clip-rule="evenodd" />
-        </svg>
-    </a>
-</p>
+<p class="block items-center text-sm mb-4">Eine Übersicht über alle Geräte. Klicke in der entsprechenden Spalte auf einen der Buttons, um ein Gerät zu verleihen oder vorzumerken.</p>
 
 @if(session('status'))
     <div id="alert" role="alert" class="mb-8 rounded-md border border-gray-300 bg-white p-4 shadow-sm">
@@ -86,6 +75,31 @@
 <!-- GRAUER BLOCK mit Dropdown + Tabelle -->
 <div class="lg:container mx-auto flex items-center mb-8 p-4 pt-4 bg-gray-600 rounded">
     <div class="w-full">
+
+
+
+<div class="mb-8 flex justify-end gap-3">
+    <!-- Gerät hinzufügen -->
+    <a href="{{ route('devices.create') }}"
+       class="inline-flex items-center px-4 py-2 rounded-md bg-gray-600 text-white text-sm font-medium hover:bg-yellow-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 24 24" fill="currentColor">
+            <path fill-rule="evenodd" d="M12 4.5a.75.75 0 01.75.75v6h6a.75.75 0 010 1.5h-6v6a.75.75 0 01-1.5 0v-6h-6a.75.75 0 010-1.5h6v-6A.75.75 0 0112 4.5z" clip-rule="evenodd"/>
+        </svg>
+        Gerät hinzufügen
+    </a>
+
+    <!-- Kategorien verwalten -->
+    <a href="{{ route('categories.index') }}"
+       class="inline-flex items-center px-4 py-2 rounded-md bg-gray-600 text-white text-sm font-medium bg-gray-700 hover:bg-gray-900">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 24 24" fill="currentColor">
+        <path fill-rule="evenodd" d="M10.5 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm0 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Zm0 6a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0Z" clip-rule="evenodd" />
+        </svg>
+
+        Kategorien verwalten
+    </a>
+</div>
+
+
         <!-- Toolbar: Dropdowns links, Suche rechts -->
         <div class="mb-4 flex flex-wrap items-center gap-2">
         <!-- LINKS: Geräte + Status -->
@@ -186,7 +200,7 @@
             </thead>
             <tbody id="deviceTableBody">
                 @foreach($devices as $device)
-                    <tr class="device-row" data-group="{{ $device->group }}">
+                    <tr class="device-row" data-group="{{ trim($device->category->name ?? $device->group) }}">
                         <td class="border-b px-4 py-2 border-gray-600">
                             <img src="{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}" alt="{{ $device->title }}" class="w-8 lg:w-16 h-8 lg:h-16 object-cover cursor-pointer rounded border-2 hover:border-gray-400" onclick="openImageModal('{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}')">
                         </td>
@@ -195,11 +209,12 @@
                         </td>
                         <td class="border-b px-4 py-2 border-gray-600 text-sm break-words text-gray-300 ">{{ $device->description }}</td>
                         <td class="border-b px-4 py-2 border-gray-600 text-sm break-words text-gray-300 ">
-                            @switch($device->group)
+                            @switch($device->category->name ?? $device->group)
                                 @case('VRAR') VR-/AR-Brille @break
                                 @case('Videokonferenzsystem') Videokonf. @break
                                 @case('Microcontroller') Microcontr. @break
-                                @default {{ $device->group }}
+                                @default {{ $device->category->name ?? $device->group }}
+
                             @endswitch
                         </td>
                         <td class="border-b px-4 py-2 border-gray-600 text-xs">

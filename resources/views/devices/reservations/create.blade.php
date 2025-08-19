@@ -19,7 +19,7 @@
         </div>
     @endif
 
-    <h1 class="text-2xl font-bold mb-4">{{ $device->name }} vormerken</h1>
+    <h1 class="text-2xl font-bold mb-4">Vormerken: {{ $device->title }}</h1>
 
     <form action="{{ route('devices.reservations.store', $device) }}" method="POST" class="w-full">
         @csrf
