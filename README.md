@@ -14,6 +14,6 @@ und wurde mit <a href="https://laravel.com" target="_blank">Laravel</a> sowie <a
 
 ### Main Interface
 
-![](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-1.gif)
+![](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-2.gif)
 
 
