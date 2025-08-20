@@ -15,10 +15,22 @@
         </p>
         <h2 class="text-2xl font-bold mb-4 mt-8">v1.2 | 14.08.2025</h2>
         <p class="text-sm mb-2 text-left leading-relaxed">
+            <strong>Ergänzung um Filterung und Suchfunktion</strong>
             <ul class="list-disc text-sm ">
                 <li>Suchfunktion nach Gerät, Gerätebeschreibung sowie Raum, Raumstandort und Raumbeschreibung</li>
                 <li>Filterung nach Gerätekategorie, Gerätestatus sowie Raumstandort, Raumstatus</li>
             </ul>
+        </p>
+        <p class="text-sm my-2 text-left leading-relaxed">
+            <strong>Ergänzung um Vormerkung, Stornierung und Übernahme einer zwischengespeicherten Vormerkung zur Ausleihe</strong>
+            <ul class="list-disc text-sm ">
+                <li>Mehrmalige Vormerkung eines Geräts für zukünftige Zeiträume</li>
+                <li>Stornierung einer Vormerkung</li>
+                <li>Ausleihe eines Geräts auf Basis einer zwischengespeicherten Vormerkung</li>
+            </ul>
+        </p>
+        <p class="text-sm my-2 text-left leading-relaxed">
+            Ergänzung um Erstellung, Bearbeitung und Löschung <strong>eigener Gerätekategorien</strong>
         </p>
         <h2 class="text-2xl font-bold mb-4 mt-8">v1.1 | 26.03.2025</h2>
             <ul class="list-disc text-sm ">
