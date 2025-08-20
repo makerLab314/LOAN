@@ -32,7 +32,8 @@ class DeviceReservationController extends Controller
             'start_time' => ['required','date_format:H:i'],
             'end_date'   => ['required','date','after_or_equal:start_date'],
             'end_time'   => ['required','date_format:H:i'],
-            'purpose'    => ['nullable','string','max:255'], // Zeichenlimit, Wortlimit prüfen wir gleich separat
+            'purpose'    => ['nullable','string','max:255'],
+            'reserved_by_name' => ['nullable','string','max:255'],
         ]);
 
         $start = Carbon::createFromFormat('Y-m-d H:i', $validated['start_date'].' '.$validated['start_time']);
@@ -75,6 +76,7 @@ class DeviceReservationController extends Controller
             'start_at'  => $start,
             'end_at'    => $end,
             'purpose'   => $validated['purpose'] ?? null,
+            'reserved_by_name' => $request->input('reserved_by_name'),
             'status'    => 'pending',
         ]);
 

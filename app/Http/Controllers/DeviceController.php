@@ -34,6 +34,7 @@ class DeviceController extends Controller
             'borrower_name'   => 'required|string|max:255',
             'loan_start_date' => 'required|date',
             'loan_end_date'   => 'required|date|after_or_equal:loan_start_date',
+            'loan_purpose'    => 'nullable|string|max:255',
         ]);
 
         $device = Device::findOrFail($request->device_id);
@@ -41,6 +42,7 @@ class DeviceController extends Controller
         $device->borrower_name = $request->borrower_name;
         $device->loan_start_date = $request->loan_start_date;
         $device->loan_end_date = $request->loan_end_date;
+        $device->loan_purpose    = $request->loan_purpose;
         $device->save();
 
         DeviceHistory::create([
@@ -60,6 +62,7 @@ class DeviceController extends Controller
         $device->borrower_name = null;
         $device->loan_start_date = null;
         $device->loan_end_date = null;
+        $device->loan_purpose = null;
         $device->save();
 
         DeviceHistory::create([

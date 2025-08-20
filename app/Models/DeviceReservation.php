@@ -7,7 +7,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class DeviceReservation extends Model
 {
-    protected $fillable = ['device_id','user_id','start_at','end_at','purpose','status'];
+    protected $fillable = [
+        'device_id',
+        'user_id',
+        'start_at',
+        'end_at',
+        'purpose',
+        'status',
+        'reserved_by_name',
+    ];
 
     protected $casts = [
         'start_at' => 'datetime',

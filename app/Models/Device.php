@@ -12,13 +12,14 @@ class Device extends Model
     protected $fillable = [
         'title',
         'description',
-        'group',        // bleibt vorerst, bis die Spalte entfernt wird
+        'group',
         'image',
         'status',
         'borrower_name',
         'loan_start_date',
         'loan_end_date',
-        'category_id',  // WICHTIG: neu für Mass Assignment
+        'category_id',
+        'loan_purpose', 
     ];
 
     public function reservations()
