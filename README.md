@@ -11,12 +11,9 @@ und wurde mit <a href="https://laravel.com" target="_blank">Laravel</a> sowie <a
 <br><br>
 <em>LOAN | A free loan management system</em> is made with <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. Content Language: lang="de". Similar to the Laravel framework, LOAN is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
-### Login
-
-<img src="https://digillab.uni-augsburg.de/wp-content/uploads/2024/07/lend_login.png">
 
 ### Main Interface
 
-![](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/Aufz.gif){width=400}
+![](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-1.gif)
 
 
