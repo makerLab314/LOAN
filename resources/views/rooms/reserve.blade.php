@@ -47,8 +47,9 @@
         </div>
 
         <div class="mb-4">
-            <label for="purpose" class="block text-gray-700 text-sm font-bold mb-2">Zweck (max. 100 Wörter):</label>
+            <label for="purpose" class="block text-gray-700 text-sm font-bold mb-2">Zweck (max. 100 Zeichen):</label>
             <textarea name="purpose" id="purpose" class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" rows="3" maxlength="100" required></textarea>
+            <p class="text-xs text-gray-500 mt-1"><strong>Beispiel:</strong> Profin. Meier nutzt den Raum für ihr Blockseminar "Interaktives Lernen mit Arduino".</p>
         </div>
 
         <div class="mb-4">

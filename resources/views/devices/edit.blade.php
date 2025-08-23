@@ -42,7 +42,7 @@
         </div>
 
         <div class="mb-4">
-            <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Beschreibung (Aufbewahrungsort wie Schranknummer/Fach, z.B. <em>1/F</em>):</label>
+            <label for="description" class="block text-gray-700 text-sm font-bold mb-2">Beschreibung und Details (Aufbewahrungsort wie Schranknummer/Fach, z.B. <em>1/F</em> & Besonderheiten):</label>
             <textarea rows="4" name="description" id="description" class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight">{{ old('description', $device->description) }}</textarea>
         </div>
 
@@ -57,18 +57,14 @@
         </div>
 
         <div class="mb-4">
-            <label for="group" class="block text-gray-700 text-sm font-bold mb-2">Kategorie:</label>
-            <select name="group" id="group" class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" required>
-                <option value="Stativ" {{ $device->group == 'Stativ' ? 'selected' : '' }}>Stativ</option>
-                <option value="Kamera" {{ $device->group == 'Kamera' ? 'selected' : '' }}>Kamera</option>
-                <option value="VRAR" {{ $device->group == 'VRAR' ? 'selected' : '' }}>VR-/AR-Brille</option>
-                <option value="Mikrofon" {{ $device->group == 'Mikrofon' ? 'selected' : '' }}>Mikrofon</option>
-                <option value="Videokonferenzsystem" {{ $device->group == 'Videokonferenzsystem' ? 'selected' : '' }}>Videokonferenzsystem</option>
-                <option value="Koffer" {{ $device->group == 'Koffer' ? 'selected' : '' }}>Koffer</option>
-                <option value="Laptop" {{ $device->group == 'Laptop' ? 'selected' : '' }}>Laptop</option>
-                <option value="Tablet" {{ $device->group == 'Tablet' ? 'selected' : '' }}>Tablet</option>
-                <option value="Microcontroller" {{ $device->group == 'Microcontroller' ? 'selected' : '' }}>Microcontroller</option>
-                <option value="Sonstiges" {{ $device->group == 'Sonstiges' ? 'selected' : '' }}>Sonstiges</option>
+            <label class="block text-sm font-medium mb-1">Kategorie</label>
+            <select name="category_id" class="w-full border rounded p-2" required>
+                <option value="">– bitte wählen –</option>
+                @foreach($categories as $cat)
+                    <option value="{{ $cat->id }}" @selected(old('category_id', $device->category_id ?? null) == $cat->id)>
+                        {{ $cat->name }}
+                    </option>
+                @endforeach
             </select>
         </div>
 

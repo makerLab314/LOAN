@@ -1,11 +1,20 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DeviceController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\DeviceReservationController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RoomController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UserController;
+
+
+Route::resource('categories', CategoryController::class)->middleware(['auth']); 
+
+Route::get('/logs', function () {
+    return view('layouts.logs');
+});
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -25,6 +34,12 @@ Route::get('/dashboard', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/devices/overview', [DeviceController::class, 'overview'])->name('devices.overview');
+    Route::get('/devices/{device}/reserve',  [DeviceReservationController::class, 'create'])->name('devices.reservations.create');
+    Route::post('/devices/{device}/reserve', [DeviceReservationController::class, 'store'])->name('devices.reservations.store');
+    Route::delete('/devices/reservations/{reservation}', [DeviceReservationController::class, 'destroy'])
+    ->name('devices.reservations.destroy')
+    ->middleware('auth');
+
 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');

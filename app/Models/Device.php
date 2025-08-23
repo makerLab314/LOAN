@@ -18,6 +18,17 @@ class Device extends Model
         'borrower_name',
         'loan_start_date',
         'loan_end_date',
-        // weitere Felder
+        'category_id',
+        'loan_purpose', 
     ];
+
+    public function reservations()
+    {
+        return $this->hasMany(\App\Models\DeviceReservation::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(\App\Models\Category::class);
+    }
 }
