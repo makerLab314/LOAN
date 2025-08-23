@@ -44,7 +44,7 @@ DB_CONNECTION=sqlite
 DB_DATABASE="ABSOLUTER_PFAD_ZUR_DB"
 # Ausführen der Migrationen
 php artisan migrate
-# Ausführen des Seeds für den ersten Admin: admin@example.com mit ChangeMe123!
+# Ausführen des Seeds für den ersten Admin: admin@test.com mit geheimespasswort
 php artisan db:seed
 # Starten des Servers unter 127.0.0.1:8000
 php artisan serve
