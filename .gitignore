@@ -16,4 +16,5 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+data
 ToDo.txt

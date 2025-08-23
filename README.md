@@ -28,4 +28,52 @@ und wurde mit <a href="https://laravel.com" target="_blank">Laravel</a> sowie <a
 ![](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-3-device.png)
 
 
+## Run locally without Docker
 
+```
+# Installation der Abhängigkeiten
+composer install
+# Anlegen der .env
+copy .env.example .env
+# Setzung des App-Keys
+php artisan key:generate
+# Erstellung der DB
+New-Item -ItemType File .\database\database.sqlite -Force | Out-Null
+# (Aus-)kommentieren der (ir-)relevanten DB-Parameter in der .env
+DB_CONNECTION=sqlite
+DB_DATABASE="ABSOLUTER_PFAD_ZUR_DB"
+# Ausführen der Migrationen
+php artisan migrate
+# Ausführen des Seeds für den ersten Admin: admin@example.com mit ChangeMe123!
+php artisan db:seed
+# Starten des Servers unter 127.0.0.1:8000
+php artisan serve
+# Setzung des Storage-Links
+php artisan storage:link```
+
+## Run locally with Docker
+
+Using docker, one can run this app locally using php-fpm, redis and mariadb.
+
+### APP_KEY creation
+
+The laravel app needs an `APP_KEY` which can be created like that:
+
+`echo "APP_KEY=base64:$(openssl rand -base64 32)" >> .env`
+and should be added to the compose.yml
+
+### Setup service
+
+The service can be set up using
+
+`docker compose up -d`
+
+Run the migrations and seed the database (to create the first admin user):
+
+`docker compose run loan php artisan migrate --seed`
+
+### Login
+
+Go to http://localhost:8080/ and login with the seeded user.
+
+You can then start using the app.
