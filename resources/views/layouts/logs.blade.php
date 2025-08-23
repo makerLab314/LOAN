@@ -13,7 +13,7 @@
         <p class="text-sm mb-2 text-left leading-relaxed">
             Die Plattform wurde entwickelt, um eine Möglichkeit zur Katalogisierung und Prozessverwaltung im Rahmen einer nachvollziehbaren Geräteausleihe und Raumbuchung zu schaffen. Eine Rollen- und Rechteverwaltung sowie eine Prozesshistorie schaffen zudem Transparenz in Bezug auf Handlungsoptionen und Kontrolle.
         </p>
-        <h2 class="text-2xl font-bold mb-4 mt-8">v1.2 | 14.08.2025</h2>
+        <h2 class="text-2xl font-bold mb-4 mt-8">v1.2 | 20.08.2025</h2>
         <p class="text-sm mb-2 text-left leading-relaxed">
             <strong>Ergänzung um Filterung und Suchfunktion</strong>
             <ul class="list-disc text-sm ">
