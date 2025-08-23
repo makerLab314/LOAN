@@ -49,7 +49,8 @@ php artisan db:seed
 # Starten des Servers unter 127.0.0.1:8000
 php artisan serve
 # Setzung des Storage-Links
-php artisan storage:link```
+php artisan storage:link
+```
 
 ## Run locally with Docker
 
