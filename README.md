@@ -1,6 +1,6 @@
 ## Preview
 
-Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</em> von Vincent Dusanek. Das System läuft auf einer LNPP-Struktur: 
+Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</em>. Das System läuft auf einer LNPP-Struktur: 
 <ul>
     <li>Ubuntu 24.04</li>
     <li>Nginx</li>
