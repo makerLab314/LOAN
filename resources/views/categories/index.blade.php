@@ -13,7 +13,7 @@
         </svg>
     </a>
     <span class="mx-2 text-yellow-600">/</span>
-    <span class="text-yellow-600 mr-1"><a href="{{ route('devices.index') }}">Geräte</a></span>
+    <span class="text-yellow-600 mr-1"><a href="{{ route('devices.index') }}">{{ __('Geräte') }}</a></span>
     <span class="mx-1 text-yellow-600">/</span>
     <span id="current-category-breadcrumb" class="mx-1 text-gray-500">Kategorien</span>
 </nav>

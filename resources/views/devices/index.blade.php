@@ -15,11 +15,11 @@
             </svg>
         </a>
         <span class="mx-2 text-yellow-600">/</span>
-        <a href="{{ route('devices.index') }}" class="text-yellow-600 hover:underline">Geräte</a>
+        <a href="{{ route('devices.index') }}" class="text-yellow-600 hover:underline">{{ __('Geräte') }}</a>
         <span id="current-category-breadcrumb"></span>
     </nav>
 
-    <h1 class="text-2xl font-bold mb-4">Geräte</h1>
+    <h1 class="text-2xl font-bold mb-4">{{ __('Geräte') }}</h1>
     <p class="block items-center text-sm mb-4">Eine Übersicht über alle Geräte. Klicke in der entsprechenden Spalte auf
         einen der Buttons, um ein <strong>Gerät zu verleihen oder vorzumerken</strong>.</p>
     <p class="block items-center text-sm mb-8">

@@ -13,7 +13,7 @@
             </svg>
         </a>
         <span class="mx-2 text-yellow-600">/</span>
-        <span class="text-gray-500">Gebuchte Geräte</span>
+        <span class="text-gray-500">{{ __('Gebuchte Geräte') }}</span>
         <span id="current-category-breadcrumb"></span>
     </nav>
 

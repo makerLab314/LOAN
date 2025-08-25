@@ -16,7 +16,7 @@
             </svg>
         </a>
         <span class="mx-2 text-yellow-600">/</span>
-        <a href="{{ route('devices.index') }}" class="text-yellow-600 hover:underline">Geräte</a>
+        <a href="{{ route('devices.index') }}" class="text-yellow-600 hover:underline">{{ __('Geräte') }}</a>
         <span class="mx-2 text-yellow-600">/</span>
         <span class="text-gray-500">Gerät hinzufügen</span>
     </nav>

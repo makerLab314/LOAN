@@ -9,6 +9,30 @@ use App\Http\Controllers\RoomController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+Route::post('/locale', function (Request $request) {
+    $data = $request->validate([
+        'locale' => 'required|in:de,en'
+    ]);
+
+    // Session immer setzen
+    session(['locale' => $data['locale']]);
+
+    // Falls eingeloggt: auch im User speichern
+    if (Auth::check()) {
+        $user = Auth::user();
+        if ($user->locale !== $data['locale']) {
+            $user->locale = $data['locale'];
+            $user->save();
+        }
+    }
+
+    // Zurück auf die vorherige Seite
+    return back();
+})->name('locale.switch');
+
 
 Route::resource('categories', CategoryController::class)->middleware(['auth']); 
 
