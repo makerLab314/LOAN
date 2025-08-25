@@ -7,28 +7,28 @@ Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche un
     <li>Postgres</li>
     <li>PHP 8.3</li>
 </ul>
-und wurde mit <a href="https://laravel.com" target="_blank">Laravel</a> sowie <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a> programmiert und ist unter einer MIT Lizenz (https://opensource.org/licenses/MIT) verfügbar. Um Zugang zu einem Testaccount unter <a href="http://loan.vdus.de" target="_blank">http://loan.vdus.de</a> zu erhalten, kontaktieren Sie mich bitte unter vincent.dusanek[at]gmail.com.
+und wurde mit <a href="https://laravel.com" target="_blank">Laravel</a> sowie <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a> programmiert und ist unter einer <a href="https://opensource.org/licenses/MIT"target="_blank">MIT-Lizenz</a> verfügbar. Um Zugang zu einem Testaccount unter <a href="http://loan.vdus.de" target="_blank">http://loan.vdus.de</a> zu erhalten, kontaktieren Sie mich bitte unter vincent.dusanek[at]gmail.com.
 <br><br>
-<em>LOAN | A free loan management system</em> is made with <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. Content Language: lang="de". Similar to the Laravel framework, LOAN is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+<em>LOAN | A free loan management system</em> is made with <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. Content Language: lang="de". Similar to the Laravel framework, LOAN is open-sourced software licensed under the <a href="https://opensource.org/licenses/MIT"target="_blank">MIT License</a>.
 
-### Verleihprozess
+### Verleihprozess/ Loan process
 
 ![](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-2.gif)
 
-### Anmeldung
+### Anmeldung/ Login
 
 ![](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-1-login.png)
 
-### Geräte
+### Geräte/ Devices
 
 ![](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-2-devices.png)
 
-### Detailansicht: Gerät
+### Detailansicht: Gerät/ Details: Device
 
 ![](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-3-device.png)
 
 
-## Run locally without Docker
+## Lokale Installation ohne Docker/ Run locally without Docker
 
 ```
 # Installation der Abhängigkeiten
@@ -52,7 +52,7 @@ php artisan serve
 php artisan storage:link
 ```
 
-## Run locally with Docker
+## Lokale Installation mit Docker/ Run locally with Docker
 
 Using docker, one can run this app locally using php-fpm, redis and mariadb.
 
