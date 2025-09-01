@@ -1,4 +1,4 @@
-## Preview
+## LOAN
 
 Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</em>. Das System läuft auf einer LNPP-Struktur: 
 <ul>
@@ -21,6 +21,8 @@ This project is licensed under the **Creative Commons Attribution–NonCommercia
 SPDX-License-Identifier: **CC-BY-NC-SA-4.0**
 
 For commercial licensing inquiries, please open an issue on GitHub.
+
+## Preview
 
 ### Verleihprozess/ Loan process
 
