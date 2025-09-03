@@ -16,7 +16,7 @@ und wurde mit <a href="https://laravel.com" target="_blank">Laravel</a> sowie <a
 
 <details>
     <summary>About</summary>
-    <p>Welcome to LOAN, a loan management system for scientific and media education institutions. The system runs on an LNPP structure:
+    <p><br>Welcome to LOAN, a loan management system for scientific and media education institutions. The system runs on an LNPP structure:
 <ul>
     <li>Ubuntu 24.04</li>
     <li>Nginx</li>
