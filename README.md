@@ -26,7 +26,7 @@ and was programmed using <a href="https://laravel.com" target="_blank">Laravel</
 
 <em>LOAN | A free loan management system</em> is made with <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. Content Language: lang="de".
 
-## Lizenz/ License
+## Lizenz
 
 Dieses Projekt unterliegt der Creative Commons Attribution–NonCommercial–ShareAlike 4.0 International (CC BY-NC-SA 4.0) Lizenz.
 
@@ -35,6 +35,8 @@ Dieses Projekt unterliegt der Creative Commons Attribution–NonCommercial–Sha
 SPDX-License-Identifier: **CC-BY-NC-SA-4.0**
 
 Für Anfragen zu kommerziellen Lizenzen eröffnen Sie bitte ein Ticket auf GitHub.
+
+## License
 
 This project is licensed under the **Creative Commons Attribution–NonCommercial–ShareAlike 4.0 International** (CC BY-NC-SA 4.0) license.
 
