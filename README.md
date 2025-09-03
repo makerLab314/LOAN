@@ -15,7 +15,7 @@ und wurde mit <a href="https://laravel.com" target="_blank">Laravel</a> sowie <a
 <br></p>
 
 <details>
-    <summary>### About</summary>
+    <summary>About</summary>
     <p><br>Welcome to LOAN, a loan management system for scientific and media education institutions. The system runs on an LNPP structure:
 <ul>
     <li>Ubuntu 24.04</li>
@@ -29,25 +29,22 @@ and was programmed using <a href="https://laravel.com" target="_blank">Laravel</
 <em>LOAN | A free loan management system</em> is made with <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. Content Language: lang="de".</p>
     </details>
 
-### About
-
-
-
 ## Lizenz/ License
 
 ### CC-BY-NC-SA-4.0 Lizenz
 
-Dieses Projekt unterliegt der Creative Commons Attribution–NonCommercial–ShareAlike 4.0 International (CC BY-NC-SA 4.0) Lizenz.
+<p>Dieses Projekt unterliegt der Creative Commons Attribution–NonCommercial–ShareAlike 4.0 International (CC BY-NC-SA 4.0) Lizenz.
 
 - **Erlaubt:** Nutzung, Vervielfältigung, Änderung und Weitergabe für nichtkommerzielle Zwecke, sofern Sie die Quelle angemessen angeben und abgeleitete Werke unter derselben Lizenz verbreiten.
 - **Nicht erlaubt:** kommerzielle Nutzung dieses Projekts oder abgeleiteter Werke ohne vorherige Genehmigung.
 SPDX-License-Identifier: **CC-BY-NC-SA-4.0**
 
 Für Anfragen zu kommerziellen Lizenzen eröffnen Sie bitte ein Ticket auf GitHub.
+<br></p>
 
-### CC-BY-NC-SA-4.0 License
-
-This project is licensed under the **Creative Commons Attribution–NonCommercial–ShareAlike 4.0 International** (CC BY-NC-SA 4.0) license.
+<details>
+    <summary>CC-BY-NC-SA-4.0 License</summary>
+    <p><br>This project is licensed under the **Creative Commons Attribution–NonCommercial–ShareAlike 4.0 International** (CC BY-NC-SA 4.0) license.
 
 - **Allowed:** use, copy, modify, and share **for non-commercial purposes**, provided you give appropriate credit and distribute derivative works under the **same license**.
 - **Not allowed:** **commercial use** of this project or any derivative works without prior permission.
@@ -55,6 +52,9 @@ This project is licensed under the **Creative Commons Attribution–NonCommercia
 SPDX-License-Identifier: **CC-BY-NC-SA-4.0**
 
 For commercial licensing inquiries, please open an issue on GitHub.
+</p>
+    </details>
+
 
 ## Preview
 
