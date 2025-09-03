@@ -1,5 +1,7 @@
 ## LOAN
 
+### Über
+
 Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</em>. Das System läuft auf einer LNPP-Struktur: 
 <ul>
     <li>Ubuntu 24.04</li>
@@ -9,6 +11,9 @@ Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche un
 </ul>
 und wurde mit <a href="https://laravel.com" target="_blank">Laravel</a> sowie <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a> programmiert und ist unter einer <a href="https://opensource.org/licenses/MIT"target="_blank">MIT-Lizenz</a> verfügbar. Um Zugang zu einem Testaccount unter <a href="http://loan.vdus.de" target="_blank">http://loan.vdus.de</a> zu erhalten, kontaktieren Sie mich bitte unter vincent.dusanek[at]gmail.com.
 <br><br>
+
+### About
+
 <em>LOAN | A free loan management system</em> is made with <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. Content Language: lang="de".
 
 ## Lizenz/ License
