@@ -40,7 +40,7 @@ SPDX-License-Identifier: **CC-BY-NC-SA-4.0**
 
 Für Anfragen zu kommerziellen Lizenzen eröffnen Sie bitte ein Ticket auf GitHub.
 
-## CC-BY-NC-SA-4.0 License
+### CC-BY-NC-SA-4.0 License
 
 This project is licensed under the **Creative Commons Attribution–NonCommercial–ShareAlike 4.0 International** (CC BY-NC-SA 4.0) license.
 
