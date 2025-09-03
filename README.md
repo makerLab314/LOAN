@@ -9,10 +9,20 @@ Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche un
     <li>Postgres</li>
     <li>PHP 8.3</li>
 </ul>
-und wurde mit <a href="https://laravel.com" target="_blank">Laravel</a> sowie <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a> programmiert und ist unter einer <a href="https://opensource.org/licenses/MIT"target="_blank">MIT-Lizenz</a> verfügbar. Um Zugang zu einem Testaccount unter <a href="http://loan.vdus.de" target="_blank">http://loan.vdus.de</a> zu erhalten, kontaktieren Sie mich bitte unter vincent.dusanek[at]gmail.com.
+und wurde mit <a href="https://laravel.com" target="_blank">Laravel</a> sowie <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a> programmiert. Es ist unter einer <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"target=“_blank”>CC BY-NC-SA 4.0</a> verfügbar. Um Zugang zu einem Testaccount unter <a href="http://loan.vdus.de" target="_blank">http://loan.vdus.de</a> zu erhalten, kontaktieren Sie mich bitte unter vincent.dusanek[at]gmail.com.
 <br><br>
 
 ### About
+
+Welcome to LOAN, a loan management system for scientific and media education institutions. The system runs on an LNPP structure:
+<ul>
+    <li>Ubuntu 24.04</li>
+    <li>Nginx</li>
+    <li>Postgres</li>
+    <li>PHP 8.3</li>
+</ul>
+
+and was programmed using <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. It is available under a <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"target=“_blank”>CC BY-NC-SA 4.0</a>. To get access to a test account at <a href="http://loan.vdus.de" target="_blank">http://loan.vdus.de</a>, please contact me at vincent.dusanek[at]gmail.com.
 
 <em>LOAN | A free loan management system</em> is made with <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. Content Language: lang="de".
 
