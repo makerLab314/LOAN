@@ -4,11 +4,6 @@
 
 ### Über
 
-<details>
-    <summary>Accordion_name</summary>
-    <p>Accordion_content</p>
-    </details>
-
 Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</em>. Das System läuft auf einer LNPP-Struktur: 
 <ul>
     <li>Ubuntu 24.04</li>
@@ -19,9 +14,9 @@ Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche un
 und wurde mit <a href="https://laravel.com" target="_blank">Laravel</a> sowie <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a> programmiert. Es ist unter einer <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"target=“_blank”>CC BY-NC-SA 4.0</a> verfügbar. Um Zugang zu einem Testaccount unter <a href="http://loan.vdus.de" target="_blank">http://loan.vdus.de</a> zu erhalten, kontaktieren Sie mich bitte unter vincent.dusanek[at]gmail.com.
 <br>
 
-### About
-
-Welcome to LOAN, a loan management system for scientific and media education institutions. The system runs on an LNPP structure:
+<details>
+    <summary>About</summary>
+    <p>Welcome to LOAN, a loan management system for scientific and media education institutions. The system runs on an LNPP structure:
 <ul>
     <li>Ubuntu 24.04</li>
     <li>Nginx</li>
@@ -31,7 +26,12 @@ Welcome to LOAN, a loan management system for scientific and media education ins
 
 and was programmed using <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. It is available under a <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"target=“_blank”>CC BY-NC-SA 4.0</a>. To get access to a test account at <a href="http://loan.vdus.de" target="_blank">http://loan.vdus.de</a>, please contact me at vincent.dusanek[at]gmail.com.
 
-<em>LOAN | A free loan management system</em> is made with <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. Content Language: lang="de".
+<em>LOAN | A free loan management system</em> is made with <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. Content Language: lang="de".</p>
+    </details>
+
+### About
+
+
 
 ## Lizenz/ License
 
