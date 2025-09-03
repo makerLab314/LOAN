@@ -4,6 +4,11 @@
 
 ### Über
 
+<details>
+    <summary>Accordion_name</summary>
+    <p>Accordion_content</p>
+    </details>
+
 Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</em>. Das System läuft auf einer LNPP-Struktur: 
 <ul>
     <li>Ubuntu 24.04</li>
