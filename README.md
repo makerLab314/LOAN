@@ -1,10 +1,10 @@
-# LOAN
+# LOAN V2 (Forked from original dusanvin/LOAN)
 
 ## Allgemeines/ General
 
 ### Über
 
-<p>Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</em>. Das System läuft auf einer LNPP-Struktur: 
+<p>Willkommen be <em>LOAN, dem System zur Geräteausleihe für das MakerLab der FWS Frankfurt.</em>. Das System läuft auf einer LNPP-Struktur: 
 <ul>
     <li>Ubuntu 24.04</li>
     <li>Nginx</li>
@@ -30,8 +30,6 @@ and was programmed using <a href="https://laravel.com" target="_blank">Laravel</
     </details>
 
 ## Lizenz/ License
-
-### CC-BY-NC-SA-4.0 Lizenz
 
 <p>Dieses Projekt unterliegt der Creative Commons Attribution–NonCommercial–ShareAlike 4.0 International (CC BY-NC-SA 4.0) Lizenz.
 
