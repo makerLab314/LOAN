@@ -19,8 +19,18 @@ class Device extends Model
         'loan_start_date',
         'loan_end_date',
         'category_id',
-        'loan_purpose', 
+        'loan_purpose',
+        'total_quantity',
+        'loaned_quantity',
     ];
+
+    /**
+     * Get the available quantity for loan.
+     */
+    public function getAvailableQuantityAttribute(): int
+    {
+        return max(0, $this->total_quantity - $this->loaned_quantity);
+    }
 
     public function reservations()
     {

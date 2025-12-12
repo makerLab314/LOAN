@@ -34,11 +34,11 @@
 
     <div class="container mx-auto mb-8 p-4 bg-gray-600 rounded-tr rounded-b">
         <div id="Gerätespezifika" class="tab-content">
-            <div class="flex">
-                <div class="w-1/4">
-                    <img src="{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}" alt="{{ $device->title }}" class="w-full h-auto object-cover cursor-pointer rounded border-2 hover:border-gray-400" onclick="openImageModal('{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}')">
+            <div class="flex flex-col md:flex-row">
+                <div class="w-full md:w-1/4 mb-4 md:mb-0">
+                    <img src="{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}" alt="{{ $device->title }}" class="w-full h-auto max-w-xs mx-auto md:max-w-none object-cover cursor-pointer rounded border-2 hover:border-gray-400" onclick="openImageModal('{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}')">
                 </div>
-                <div class="w-3/4 pl-4">
+                <div class="w-full md:w-3/4 md:pl-4">
                     <div class="mb-4">
                         <label for="title" class="block text-gray-300 text-sm font-semibold mb-2">Name & Label inkl. Seriennummer (SN):</label>
                         <input type="text" name="title" id="title" class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" value="{{ $device->title }}" disabled>
@@ -63,11 +63,21 @@
                         </select>
                     </div>
 
-                    <div class="mb-4">
-                        <label for="status" class="block text-gray-300 text-sm font-semibold mb-2">Status:</label>
-                        <span class="text-white {{ $device->status == 'available' ? 'bg-green-600' : 'bg-yellow-600' }} rounded p-2 inline-flex">
-                            {{ $device->status == 'available' ? 'Verfügbar' : 'Verliehen' }}
-                        </span>
+                    <div class="flex flex-wrap gap-4 mb-4">
+                        <div>
+                            <label for="status" class="block text-gray-300 text-sm font-semibold mb-2">Status:</label>
+                            <span class="text-white {{ $device->status == 'available' ? 'bg-green-600' : 'bg-yellow-600' }} rounded p-2 inline-flex">
+                                {{ $device->status == 'available' ? 'Verfügbar' : 'Verliehen' }}
+                            </span>
+                        </div>
+                        @if(($device->total_quantity ?? 1) > 1)
+                        <div>
+                            <label class="block text-gray-300 text-sm font-semibold mb-2">Anzahl:</label>
+                            <span class="text-white bg-gray-500 rounded p-2 inline-flex">
+                                {{ $device->available_quantity }}/{{ $device->total_quantity }} verfügbar
+                            </span>
+                        </div>
+                        @endif
                     </div>
                 </div>
             </div>

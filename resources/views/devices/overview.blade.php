@@ -83,12 +83,12 @@
     <div class="lg:container mx-auto flex items-center mb-8 p-4 pt-4 bg-gray-600 rounded">
         <div class="w-full">
             <!-- Toolbar -->
-            <div class="mb-4 flex flex-wrap items-center gap-2">
-                <div class="flex items-center gap-2">
+            <div class="mb-4 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                     <!-- Kategorie-Dropdown -->
                     <div class="relative inline-block text-left">
                         <button id="categoryButton" type="button"
-                                class="inline-flex w-56 justify-between items-center rounded-md bg-gray-500 px-4 py-2 text-sm text-white shadow-sm hover:bg-gray-400 focus:outline-none"
+                                class="inline-flex w-full sm:w-56 justify-between items-center rounded-md bg-gray-500 px-4 py-2 text-sm text-white shadow-sm hover:bg-gray-400 focus:outline-none"
                                 aria-haspopup="true" aria-expanded="false" onclick="toggleCategoryMenu()">
                             <span id="categoryButtonLabel">Kategorie</span>
                             <svg class="h-5 w-5 ml-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -112,7 +112,7 @@
                     <!-- Status-Dropdown -->
                     <div class="relative inline-block text-left">
                         <button id="typeButton" type="button"
-                                class="inline-flex w-44 justify-between items-center rounded-md bg-gray-500 px-4 py-2 text-sm text-gray-100 shadow-sm hover:bg-gray-400 focus:outline-none"
+                                class="inline-flex w-full sm:w-44 justify-between items-center rounded-md bg-gray-500 px-4 py-2 text-sm text-gray-100 shadow-sm hover:bg-gray-400 focus:outline-none"
                                 aria-haspopup="true" aria-expanded="false" onclick="toggleTypeMenu()">
                             <span id="typeButtonLabel">Status</span>
                             <svg class="h-5 w-5 ml-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -120,7 +120,7 @@
                             </svg>
                         </button>
                         <div id="typeMenu"
-                             class="hidden absolute z-20 mt-2 w-44 origin-top-left rounded-md bg-gray-500 shadow-lg ring-1 ring-black ring-opacity-5">
+                             class="hidden absolute z-20 mt-2 w-full sm:w-44 origin-top-left rounded-md bg-gray-500 shadow-lg ring-1 ring-black ring-opacity-5">
                             <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="typeButton">
                                 <a href="#" class="type-item block px-4 py-2 text-sm text-gray-100 hover:bg-gray-400" data-type="all">Alle</a>
                                 <a href="#" class="type-item block px-4 py-2 text-sm text-gray-100 hover:bg-gray-400" data-type="loaned">Verliehen</a>
@@ -131,10 +131,10 @@
                 </div>
 
                 <!-- Suche -->
-                <div class="ml-auto">
+                <div class="sm:ml-auto w-full sm:w-auto">
                     <div class="relative">
                         <input id="searchInput" type="text" placeholder="Suchen: Name oder Beschreibung…"
-                               class="w-80 rounded-md bg-gray-700 placeholder-gray-400 text-gray-200 px-4 py-2 text-sm
+                               class="w-full sm:w-80 rounded-md bg-gray-700 placeholder-gray-400 text-gray-200 px-4 py-2 text-sm
                                border border-gray-700 focus:outline-none focus:ring-0 focus:ring-transparent focus:border-gray-700"
                                autocomplete="off" />
                         <button type="button" id="clearSearch"
@@ -153,11 +153,13 @@
                 Wende dich an die Administration, wenn eine weitere Kategorie hinzugefügt werden soll.
             </div>
 
-            <table class="w-full bg-gray-700 text-white rounded-lg table-fixed text-left">
-                <thead>
-                    <tr>
-                        <th class="border-b-2 px-4 py-2 border-gray-500 w-24 font-medium text-sm">Bild</th>
-                        <th class="border-b-2 px-4 py-2 border-gray-500 w-94 font-medium text-sm">Name & Label</th>
+            <!-- Desktop Table -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full bg-gray-700 text-white rounded-lg table-fixed text-left">
+                    <thead>
+                        <tr>
+                            <th class="border-b-2 px-4 py-2 border-gray-500 w-24 font-medium text-sm">Bild</th>
+                            <th class="border-b-2 px-4 py-2 border-gray-500 w-64 font-medium text-sm">Name & Label</th>
                         <th class="border-b-2 px-4 py-2 border-gray-500 w-32 font-medium text-sm">Beschreibung</th>
                         <th class="border-b-2 px-4 py-2 border-gray-500 w-40 font-medium text-sm"><span class="hidden lg:inline">Kategorie</span></th>
                         <th class="border-b-2 px-4 py-2 border-gray-500 w-32 font-medium text-sm">Status</th>
@@ -304,6 +306,98 @@
                     @endforelse
                 </tbody>
             </table>
+            </div>
+            
+            <!-- Mobile Card View -->
+            <div class="md:hidden space-y-4" id="mixCardContainer">
+                {{-- Ausgeliehene Geräte --}}
+                @foreach ($devices as $device)
+                    @if ($device->status == 'loaned')
+                        <div class="mix-card bg-gray-700 rounded-lg p-4" data-type="loaned" data-group="{{ $device->category->name ?? $device->group }}">
+                            <div class="flex items-start gap-3">
+                                <img src="{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}"
+                                    alt="{{ $device->title }}"
+                                    class="w-16 h-16 object-cover rounded border-2 border-gray-600">
+                                <div class="flex-1 min-w-0">
+                                    <a href="{{ route('devices.show', $device->id) }}"
+                                        class="text-white font-medium hover:underline block truncate">{{ $device->title }}</a>
+                                    <p class="text-gray-400 text-sm truncate">{{ $device->description }}</p>
+                                    <div class="flex items-center gap-2 mt-2 flex-wrap">
+                                        <span class="text-white bg-yellow-600 rounded-full py-1 px-2 text-xs">Verliehen</span>
+                                    </div>
+                                    <p class="text-gray-400 text-sm mt-2">
+                                        {{ $device->borrower_name }}
+                                        @if (!empty($device->loan_end_date))
+                                            bis {{ \Carbon\Carbon::parse($device->loan_end_date)->format('d.m.Y') }}
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-600">
+                                <form action="{{ route('devices.return') }}" method="POST" class="flex-1"
+                                    onsubmit="return confirm('Wurde {{ $device->title }} vollständig und korrekt angenommen?');">
+                                    @csrf
+                                    <input type="hidden" name="device_id" value="{{ $device->id }}">
+                                    <button type="submit"
+                                        class="w-full bg-gray-200 hover:bg-white text-black font-bold py-2 px-4 rounded text-xs">
+                                        Annehmen
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
+
+                {{-- Vorgemerkte Geräte --}}
+                @forelse($reservations as $res)
+                    @php $dev = $res->device; @endphp
+                    @if ($dev)
+                        <div class="mix-card bg-gray-700 rounded-lg p-4" data-type="reserved" data-group="{{ $dev->group }}">
+                            <div class="flex items-start gap-3">
+                                <img src="{{ $dev->image ? Storage::url($dev->image) : asset('img/filler.png') }}"
+                                    alt="{{ $dev->title }}"
+                                    class="w-16 h-16 object-cover rounded border-2 border-gray-600">
+                                <div class="flex-1 min-w-0">
+                                    <a href="{{ route('devices.show', $dev->id) }}"
+                                        class="text-white font-medium hover:underline block truncate">{{ $dev->title }}</a>
+                                    <p class="text-gray-400 text-sm truncate">{{ $dev->description }}</p>
+                                    <div class="flex items-center gap-2 mt-2 flex-wrap">
+                                        <span class="text-white bg-purple-600 rounded-full py-1 px-2 text-xs">Vorgemerkt</span>
+                                    </div>
+                                    <p class="text-gray-400 text-sm mt-2">
+                                        {{ $res->reserved_by_name ?? optional($res->user)->name ?? 'Unbekannt' }}:
+                                        {{ $res->start_at->timezone(config('app.timezone'))->format('d.m.Y') }} bis
+                                        {{ $res->end_at->timezone(config('app.timezone'))->format('d.m.Y') }}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-600">
+                                <button type="button"
+                                    class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-3 rounded text-xs js-loan-prefill"
+                                    data-device-id="{{ $dev->id }}"
+                                    data-borrower="{{ e($res->reserved_by_name ?? optional($res->user)->name) }}"
+                                    data-start="{{ $res->start_at->timezone(config('app.timezone'))->format('Y-m-d') }}"
+                                    data-end="{{ $res->end_at->timezone(config('app.timezone'))->format('Y-m-d') }}"
+                                    data-purpose="{{ e($res->purpose) }}">
+                                    Verleihen
+                                </button>
+                                @if ($res->status === 'pending' && $res->user_id === auth()->id())
+                                    <form action="{{ route('devices.reservations.destroy', $res) }}" method="POST" class="flex-1"
+                                        onsubmit="return confirm('Willst du die Vormerkung wirklich widerrufen?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit"
+                                            class="w-full bg-gray-600 hover:bg-gray-800 text-white py-2 px-3 rounded text-xs font-medium">
+                                            Stornieren
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
+                @empty
+                @endforelse
+            </div>
         </div>
     </div>
 
@@ -418,9 +512,11 @@
         /** ------- Apply Filters + Sort ------- **/
         function applyFilters() {
             const rows = Array.from(document.querySelectorAll('.mix-row'));
+            const cards = Array.from(document.querySelectorAll('.mix-card'));
             const body = document.getElementById('mixTableBody');
             const q = (filters.query || '').toLocaleLowerCase('de');
 
+            // Filter desktop table rows
             rows.forEach(row => {
                 const rowGroup = row.dataset.group || '';
                 const rowType = row.dataset.type || '';
@@ -436,6 +532,24 @@
                 }
 
                 row.style.display = (inGroup && inType && inSearch) ? '' : 'none';
+            });
+            
+            // Filter mobile cards
+            cards.forEach(card => {
+                const cardGroup = card.dataset.group || '';
+                const cardType = card.dataset.type || '';
+                
+                const inGroup = !filters.group || cardGroup === filters.group;
+                const inType = (filters.type === 'all') || (cardType === filters.type);
+                
+                let inSearch = true;
+                if (q) {
+                    const name = (card.querySelector('a')?.textContent || '').toLocaleLowerCase('de');
+                    const desc = (card.querySelector('p.text-gray-400')?.textContent || '').toLocaleLowerCase('de');
+                    inSearch = name.includes(q) || desc.includes(q);
+                }
+                
+                card.style.display = (inGroup && inType && inSearch) ? '' : 'none';
             });
 
             const visible = rows.filter(r => r.style.display !== 'none');
