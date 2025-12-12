@@ -84,7 +84,7 @@
 
 
 
-            <div class="mb-4 flex justify-end gap-3">
+            <div class="mb-4 flex flex-wrap justify-end gap-3">
                 <!-- Gerät hinzufügen -->
                 <a href="{{ route('devices.create') }}"
                     class="inline-flex items-center pl-3 pr-4 py-2 rounded-md bg-gray-600 text-white text-sm font-medium hover:bg-yellow-600">
@@ -93,32 +93,33 @@
                             d="M12 4.5a.75.75 0 01.75.75v6h6a.75.75 0 010 1.5h-6v6a.75.75 0 01-1.5 0v-6h-6a.75.75 0 010-1.5h6v-6A.75.75 0 0112 4.5z"
                             clip-rule="evenodd" />
                     </svg>
-                    Gerät hinzufügen
+                    <span class="hidden sm:inline">Gerät hinzufügen</span>
+                    <span class="sm:hidden">Neu</span>
                 </a>
 
                 <!-- Kategorien verwalten -->
                 <a href="{{ route('categories.index') }}"
                     class="inline-flex items-center px-4 py-2 rounded-md bg-gray-600 text-white text-sm font-medium bg-gray-700 hover:bg-gray-900">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 mr-3">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-5 w-5 sm:mr-3">
                         <path fill-rule="evenodd"
                             d="M3 5.25a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 5.25Zm0 4.5A.75.75 0 0 1 3.75 9h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 9.75Zm0 4.5a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75Zm0 4.5a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75Z"
                             clip-rule="evenodd" />
                     </svg>
 
 
-                    Kategorien verwalten
+                    <span class="hidden sm:inline">Kategorien verwalten</span>
                 </a>
             </div>
 
 
             <!-- Toolbar: Dropdowns links, Suche rechts -->
-            <div class="mb-4 flex flex-wrap items-center gap-2">
+            <div class="mb-4 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2">
                 <!-- LINKS: Geräte + Status -->
-                <div class="flex items-center gap-2">
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                     <!-- Geräte-Dropdown -->
                     <div class="relative inline-block text-left">
                         <button id="categoryButton" type="button"
-                            class="inline-flex w-56 justify-between items-center rounded-md bg-gray-500 px-4 py-2 text-sm text-white shadow-sm hover:bg-gray-400 focus:outline-none"
+                            class="inline-flex w-full sm:w-56 justify-between items-center rounded-md bg-gray-500 px-4 py-2 text-sm text-white shadow-sm hover:bg-gray-400 focus:outline-none"
                             aria-haspopup="true" aria-expanded="false" onclick="toggleCategoryMenu()">
                             <span id="categoryButtonLabel">Geräte</span>
                             <svg class="h-5 w-5 ml-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -147,7 +148,7 @@
                     <!-- Status-Dropdown -->
                     <div class="relative inline-block text-left">
                         <button id="statusButton" type="button"
-                            class="inline-flex w-40 justify-between items-center rounded-md bg-gray-500 px-4 py-2 text-sm text-gray-100 shadow-sm hover:bg-gray-400 focus:outline-none"
+                            class="inline-flex w-full sm:w-40 justify-between items-center rounded-md bg-gray-500 px-4 py-2 text-sm text-gray-100 shadow-sm hover:bg-gray-400 focus:outline-none"
                             aria-haspopup="true" aria-expanded="false" onclick="toggleStatusMenu()">
                             <span id="statusButtonLabel">Status</span>
                             <svg class="h-5 w-5 ml-3" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -158,7 +159,7 @@
                         </button>
 
                         <div id="statusMenu"
-                            class="hidden absolute z-20 mt-2 w-40 origin-top-left rounded-md bg-gray-500 shadow-lg ring-1 ring-black ring-opacity-5">
+                            class="hidden absolute z-20 mt-2 w-full sm:w-40 origin-top-left rounded-md bg-gray-500 shadow-lg ring-1 ring-black ring-opacity-5">
                             <div class="py-1" role="menu" aria-orientation="vertical"
                                 aria-labelledby="statusButton">
                                 <a href="#"
@@ -176,10 +177,10 @@
                 </div>
 
                 <!-- RECHTS: Suche -->
-                <div class="ml-auto">
+                <div class="sm:ml-auto w-full sm:w-auto">
                     <div class="relative">
                         <input id="searchInput" type="text" placeholder="Suchen: Name oder Beschreibung…"
-                            class="w-80 rounded-md bg-gray-700 placeholder-gray-400 text-gray-200 px-4 py-2 text-sm
+                            class="w-full sm:w-80 rounded-md bg-gray-700 placeholder-gray-400 text-gray-200 px-4 py-2 text-sm
                     border border-gray-700 focus:outline-none focus:ring-0 focus:ring-transparent focus:border-gray-700"
                             autocomplete="off" />
                         <button type="button" id="clearSearch"
@@ -195,140 +196,181 @@
                     </div>
                 </div>
             </div>
-            <table class="w-full bg-gray-700 text-white rounded-lg table-fixed text-left">
-                <thead>
-                    <tr>
-                        <th class="border-b-2 px-4 py-2 border-gray-500 w-24 font-medium text-sm">Bild</th>
-                        <th class="border-b-2 px-4 py-2 border-gray-500 w-96 font-medium text-sm">Name & Label</th>
-                        <th class="border-b-2 px-4 py-2 border-gray-500 w-32 font-medium text-sm">Beschreibung</th>
-                        <th class="border-b-2 px-4 py-2 border-gray-500 w-40 font-medium text-sm"><span
-                                class="hidden lg:inline">Kategorie</span></th>
-                        <th class="border-b-2 px-4 py-2 border-gray-500 w-32 font-medium text-sm">Status</th>
+
+            <!-- Desktop Table -->
+            <div class="hidden md:block overflow-x-auto">
+                <table class="w-full bg-gray-700 text-white rounded-lg table-fixed text-left">
+                    <thead>
+                        <tr>
+                            <th class="border-b-2 px-4 py-2 border-gray-500 w-24 font-medium text-sm">Bild</th>
+                            <th class="border-b-2 px-4 py-2 border-gray-500 w-64 font-medium text-sm">Name & Label</th>
+                            <th class="border-b-2 px-4 py-2 border-gray-500 w-32 font-medium text-sm">Beschreibung</th>
+                            <th class="border-b-2 px-4 py-2 border-gray-500 w-32 font-medium text-sm"><span class="hidden lg:inline">Kategorie</span></th>
+                            <th class="border-b-2 px-4 py-2 border-gray-500 w-24 font-medium text-sm">Anzahl</th>
+                            <th class="border-b-2 px-4 py-2 border-gray-500 w-32 font-medium text-sm">Status</th>
+                            <th class="border-b-2 px-4 py-2 border-gray-500 w-48 font-medium text-sm">Person / Zeitraum</th>
+                            <th class="border-b-2 px-4 py-2 border-gray-500 w-48 font-medium text-sm"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="deviceTableBody">
                         @foreach ($devices as $device)
-                            @if ($device->borrower_name)
-                                <th class="border-b-2 px-4 py-2 border-gray-500 w-90 font-medium text-sm">Person /
-                                    Zeitraum</th>
-                                @break
-
-                            @else
-                                <td class="border-b-2 px-4 py-2 border-gray-500 w-90 font-medium text-sm">Person /
-                                    Zeitraum</td>
-                                @break
-                            @endif
-                        @endforeach
-                        <th class="border-b-2 px-4 py-2 border-gray-500 w-64 font-medium text-sm"></th>
-                    </tr>
-                </thead>
-                <tbody id="deviceTableBody">
-                    @foreach ($devices as $device)
-                        <tr class="device-row" data-group="{{ trim($device->category->name ?? $device->group) }}">
-                            <td class="border-b px-4 py-2 border-gray-600">
-                                <img src="{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}"
-                                    alt="{{ $device->title }}"
-                                    class="w-8 lg:w-16 h-8 lg:h-16 object-cover cursor-pointer rounded border-2 hover:border-gray-400"
-                                    onclick="openImageModal('{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}')">
-                            </td>
-                            <td class="border-b px-4 py-2 border-gray-600 text-sm break-words">
-                                <a href="{{ route('devices.show', $device->id) }}"
-                                    class="text-gray-300 hover:underline hover:text-white">{{ $device->title }}</a>
-                            </td>
-                            <td class="border-b px-4 py-2 border-gray-600 text-sm break-words text-gray-300 ">
-                                {{ $device->description }}</td>
-                            <td class="border-b px-4 py-2 border-gray-600 text-sm break-words text-gray-300 ">
-                                @switch($device->category->name ?? $device->group)
-                                    @case('VRAR')
-                                        VR-/AR-Brille
-                                    @break
-
-                                    @case('Videokonferenzsystem')
-                                        Videokonf.
-                                    @break
-
-                                    @case('Microcontroller')
-                                        Microcontr.
-                                    @break
-
-                                    @default
-                                        {{ $device->category->name ?? $device->group }}
-                                @endswitch
-                            </td>
-                            <td class="border-b px-4 py-2 border-gray-600 text-xs">
-                                <span
-                                    class="text-white {{ $device->status == 'available' ? 'bg-green-600' : 'bg-yellow-600' }} rounded-full py-1 px-2 inline-flex">
-                                    {{ $device->status == 'available' ? 'Verfügbar' : 'Verliehen' }}
-                                </span>
-                            </td>
-                            @if ($device->borrower_name)
-                                <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300 ">
-                                    {{ $device->borrower_name }} bis
-                                    {{ \Carbon\Carbon::parse($device->loan_end_date)->format('d.m.Y') }}
-
-                                    @if (!empty($device->loan_purpose))
-                                        <div class="text-sm text-gray-400 mt-1">
-                                            {{ $device->loan_purpose }}
-                                        </div>
-                                    @endif
+                            <tr class="device-row" data-group="{{ trim($device->category->name ?? $device->group) }}" 
+                                data-available-qty="{{ $device->available_quantity }}" 
+                                data-total-qty="{{ $device->total_quantity }}">
+                                <td class="border-b px-4 py-2 border-gray-600">
+                                    <img src="{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}"
+                                        alt="{{ $device->title }}"
+                                        class="w-8 lg:w-16 h-8 lg:h-16 object-cover cursor-pointer rounded border-2 hover:border-gray-400"
+                                        onclick="openImageModal('{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}')">
                                 </td>
-                            @else
-                                <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300 ">
-                                    Momentan verfügbar
+                                <td class="border-b px-4 py-2 border-gray-600 text-sm break-words">
+                                    <a href="{{ route('devices.show', $device->id) }}"
+                                        class="text-gray-300 hover:underline hover:text-white">{{ $device->title }}</a>
                                 </td>
-                            @endif
-                            <td class="border-b px-4 py-2 border-gray-600 text-sm text-left">
-                                <div class="flex justify-end items-center">
-                                    @if ($device->status == 'available')
-                                        <button onclick="openLoanModal({{ $device->id }})"
-                                            class="mr-2 hover:bg-yellow-600 hover:text-white text-gray-200 font-bold py-2 px-4 rounded text-xs">
-                                            <span class="hidden xl:inline">Verleihen</span>
-                                            <span class="xl:hidden">V</span>
-                                        </button>
+                                <td class="border-b px-4 py-2 border-gray-600 text-sm break-words text-gray-300">
+                                    {{ $device->description }}</td>
+                                <td class="border-b px-4 py-2 border-gray-600 text-sm break-words text-gray-300">
+                                    @switch($device->category->name ?? $device->group)
+                                        @case('VRAR')
+                                            VR-/AR-Brille
+                                        @break
+                                        @case('Videokonferenzsystem')
+                                            Videokonf.
+                                        @break
+                                        @case('Microcontroller')
+                                            Microcontr.
+                                        @break
+                                        @default
+                                            {{ $device->category->name ?? $device->group }}
+                                    @endswitch
+                                </td>
+                                <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300">
+                                    @if($device->total_quantity > 1)
+                                        <span class="font-medium">{{ $device->available_quantity }}/{{ $device->total_quantity }}</span>
                                     @else
-                                        <form id="return-form-{{ $device->id }}"
-                                            action="{{ route('devices.return') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="device_id" value="{{ $device->id }}">
-                                            <!-- <button type="button" onclick="confirmReturn({{ $device->id }}, '{{ $device->title }}', '{{ $device->description }}')"
-                                                            class="shadow-md bg-gray-800 hover:bg-black text-white font-bold py-2 px-4 rounded text-xs">
-                                                            <span class="hidden xl:inline">Zurückgeben</span>
-                                                            <span class="xl:hidden">Z</span>
-                                                        </button> -->
-                                        </form>
+                                        1
                                     @endif
-                                    {{-- NEU: --}}
-                                    <button type="button" onclick="openReservationModal({{ $device->id }})"
-                                        class="inline-flex items-center px-4 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium">
-                                        Vormerken
-                                    </button>
-                                    <a href="{{ route('devices.edit', $device) }}"
-                                        class="py-2 pl-2 lg:pl-6 pr-2 rounded text-gray-300 hover:text-white">
-                                        <svg height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
-                                            fill="currentColor" class="size-6">
-                                            <path
-                                                d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
-                                            <path
-                                                d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
-                                        </svg>
-                                    </a>
-                                    <form action="{{ route('devices.destroy', $device) }}" method="POST"
-                                        class="inline-block">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="py-2 px-0 rounded text-gray-300 hover:text-white"
-                                            onclick="return confirm('Sind Sie sicher, dass Sie dieses Gerät löschen möchten?')">
+                                </td>
+                                <td class="border-b px-4 py-2 border-gray-600 text-xs">
+                                    @if($device->available_quantity > 0)
+                                        <span class="text-white bg-green-600 rounded-full py-1 px-2 inline-flex">
+                                            Verfügbar
+                                        </span>
+                                    @else
+                                        <span class="text-white bg-yellow-600 rounded-full py-1 px-2 inline-flex">
+                                            Verliehen
+                                        </span>
+                                    @endif
+                                </td>
+                                @if ($device->borrower_name)
+                                    <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300">
+                                        {{ $device->borrower_name }} bis
+                                        {{ \Carbon\Carbon::parse($device->loan_end_date)->format('d.m.Y') }}
+                                        @if (!empty($device->loan_purpose))
+                                            <div class="text-sm text-gray-400 mt-1">
+                                                {{ $device->loan_purpose }}
+                                            </div>
+                                        @endif
+                                    </td>
+                                @else
+                                    <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300">
+                                        Momentan verfügbar
+                                    </td>
+                                @endif
+                                <td class="border-b px-4 py-2 border-gray-600 text-sm text-left">
+                                    <div class="flex justify-end items-center flex-wrap gap-1">
+                                        @if ($device->available_quantity > 0)
+                                            <button onclick="openLoanModal({{ $device->id }}, {{ $device->available_quantity }}, {{ $device->total_quantity }})"
+                                                class="mr-2 hover:bg-yellow-600 hover:text-white text-gray-200 font-bold py-2 px-4 rounded text-xs">
+                                                <span class="hidden xl:inline">Verleihen</span>
+                                                <span class="xl:hidden">V</span>
+                                            </button>
+                                        @endif
+                                        <button type="button" onclick="openReservationModal({{ $device->id }})"
+                                            class="inline-flex items-center px-4 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium">
+                                            Vormerken
+                                        </button>
+                                        <a href="{{ route('devices.edit', $device) }}"
+                                            class="py-2 pl-2 lg:pl-4 pr-2 rounded text-gray-300 hover:text-white">
                                             <svg height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
                                                 fill="currentColor" class="size-6">
-                                                <path fill-rule="evenodd"
-                                                    d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
-                                                    clip-rule="evenodd" />
+                                                <path
+                                                    d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
+                                                <path
+                                                    d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
                                             </svg>
-                                        </button>
-                                    </form>
+                                        </a>
+                                        <form action="{{ route('devices.destroy', $device) }}" method="POST"
+                                            class="inline-block">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="py-2 px-0 rounded text-gray-300 hover:text-white"
+                                                onclick="return confirm('Sind Sie sicher, dass Sie dieses Gerät löschen möchten?')">
+                                                <svg height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                    fill="currentColor" class="size-6">
+                                                    <path fill-rule="evenodd"
+                                                        d="M16.5 4.478v.227a48.816 48.816 0 0 1 3.878.512.75.75 0 1 1-.256 1.478l-.209-.035-1.005 13.07a3 3 0 0 1-2.991 2.77H8.084a3 3 0 0 1-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 0 1-.256-1.478A48.567 48.567 0 0 1 7.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 0 1 3.369 0c1.603.051 2.815 1.387 2.815 2.951Zm-6.136-1.452a51.196 51.196 0 0 1 3.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 0 0-6 0v-.113c0-.794.609-1.428 1.364-1.452Zm-.355 5.945a.75.75 0 1 0-1.5.058l.347 9a.75.75 0 1 0 1.499-.058l-.346-9Zm5.48.058a.75.75 0 1 0-1.498-.058l-.347 9a.75.75 0 0 0 1.5.058l.345-9Z"
+                                                        clip-rule="evenodd" />
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="md:hidden space-y-4" id="deviceCardContainer">
+                @foreach ($devices as $device)
+                    <div class="device-card bg-gray-700 rounded-lg p-4" data-group="{{ trim($device->category->name ?? $device->group) }}">
+                        <div class="flex items-start gap-3">
+                            <img src="{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}"
+                                alt="{{ $device->title }}"
+                                class="w-16 h-16 object-cover rounded border-2 border-gray-600"
+                                onclick="openImageModal('{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}')">
+                            <div class="flex-1 min-w-0">
+                                <a href="{{ route('devices.show', $device->id) }}"
+                                    class="text-white font-medium hover:underline block truncate">{{ $device->title }}</a>
+                                <p class="text-gray-400 text-sm truncate">{{ $device->description }}</p>
+                                <div class="flex items-center gap-2 mt-2 flex-wrap">
+                                    @if($device->available_quantity > 0)
+                                        <span class="text-white bg-green-600 rounded-full py-1 px-2 text-xs">Verfügbar</span>
+                                    @else
+                                        <span class="text-white bg-yellow-600 rounded-full py-1 px-2 text-xs">Verliehen</span>
+                                    @endif
+                                    @if($device->total_quantity > 1)
+                                        <span class="text-gray-300 text-xs">{{ $device->available_quantity }}/{{ $device->total_quantity }} verfügbar</span>
+                                    @endif
                                 </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                                @if ($device->borrower_name)
+                                    <p class="text-gray-400 text-sm mt-2">
+                                        {{ $device->borrower_name }} bis {{ \Carbon\Carbon::parse($device->loan_end_date)->format('d.m.Y') }}
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-600">
+                            @if ($device->available_quantity > 0)
+                                <button onclick="openLoanModal({{ $device->id }}, {{ $device->available_quantity }}, {{ $device->total_quantity }})"
+                                    class="flex-1 bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-3 rounded text-xs">
+                                    Verleihen
+                                </button>
+                            @endif
+                            <button type="button" onclick="openReservationModal({{ $device->id }})"
+                                class="flex-1 bg-gray-600 hover:bg-gray-800 text-white py-2 px-3 rounded text-xs font-medium">
+                                Vormerken
+                            </button>
+                            <a href="{{ route('devices.edit', $device) }}"
+                                class="py-2 px-3 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs">
+                                Bearbeiten
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
         </div>
     </div>
 
@@ -365,6 +407,20 @@
                                     class="w-full">
                                     @csrf
                                     <input type="hidden" name="device_id" id="device_id">
+                                    
+                                    <!-- Quantity field (shown only for multi-quantity devices) -->
+                                    <div class="mb-4" id="loan_quantity_container" style="display: none;">
+                                        <label for="loan_quantity" class="block text-gray-700 text-sm font-bold mb-2">
+                                            Anzahl ausleihen:
+                                        </label>
+                                        <div class="flex items-center gap-2">
+                                            <input type="number" name="loan_quantity" id="loan_quantity" min="1" value="1"
+                                                class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-24 py-2 px-3 text-gray-700 leading-tight">
+                                            <span class="text-gray-600 text-sm">von <span id="available_quantity_display">1</span> verfügbar</span>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-1">Wähle die Anzahl der Geräte, die du ausleihen möchtest.</p>
+                                    </div>
+                                    
                                     <div class="mb-4">
                                         <label for="borrower_name" class="block text-gray-700 text-sm font-bold mb-2">Name
                                             der Person:</label>
@@ -516,8 +572,23 @@
             document.getElementById('imageModal').classList.add('hidden');
         }
 
-        function openLoanModal(deviceId) {
+        function openLoanModal(deviceId, availableQty = 1, totalQty = 1) {
             document.getElementById('device_id').value = deviceId;
+            
+            // Handle quantity display
+            const qtyContainer = document.getElementById('loan_quantity_container');
+            const qtyInput = document.getElementById('loan_quantity');
+            const qtyDisplay = document.getElementById('available_quantity_display');
+            
+            if (totalQty > 1 && qtyContainer && qtyInput && qtyDisplay) {
+                qtyContainer.style.display = 'block';
+                qtyInput.max = availableQty;
+                qtyInput.value = 1;
+                qtyDisplay.textContent = availableQty;
+            } else if (qtyContainer) {
+                qtyContainer.style.display = 'none';
+            }
+            
             document.getElementById('loanModal').classList.remove('hidden');
         }
 
@@ -561,28 +632,29 @@
         function applyFilters() {
             const tableBody = document.getElementById('deviceTableBody');
             const rows = Array.from(document.querySelectorAll('.device-row'));
+            const cards = Array.from(document.querySelectorAll('.device-card'));
             const table = document.querySelector('table');
             const message = document.getElementById('customMessage');
 
             // "Neu" Spezialfall wie gehabt (falls du ihn nutzt)
             if (currentFilters.group === 'Neu') {
-                table.style.display = 'none';
+                if (table) table.style.display = 'none';
                 if (message) message.style.display = 'block';
                 return;
             } else {
-                table.style.display = '';
+                if (table) table.style.display = '';
                 if (message) message.style.display = 'none';
             }
 
             const q = currentFilters.query.toLocaleLowerCase('de');
 
-            // 1) Filtern (Kategorie + Status + Suche)
+            // 1) Filtern Desktop-Tabelle (Kategorie + Status + Suche)
             rows.forEach(row => {
                 // Kategorie
                 const inGroup = !currentFilters.group || row.dataset.group === currentFilters.group;
 
-                // Status (wir lesen deinen farbigen Badge aus Spalte 5)
-                const isAvailable = row.querySelector('td:nth-child(5) span')?.classList.contains('bg-green-600');
+                // Status (wir lesen den farbigen Badge aus Spalte 6 nach Anzahl-Spalte)
+                const isAvailable = row.querySelector('td:nth-child(6) span')?.classList.contains('bg-green-600');
                 let inStatus = true;
                 if (currentFilters.status === 'available') inStatus = !!isAvailable;
                 if (currentFilters.status === 'loaned') inStatus = !isAvailable;
@@ -596,6 +668,27 @@
                 }
 
                 row.style.display = (inGroup && inStatus && inSearch) ? '' : 'none';
+            });
+
+            // 1b) Filtern Mobile-Karten
+            cards.forEach(card => {
+                const inGroup = !currentFilters.group || card.dataset.group === currentFilters.group;
+                
+                // Status from card badge
+                const isAvailable = card.querySelector('.bg-green-600') !== null;
+                let inStatus = true;
+                if (currentFilters.status === 'available') inStatus = !!isAvailable;
+                if (currentFilters.status === 'loaned') inStatus = !isAvailable;
+                
+                // Suche
+                let inSearch = true;
+                if (q) {
+                    const name = (card.querySelector('a')?.textContent || '').toLocaleLowerCase('de');
+                    const desc = (card.querySelector('p.text-gray-400')?.textContent || '').toLocaleLowerCase('de');
+                    inSearch = name.includes(q) || desc.includes(q);
+                }
+                
+                card.style.display = (inGroup && inStatus && inSearch) ? '' : 'none';
             });
 
             // 2) Sichtbare Zeilen sortieren (Name, de, numeric)

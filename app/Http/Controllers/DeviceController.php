@@ -30,15 +30,26 @@ class DeviceController extends Controller
 
     public function loan(Request $request)
     {
+        $device = Device::findOrFail($request->device_id);
+        
         $request->validate([
             'borrower_name'   => 'required|string|max:255',
             'loan_start_date' => 'required|date',
             'loan_end_date'   => 'required|date|after_or_equal:loan_start_date',
             'loan_purpose'    => 'nullable|string|max:255',
+            'loan_quantity'   => 'nullable|integer|min:1|max:' . $device->available_quantity,
         ]);
 
-        $device = Device::findOrFail($request->device_id);
-        $device->status = 'loaned';
+        $loanQuantity = $request->loan_quantity ?? 1;
+        
+        // Update loaned quantity
+        $device->loaned_quantity = $device->loaned_quantity + $loanQuantity;
+        
+        // Update status based on availability
+        if ($device->loaned_quantity >= $device->total_quantity) {
+            $device->status = 'loaned';
+        }
+        
         $device->borrower_name = $request->borrower_name;
         $device->loan_start_date = $request->loan_start_date;
         $device->loan_end_date = $request->loan_end_date;
@@ -48,31 +59,47 @@ class DeviceController extends Controller
         DeviceHistory::create([
             'device_id' => $device->id,
             'action'    => 'loaned',
-            'user_name' => $request->borrower_name,
+            'user_name' => $request->borrower_name . ' (' . $loanQuantity . ' Stück)',
             'action_by' => Auth::user()->name,
         ]);
 
-        return redirect()->route('devices.index')->with('status', 'Das Gerät wurde erfolgreich verliehen.');
+        $message = $loanQuantity === 1 
+            ? '1 Gerät wurde erfolgreich verliehen.' 
+            : $loanQuantity . ' Geräte wurden erfolgreich verliehen.';
+        return redirect()->route('devices.index')->with('status', $message);
     }
 
     public function return(Request $request)
     {
         $device = Device::findOrFail($request->device_id);
-        $device->status = 'available';
-        $device->borrower_name = null;
-        $device->loan_start_date = null;
-        $device->loan_end_date = null;
-        $device->loan_purpose = null;
+        
+        $returnQuantity = $request->return_quantity ?? $device->loaned_quantity;
+        $returnQuantity = min($returnQuantity, $device->loaned_quantity); // Don't return more than loaned
+        
+        // Update loaned quantity
+        $device->loaned_quantity = max(0, $device->loaned_quantity - $returnQuantity);
+        
+        // Update status based on loaned quantity
+        if ($device->loaned_quantity == 0) {
+            $device->status = 'available';
+            $device->borrower_name = null;
+            $device->loan_start_date = null;
+            $device->loan_end_date = null;
+            $device->loan_purpose = null;
+        }
         $device->save();
 
         DeviceHistory::create([
             'device_id' => $device->id,
             'action'    => 'returned',
-            'user_name' => Auth::user()->name,
+            'user_name' => Auth::user()->name . ' (' . $returnQuantity . ' Stück)',
             'action_by' => Auth::user()->name,
         ]);
 
-        return redirect()->route('devices.index')->with('status', 'Das Gerät wurde erfolgreich zurückgegeben.');
+        $message = $returnQuantity === 1 
+            ? '1 Gerät wurde erfolgreich zurückgegeben.' 
+            : $returnQuantity . ' Geräte wurden erfolgreich zurückgegeben.';
+        return redirect()->route('devices.index')->with('status', $message);
     }
 
     public function overview()
@@ -103,19 +130,21 @@ class DeviceController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title'       => ['required','string','max:255'],
-            'description' => ['nullable','string'],
-            'image'       => ['nullable','image'],
-            'category_id' => ['required','exists:categories,id'],
+            'title'          => ['required','string','max:255'],
+            'description'    => ['nullable','string'],
+            'image'          => ['nullable','image'],
+            'category_id'    => ['required','exists:categories,id'],
+            'total_quantity' => ['nullable','integer','min:1'],
         ]);
 
         // group SPIEGELN (Übergangsphase, bis Spalte entfernt wird)
         $category = Category::find($validated['category_id']);
         $payload = [
-            'title'       => $validated['title'],
-            'description' => $validated['description'] ?? null,
-            'category_id' => $validated['category_id'],
-            'group'       => $category?->name, // hält Altlogik kompatibel
+            'title'          => $validated['title'],
+            'description'    => $validated['description'] ?? null,
+            'category_id'    => $validated['category_id'],
+            'group'          => $category?->name, // hält Altlogik kompatibel
+            'total_quantity' => $validated['total_quantity'] ?? 1,
         ];
 
         if ($request->hasFile('image')) {
@@ -136,18 +165,20 @@ class DeviceController extends Controller
     public function update(Request $request, Device $device)
     {
         $validated = $request->validate([
-            'title'       => ['required','string','max:255'],
-            'description' => ['nullable','string'],
-            'image'       => ['nullable','image'],
-            'category_id' => ['required','exists:categories,id'],
+            'title'          => ['required','string','max:255'],
+            'description'    => ['nullable','string'],
+            'image'          => ['nullable','image'],
+            'category_id'    => ['required','exists:categories,id'],
+            'total_quantity' => ['nullable','integer','min:1'],
         ]);
 
         $category = Category::find($validated['category_id']);
         $payload = [
-            'title'       => $validated['title'],
-            'description' => $validated['description'] ?? null,
-            'category_id' => $validated['category_id'],
-            'group'       => $category?->name, // Übergangskompatibilität
+            'title'          => $validated['title'],
+            'description'    => $validated['description'] ?? null,
+            'category_id'    => $validated['category_id'],
+            'group'          => $category?->name, // Übergangskompatibilität
+            'total_quantity' => $validated['total_quantity'] ?? 1,
         ];
 
         if ($request->hasFile('image')) {

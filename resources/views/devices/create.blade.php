@@ -84,6 +84,16 @@
                     <div class="text-red-600 mt-1">{{ $message }}</div>
                 @enderror
             </div>
+
+            <div class="mb-4">
+                <label for="total_quantity" class="block text-gray-700 text-sm font-bold mb-2">Anzahl (Gesamtmenge):</label>
+                <input type="number" name="total_quantity" id="total_quantity" min="1" value="{{ old('total_quantity', 1) }}"
+                    class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight">
+                <p class="text-xs text-gray-500 mt-1">Für Geräte mit mehreren Einheiten (z.B. 10 Kabel). Standard: 1</p>
+                @error('total_quantity')
+                    <div class="text-red-600 mt-1">{{ $message }}</div>
+                @enderror
+            </div>
             <div class="mb-4">
                 <button type="submit"
                     class="bg-gray-600 hover:bg-gray-800 border-gray-300 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Gerät
