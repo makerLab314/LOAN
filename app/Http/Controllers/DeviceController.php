@@ -63,7 +63,10 @@ class DeviceController extends Controller
             'action_by' => Auth::user()->name,
         ]);
 
-        return redirect()->route('devices.index')->with('status', $loanQuantity . ' Gerät(e) wurde(n) erfolgreich verliehen.');
+        $message = $loanQuantity === 1 
+            ? '1 Gerät wurde erfolgreich verliehen.' 
+            : $loanQuantity . ' Geräte wurden erfolgreich verliehen.';
+        return redirect()->route('devices.index')->with('status', $message);
     }
 
     public function return(Request $request)
@@ -93,7 +96,10 @@ class DeviceController extends Controller
             'action_by' => Auth::user()->name,
         ]);
 
-        return redirect()->route('devices.index')->with('status', $returnQuantity . ' Gerät(e) wurde(n) erfolgreich zurückgegeben.');
+        $message = $returnQuantity === 1 
+            ? '1 Gerät wurde erfolgreich zurückgegeben.' 
+            : $returnQuantity . ' Geräte wurden erfolgreich zurückgegeben.';
+        return redirect()->route('devices.index')->with('status', $message);
     }
 
     public function overview()
