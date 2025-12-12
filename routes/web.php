@@ -72,7 +72,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('devices', DeviceController::class);
     Route::post('/devices/loan', [DeviceController::class, 'loan'])->name('devices.loan');
-    Route::post('/devices/return', [DeviceController::class, 'return'])->name('devices.return');
+    Route::post('/devices/return', [DeviceController::class, 'returnLoan'])->name('devices.return');
 
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
     Route::get('/rooms/{room}/reserve', [RoomController::class, 'reserve'])->name('rooms.reserve');

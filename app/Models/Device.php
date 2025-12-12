@@ -37,6 +37,11 @@ class Device extends Model
         return $this->hasMany(\App\Models\DeviceReservation::class);
     }
 
+    public function loans()
+    {
+        return $this->hasMany(\App\Models\DeviceLoan::class);
+    }
+
     public function category()
     {
         return $this->belongsTo(\App\Models\Category::class);
