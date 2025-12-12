@@ -210,7 +210,7 @@ SPDX-License-Identifier: `CC-BY-NC-SA-4.0`
 
 ## Credits & Upstream
 
-- **Origin:** Forked from [OriginalOwner/LOAN](https://github.com/OriginalOwner/LOAN)
+- **Origin:** Forked from [dusanvin/LOAN](https://github.com/dusanvin/LOAN)
 - **This fork:** [makerLab314/LOAN](https://github.com/makerLab314/LOAN)
 - **Frameworks & Tools:**  
     [Laravel](https://laravel.com) | [TailwindCSS](https://tailwindcss.com)
