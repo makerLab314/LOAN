@@ -34,6 +34,7 @@ class DeviceReservationController extends Controller
             'end_time'   => ['required','date_format:H:i'],
             'purpose'    => ['nullable','string','max:255'],
             'reserved_by_name' => ['nullable','string','max:255'],
+            'quantity'   => ['nullable','integer','min:1'],
         ]);
 
         $start = Carbon::createFromFormat('Y-m-d H:i', $validated['start_date'].' '.$validated['start_time']);
@@ -51,8 +52,11 @@ class DeviceReservationController extends Controller
                          ->withInput();
         }
 
-        // 3) Terminüberschneidungen prüfen (keine Überschneidung mit bestehenden aktiven Vormerkungen)
-        $overlaps = $device->reservations()
+        // Get requested quantity (default to 1)
+        $requestedQuantity = $validated['quantity'] ?? 1;
+
+        // 3) Calculate reserved quantity during the requested time period
+        $reservedQuantity = $device->reservations()
             ->where('status', '!=', 'cancelled')
             ->where(function ($q) use ($start, $end) {
                 $q->whereBetween('start_at', [$start, $end])
@@ -62,10 +66,17 @@ class DeviceReservationController extends Controller
                          ->where('end_at', '>=', $end);
                   });
             })
-            ->exists();
+            ->sum('quantity');
 
-        if ($overlaps) {
-            return back()->withErrors(['start_date' => 'Dieser Zeitraum überschneidet sich mit einer bestehenden Vormerkung.'])
+        // Available quantity = total - loaned - reserved during this time period
+        $availableForReservation = $device->total_quantity - $device->loaned_quantity - $reservedQuantity;
+
+        // Validate requested quantity doesn't exceed available
+        if ($requestedQuantity > $availableForReservation) {
+            $message = $availableForReservation <= 0
+                ? 'Für diesen Zeitraum sind keine Geräte mehr verfügbar.'
+                : 'Für diesen Zeitraum sind nur noch ' . $availableForReservation . ' Gerät(e) verfügbar.';
+            return back()->withErrors(['quantity' => $message])
                          ->withInput();
         }
 
@@ -76,13 +87,17 @@ class DeviceReservationController extends Controller
             'start_at'  => $start,
             'end_at'    => $end,
             'purpose'   => $validated['purpose'] ?? null,
+            'quantity'  => $requestedQuantity,
             'reserved_by_name' => $request->input('reserved_by_name'),
             'status'    => 'pending',
         ]);
 
+        $message = $requestedQuantity === 1
+            ? 'Gerät wurde erfolgreich vorgemerkt.'
+            : $requestedQuantity . ' Geräte wurden erfolgreich vorgemerkt.';
         return redirect()
             ->route('devices.show', $device) // passe an, falls deine Show‑Route anders heißt
-            ->with('success', 'Gerät wurde erfolgreich vorgemerkt.');
+            ->with('success', $message);
     }
     public function destroy(DeviceReservation $reservation)
     {

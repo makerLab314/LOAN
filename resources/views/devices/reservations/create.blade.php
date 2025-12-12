@@ -48,6 +48,18 @@
                    class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" required>
         </div>
 
+        @if($device->total_quantity > 1)
+        <div class="mb-4">
+            <label for="quantity" class="block text-gray-700 text-sm font-bold mb-2">Anzahl vormerken:</label>
+            <div class="flex items-center gap-2">
+                <input type="number" name="quantity" id="quantity" min="1" max="{{ $device->total_quantity }}" value="{{ old('quantity', 1) }}"
+                       class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-24 py-2 px-3 text-gray-700 leading-tight">
+                <span class="text-gray-600 text-sm">von {{ $device->total_quantity }} gesamt</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">Wähle die Anzahl der Geräte, die du vormerken möchtest.</p>
+        </div>
+        @endif
+
         <div class="mb-4">
             <label for="purpose" class="block text-gray-700 text-sm font-bold mb-2">Person / Kontext (max. 255 Zeichen):</label>
             <textarea name="purpose" id="purpose" rows="3" maxlength="255"

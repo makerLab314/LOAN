@@ -286,7 +286,7 @@
                                                 <span class="xl:hidden">V</span>
                                             </button>
                                         @endif
-                                        <button type="button" onclick="openReservationModal({{ $device->id }})"
+                                        <button type="button" onclick="openReservationModal({{ $device->id }}, {{ $device->total_quantity }})"
                                             class="inline-flex items-center px-4 py-2 rounded bg-gray-600 hover:bg-gray-800 text-white text-xs font-medium">
                                             Vormerken
                                         </button>
@@ -359,7 +359,7 @@
                                     Verleihen
                                 </button>
                             @endif
-                            <button type="button" onclick="openReservationModal({{ $device->id }})"
+                            <button type="button" onclick="openReservationModal({{ $device->id }}, {{ $device->total_quantity }})"
                                 class="flex-1 bg-gray-600 hover:bg-gray-800 text-white py-2 px-3 rounded text-xs font-medium">
                                 Vormerken
                             </button>
@@ -500,6 +500,19 @@
                                         <input type="text" name="reserved_by_name" id="res_person" maxlength="255"
                                             class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight"
                                             placeholder="Für wen wird das Gerät vorgemerkt?">
+                                    </div>
+
+                                    <!-- Quantity field (shown only for multi-quantity devices) -->
+                                    <div class="mb-4" id="res_quantity_container" style="display: none;">
+                                        <label for="res_quantity" class="block text-gray-700 text-sm font-bold mb-2">
+                                            Anzahl vormerken:
+                                        </label>
+                                        <div class="flex items-center gap-2">
+                                            <input type="number" name="quantity" id="res_quantity" min="1" value="1"
+                                                class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-24 py-2 px-3 text-gray-700 leading-tight">
+                                            <span class="text-gray-600 text-sm">von <span id="res_total_quantity_display">1</span> gesamt</span>
+                                        </div>
+                                        <p class="text-xs text-gray-500 mt-1">Wähle die Anzahl der Geräte, die du vormerken möchtest.</p>
                                     </div>
 
                                     <div class="mb-4">
@@ -818,7 +831,7 @@
     </script>
 
     <script>
-        function openReservationModal(deviceId) {
+        function openReservationModal(deviceId, totalQty = 1) {
             // Hidden device_id (falls genutzt)
             const hid = document.getElementById('reservation_device_id');
             if (hid) hid.value = deviceId;
@@ -827,6 +840,20 @@
             const form = document.getElementById('reservationForm');
             const tpl = form.dataset.actionTemplate; // z.B. /devices/__DEVICE_ID__/reservations
             form.action = tpl.replace('__DEVICE_ID__', deviceId);
+
+            // Handle quantity display
+            const qtyContainer = document.getElementById('res_quantity_container');
+            const qtyInput = document.getElementById('res_quantity');
+            const qtyDisplay = document.getElementById('res_total_quantity_display');
+            
+            if (totalQty > 1 && qtyContainer && qtyInput && qtyDisplay) {
+                qtyContainer.style.display = 'block';
+                qtyInput.max = totalQty;
+                qtyInput.value = 1;
+                qtyDisplay.textContent = totalQty;
+            } else if (qtyContainer) {
+                qtyContainer.style.display = 'none';
+            }
 
             // (Optional) Start/Ende defaulten (heute/morgen etc.)
             const start = document.getElementById('res_start_date');

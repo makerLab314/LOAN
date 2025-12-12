@@ -13,6 +13,7 @@ class DeviceReservation extends Model
         'start_at',
         'end_at',
         'purpose',
+        'quantity',
         'status',
         'reserved_by_name',
     ];

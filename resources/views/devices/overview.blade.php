@@ -264,6 +264,9 @@
                                         {{ $res->start_at->timezone(config('app.timezone'))->format('d.m.Y') }}
                                         bis
                                         {{ $res->end_at->timezone(config('app.timezone'))->format('d.m.Y') }}
+                                        @if(($res->quantity ?? 1) > 1)
+                                            <span class="text-gray-400">({{ $res->quantity }} Stück)</span>
+                                        @endif
                                     </div>
                                     {{ $res->purpose ?? 'Keine Beschreibung vorhanden' }}
                                 </td>
@@ -363,6 +366,9 @@
                                     <p class="text-gray-400 text-sm truncate">{{ $dev->description }}</p>
                                     <div class="flex items-center gap-2 mt-2 flex-wrap">
                                         <span class="text-white bg-purple-600 rounded-full py-1 px-2 text-xs">Vorgemerkt</span>
+                                        @if(($res->quantity ?? 1) > 1)
+                                            <span class="text-gray-300 text-xs">({{ $res->quantity }} Stück)</span>
+                                        @endif
                                     </div>
                                     <p class="text-gray-400 text-sm mt-2">
                                         {{ $res->reserved_by_name ?? optional($res->user)->name ?? 'Unbekannt' }}:
