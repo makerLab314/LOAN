@@ -1,127 +1,218 @@
-# LOAN
+# LOAN (Fork by makerLab314)
 
-## Allgemeines/ General
+> ⚡️ **This is a maintained, enhanced fork of the original LOAN [https://github.com/OriginalOwner/LOAN](https://github.com/OriginalOwner/LOAN) project. All core features remain, with improvements and ongoing support from makerLab314's team.**  
+> Please report issues or suggest new features via GitHub Issues!
 
-### Über
+---
 
-<p>Willkommen be <em>LOAN, dem System zur Geräteausleihe für wissenschaftliche und medienpädagogische Einrichtungen</em>. Das System läuft auf einer LNPP-Struktur: 
-<ul>
-    <li>Ubuntu 24.04</li>
-    <li>Nginx</li>
-    <li>Postgres</li>
-    <li>PHP 8.3</li>
-</ul>
-und wurde mit <a href="https://laravel.com" target="_blank">Laravel</a> sowie <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a> programmiert. Es ist unter einer <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"target=“_blank”>CC BY-NC-SA 4.0</a> verfügbar. Um Zugang zu einem Testaccount unter <a href="http://loan.vdus.de" target="_blank">http://loan.vdus.de</a> zu erhalten, kontaktieren Sie mich bitte unter vincent.dusanek[at]gmail.com.
-<br></p>
+## Overview
 
-<details>
-    <summary>About</summary>
-    <p><br>Welcome to LOAN, a loan management system for scientific and media education institutions. The system runs on an LNPP structure:
-<ul>
-    <li>Ubuntu 24.04</li>
-    <li>Nginx</li>
-    <li>Postgres</li>
-    <li>PHP 8.3</li>
-</ul>
+**LOAN** is a flexible, modern system for device and equipment management, designed for scientific and media-education institutions.
 
-and was programmed using <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. It is available under a <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"target=“_blank”>CC BY-NC-SA 4.0</a>. To get access to a test account at <a href="http://loan.vdus.de" target="_blank">http://loan.vdus.de</a>, please contact me at vincent.dusanek[at]gmail.com.
+- **Stack:** Ubuntu 24.04, Nginx, Postgres, PHP 8.3, Laravel, TailwindCSS
+- **Purpose:** Effortless device booking, transparent loan processes, and smooth user management.
+- **Open Source License:** [CC-BY-NC-SA-4.0](#license)
 
-<em>LOAN | A free loan management system</em> is made with <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. Content Language: lang="de".</p>
-    </details>
+---
 
-## Lizenz/ License
+## Features
 
-### CC-BY-NC-SA-4.0 Lizenz
+- User-friendly web interface in German and English
+- LNPP architecture: modern, scalable, robust
+- Local or Dockerized deployment
+- Role-based access (users/admins), seed admin creation
+- Onboarding scripts, assets, and migrations included
 
-<p>Dieses Projekt unterliegt der Creative Commons Attribution–NonCommercial–ShareAlike 4.0 International (CC BY-NC-SA 4.0) Lizenz.
+---
 
-- **Erlaubt:** Nutzung, Vervielfältigung, Änderung und Weitergabe für nichtkommerzielle Zwecke, sofern Sie die Quelle angemessen angeben und abgeleitete Werke unter derselben Lizenz verbreiten.
-- **Nicht erlaubt:** kommerzielle Nutzung dieses Projekts oder abgeleiteter Werke ohne vorherige Genehmigung.
-SPDX-License-Identifier: **CC-BY-NC-SA-4.0**
+## Table of Contents
 
-Für Anfragen zu kommerziellen Lizenzen eröffnen Sie bitte ein Ticket auf GitHub.
-<br></p>
+- [Demo Previews](#demo-previews)
+- [Quick Start (Non-Docker)](#quick-start-non-docker)
+- [Quick Start (Docker)](#quick-start-docker)
+- [FAQ & Troubleshooting](#faq--troubleshooting)
+- [License](#license)
+- [Credits & Upstream](#credits--upstream)
 
-<details>
-    <summary>CC-BY-NC-SA-4.0 License</summary>
-    <p><br>This project is licensed under the **Creative Commons Attribution–NonCommercial–ShareAlike 4.0 International** (CC BY-NC-SA 4.0) license.
+---
 
-- **Allowed:** use, copy, modify, and share **for non-commercial purposes**, provided you give appropriate credit and distribute derivative works under the **same license**.
-- **Not allowed:** **commercial use** of this project or any derivative works without prior permission.
+## Demo Previews
 
-SPDX-License-Identifier: **CC-BY-NC-SA-4.0**
+**Verleihprozess / Loan Process:**  
+![Loan process GIF](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-2.gif)
 
-For commercial licensing inquiries, please open an issue on GitHub.
-</p>
-    </details>
+**Login:**  
+![Login](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-1-login.png)
 
+**Geräte / Devices:**  
+![Devices](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-2-devices.png)
 
-## Preview
+**Gerät Details / Device Details:**  
+![Device Detail](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-3-device.png)
 
-### Verleihprozess/ Loan process
+---
 
-![](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-2.gif)
+## Quick Start (Non-Docker)
 
-### Anmeldung/ Login
+These steps assume you're running on Linux/macOS. Use PowerShell on Windows where needed.
 
-![](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-1-login.png)
+### 1. Prerequisites
 
-### Geräte/ Devices
+- PHP 8.3+, Composer
+- PostgreSQL or SQLite
+- Node.js & npm (for frontend assets)
+- [Optional] Redis (recommended for queues)
 
-![](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-2-devices.png)
+### 2. Clone and Setup
 
-### Detailansicht: Gerät/ Details: Device
-
-![](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-3-device.png)
-
-
-## Lokale Installation ohne Docker/ Run locally without Docker
-
-```
-# Installation der Abhängigkeiten
+```bash
+git clone https://github.com/makerLab314/LOAN.git
+cd LOAN
 composer install
-# Anlegen der .env
-copy .env.example .env
-# Setzung des App-Keys
+cp .env.example .env
+```
+
+### 3. Generate App Key
+
+```bash
 php artisan key:generate
-# Erstellung der DB
-New-Item -ItemType File .\database\database.sqlite -Force | Out-Null
-# (Aus-)kommentieren der (ir-)relevanten DB-Parameter in der .env
-DB_CONNECTION=sqlite
-DB_DATABASE="ABSOLUTER_PFAD_ZUR_DB"
-# Ausführen der Migrationen
-php artisan migrate
-# Ausführen des Seeds für den ersten Admin: admin@test.com mit geheimespasswort
-php artisan db:seed
-# Starten des Servers unter 127.0.0.1:8000
-php artisan serve
-# Setzung des Storage-Links
+```
+
+### 4. Configure Database
+
+- **SQLite (simplest):**
+  ```bash
+  touch database/database.sqlite
+  ```
+  Then edit `.env`:
+  ```
+  DB_CONNECTION=sqlite
+  DB_DATABASE=/absolute/path/to/your/project/database/database.sqlite
+  ```
+- **PostgreSQL:**  
+  Update `.env` with your DB credentials:
+  ```
+  DB_CONNECTION=pgsql
+  DB_HOST=127.0.0.1
+  DB_PORT=5432
+  DB_DATABASE=loan
+  DB_USERNAME=youruser
+  DB_PASSWORD=yourpassword
+  ```
+
+### 5. Migrate & Seed
+
+```bash
+php artisan migrate --seed
+```
+> This creates the first admin user:  
+> **Email**: `admin@test.com`  
+> **Password**: `geheimespasswort`  
+> (Change after first login!)
+
+### 6. Build Frontend Assets
+
+```bash
+npm install
+npm run build
+```
+
+### 7. Setup Storage Symlink
+
+```bash
 php artisan storage:link
 ```
 
-## Lokale Installation mit Docker/ Run locally with Docker
+### 8. Run the Server
 
-Using docker, one can run this app locally using php-fpm, redis and mariadb.
+```bash
+php artisan serve
+```
+Visit [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
-### APP_KEY creation
+---
 
-The laravel app needs an `APP_KEY` which can be created like that:
+## Quick Start (Docker)
 
-`echo "APP_KEY=base64:$(openssl rand -base64 32)" >> .env`
-and should be added to the compose.yml
+An all-in-one solution running via Docker Compose, including `php-fpm`, Redis, and MariaDB.
 
-### Setup service
+### 1. Clone the repo
 
-The service can be set up using
+```bash
+git clone https://github.com/makerLab314/LOAN.git
+cd LOAN
+```
 
-`docker compose up -d`
+### 2. Create the `.env` file and set the `APP_KEY`
 
-Run the migrations and seed the database (to create the first admin user):
+```bash
+cp .env.example .env
+echo "APP_KEY=base64:$(openssl rand -base64 32)" >> .env
+```
+Or manually edit `.env` and insert the key.
 
-`docker compose run loan php artisan migrate --seed`
+### 3. Start Services
 
-### Login
+```bash
+docker compose up -d
+```
 
-Go to http://localhost:8080/ and login with the seeded user.
+### 4. Run Database Migrations and Seed Admin
 
-You can then start using the app.
+```bash
+docker compose run loan php artisan migrate --seed
+```
+
+### 5. Build Assets (if needed)
+
+```bash
+docker compose run loan npm install
+docker compose run loan npm run build
+```
+
+### 6. Log In
+
+Visit [http://localhost:8080](http://localhost:8080) and log in with the seeded admin account.
+
+---
+
+## FAQ & Troubleshooting
+
+- **Change Admin Password**:  
+  After setup, immediately log in as admin and change the password via the user interface.
+
+- **.env values:**  
+  Refer to Laravel documentation for advanced `.env` configuration.
+
+- **File uploads not working?**  
+  Ensure the `storage/` directory is writable and `php artisan storage:link` was run.
+
+- **Asset build issues:**  
+  If frontend styling/JS is missing, ensure `npm run build` finished without errors.
+
+- **Database connection errors in Docker:**  
+  Wait a few seconds after `docker compose up` before running migrations.
+
+---
+
+## License
+
+**CC-BY-NC-SA-4.0** (Creative Commons Attribution–NonCommercial–ShareAlike 4.0 International)
+
+- **Allowed:** Non-commercial use, modification, and redistribution with attribution, under the same license.
+- **Not allowed:** Commercial use without prior permission.
+
+SPDX-License-Identifier: `CC-BY-NC-SA-4.0`
+
+> For commercial licensing, please [open a GitHub issue](https://github.com/makerLab314/LOAN/issues).
+
+---
+
+## Credits & Upstream
+
+- **Origin:** Forked from [OriginalOwner/LOAN](https://github.com/OriginalOwner/LOAN)
+- **This fork:** [makerLab314/LOAN](https://github.com/makerLab314/LOAN)
+- **Frameworks & Tools:**  
+    [Laravel](https://laravel.com) | [TailwindCSS](https://tailwindcss.com)
+
+> We thank the original authors and contributors for their substantial initial work!
