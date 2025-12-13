@@ -214,7 +214,7 @@
                     </thead>
                     <tbody id="deviceTableBody">
                         @foreach ($devices as $device)
-                            <tr class="device-row" data-group="{{ trim($device->category->name ?? $device->group) }}" 
+                            <tr class="device-row" data-group="{{ trim($device->category?->name ?? $device->group) }}" 
                                 data-available-qty="{{ $device->available_quantity }}" 
                                 data-total-qty="{{ $device->total_quantity }}">
                                 <td class="border-b px-4 py-2 border-gray-600">
@@ -230,7 +230,7 @@
                                 <td class="border-b px-4 py-2 border-gray-600 text-sm break-words text-gray-300">
                                     {{ $device->description }}</td>
                                 <td class="border-b px-4 py-2 border-gray-600 text-sm break-words text-gray-300">
-                                    @switch($device->category->name ?? $device->group)
+                                    @switch($device->category?->name ?? $device->group)
                                         @case('VRAR')
                                             VR-/AR-Brille
                                         @break
@@ -241,7 +241,7 @@
                                             Microcontr.
                                         @break
                                         @default
-                                            {{ $device->category->name ?? $device->group }}
+                                            {{ $device->category?->name ?? $device->group }}
                                     @endswitch
                                 </td>
                                 <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300">
@@ -325,7 +325,7 @@
             <!-- Mobile Card View -->
             <div class="md:hidden space-y-4" id="deviceCardContainer">
                 @foreach ($devices as $device)
-                    <div class="device-card bg-gray-700 rounded-lg p-4" data-group="{{ trim($device->category->name ?? $device->group) }}">
+                    <div class="device-card bg-gray-700 rounded-lg p-4" data-group="{{ trim($device->category?->name ?? $device->group) }}">
                         <div class="flex items-start gap-3">
                             <img src="{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}"
                                 alt="{{ $device->title }}"
