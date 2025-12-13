@@ -232,7 +232,7 @@ class DeviceController extends Controller
     {
         $histories = DeviceHistory::with('device')
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->paginate(50);
 
         return view('devices.log', compact('histories'));
     }

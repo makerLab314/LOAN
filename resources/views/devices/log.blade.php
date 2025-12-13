@@ -28,7 +28,7 @@
         <div class="bg-black text-white p-4 rounded max-h-[600px] overflow-y-auto">
             @forelse ($histories as $history)
                 <p class="text-sm mb-1">
-                    <span class="text-gray-400">{{ \Carbon\Carbon::parse($history->created_at)->format('d.m.Y H:i') }}: </span>
+                    <span class="text-gray-400">{{ $history->created_at->format('d.m.Y H:i') }}: </span>
                     @if($history->device)
                         <a href="{{ route('devices.show', $history->device) }}" class="text-blue-300 hover:underline">
                             {{ $history->device->title }}
@@ -45,6 +45,12 @@
                 <p class="text-gray-400">Keine Historie vorhanden.</p>
             @endforelse
         </div>
+        
+        @if($histories->hasPages())
+            <div class="mt-4">
+                {{ $histories->links() }}
+            </div>
+        @endif
     </div>
 </div>
 
