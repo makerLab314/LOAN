@@ -227,4 +227,13 @@ class DeviceController extends Controller
 
         return redirect()->route('devices.index')->with('success', 'Gerät erfolgreich gelöscht.');
     }
+
+    public function log()
+    {
+        $histories = DeviceHistory::with('device')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('devices.log', compact('histories'));
+    }
 }
