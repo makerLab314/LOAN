@@ -203,7 +203,7 @@
                                 </td>
                                 <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300">
                                     {{ $loan->borrower_name }}
-                                    @if (!empty($loan->loan_end_date))
+                                    @if ($loan->loan_start_date && $loan->loan_end_date)
                                         <br><span class="text-gray-400">{{ $loan->loan_start_date->format('d.m.Y') }} bis {{ $loan->loan_end_date->format('d.m.Y') }}</span>
                                     @endif
                                     @if (!empty($loan->loan_purpose))

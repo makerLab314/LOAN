@@ -100,13 +100,13 @@ class DeviceController extends Controller
             $device->loan_end_date = null;
             $device->loan_purpose = null;
         } else {
-            // Update legacy fields with the latest remaining loan
-            $latestLoan = $device->loans()->where('id', '!=', $loan->id)->latest()->first();
-            if ($latestLoan) {
-                $device->borrower_name = $latestLoan->borrower_name;
-                $device->loan_start_date = $latestLoan->loan_start_date;
-                $device->loan_end_date = $latestLoan->loan_end_date;
-                $device->loan_purpose = $latestLoan->loan_purpose;
+            // Update legacy fields with a remaining loan
+            $remainingLoan = $device->loans()->where('id', '!=', $loan->id)->first();
+            if ($remainingLoan) {
+                $device->borrower_name = $remainingLoan->borrower_name;
+                $device->loan_start_date = $remainingLoan->loan_start_date;
+                $device->loan_end_date = $remainingLoan->loan_end_date;
+                $device->loan_purpose = $remainingLoan->loan_purpose;
             }
         }
         $device->save();
