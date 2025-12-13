@@ -262,21 +262,21 @@
                                         </span>
                                     @endif
                                 </td>
-                                @if ($device->borrower_name)
-                                    <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300">
-                                        {{ $device->borrower_name }} bis
-                                        {{ \Carbon\Carbon::parse($device->loan_end_date)->format('d.m.Y') }}
-                                        @if (!empty($device->loan_purpose))
-                                            <div class="text-sm text-gray-400 mt-1">
-                                                {{ $device->loan_purpose }}
+                                <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300">
+                                    @if ($device->loans->count() > 0)
+                                        @foreach ($device->loans as $loan)
+                                            <div class="mb-1 {{ !$loop->last ? 'pb-1 border-b border-gray-700' : '' }}">
+                                                <span class="text-gray-200">{{ $loan->borrower_name }}</span>
+                                                <span class="text-gray-400">({{ $loan->quantity }}x)</span>
+                                                <div class="text-xs text-gray-400">
+                                                    bis {{ $loan->loan_end_date->format('d.m.Y') }}
+                                                </div>
                                             </div>
-                                        @endif
-                                    </td>
-                                @else
-                                    <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300">
+                                        @endforeach
+                                    @else
                                         Momentan verfügbar
-                                    </td>
-                                @endif
+                                    @endif
+                                </td>
                                 <td class="border-b px-4 py-2 border-gray-600 text-sm text-left">
                                     <div class="flex justify-end items-center flex-wrap gap-1">
                                         @if ($device->available_quantity > 0)
@@ -345,10 +345,15 @@
                                         <span class="text-gray-300 text-xs">{{ $device->available_quantity }}/{{ $device->total_quantity }} verfügbar</span>
                                     @endif
                                 </div>
-                                @if ($device->borrower_name)
-                                    <p class="text-gray-400 text-sm mt-2">
-                                        {{ $device->borrower_name }} bis {{ \Carbon\Carbon::parse($device->loan_end_date)->format('d.m.Y') }}
-                                    </p>
+                                @if ($device->loans->count() > 0)
+                                    <div class="text-gray-400 text-sm mt-2">
+                                        @foreach ($device->loans->take(2) as $loan)
+                                            <div>{{ $loan->borrower_name }} ({{ $loan->quantity }}x) bis {{ $loan->loan_end_date->format('d.m.Y') }}</div>
+                                        @endforeach
+                                        @if ($device->loans->count() > 2)
+                                            <div class="text-xs text-gray-500">+{{ $device->loans->count() - 2 }} weitere</div>
+                                        @endif
+                                    </div>
                                 @endif
                             </div>
                         </div>

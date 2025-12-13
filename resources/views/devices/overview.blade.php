@@ -73,8 +73,8 @@
             'Sonstiges' => 'Sonstiges',
         ];
 
-        // Alle Kategorien aus geliehenen Geräten + reservierten Geräten
-        $loanedGroups = $devices->where('status', 'loaned')->pluck('group');
+        // Alle Kategorien aus aktiven Ausleihen + reservierten Geräten
+        $loanedGroups = collect($loans)->map(fn($l) => optional($l->device)->category?->name ?? optional($l->device)->group);
         $reservedGroups = collect($reservations)->map(fn($r) => optional($r->device)->group);
         $allGroups = $loanedGroups->merge($reservedGroups)->filter()->unique()->sort()->values();
     @endphp
@@ -162,15 +162,17 @@
                             <th class="border-b-2 px-4 py-2 border-gray-500 w-64 font-medium text-sm">Name & Label</th>
                         <th class="border-b-2 px-4 py-2 border-gray-500 w-32 font-medium text-sm">Beschreibung</th>
                         <th class="border-b-2 px-4 py-2 border-gray-500 w-40 font-medium text-sm"><span class="hidden lg:inline">Kategorie</span></th>
+                        <th class="border-b-2 px-4 py-2 border-gray-500 w-20 font-medium text-sm">Anzahl</th>
                         <th class="border-b-2 px-4 py-2 border-gray-500 w-32 font-medium text-sm">Status</th>
                         <th class="border-b-2 px-4 py-2 border-gray-500 w-90 font-medium text-sm">Person / Zeitraum</th>
                         <th class="border-b-2 px-4 py-2 border-gray-500 w-64 font-medium text-sm"></th>
                     </tr>
                 </thead>
                 <tbody id="mixTableBody">
-                    {{-- Ausgeliehene Geräte --}}
-                    @foreach ($devices as $device)
-                        @if ($device->status == 'loaned')
+                    {{-- Ausgeliehene Geräte (jetzt individuelle Ausleihen) --}}
+                    @foreach ($loans as $loan)
+                        @php $device = $loan->device; @endphp
+                        @if ($device)
                             <tr class="mix-row text-gray-300" data-type="loaned" data-group="{{ $device->category->name ?? $device->group }}">
                                 <td class="border-b px-4 py-2 border-gray-600">
                                     <img src="{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}"
@@ -193,28 +195,31 @@
                                         @default {{ $device->category->name ?? $device->group }}
                                     @endswitch
                                 </td>
+                                <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300">
+                                    {{ $loan->quantity }} Stück
+                                </td>
                                 <td class="border-b px-4 py-2 border-gray-600 text-xs">
                                     <span class="text-white bg-yellow-600 rounded-full py-1 px-2 inline-flex">Verliehen</span>
                                 </td>
                                 <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300">
-                                    {{ $device->borrower_name }}
-                                    @if (!empty($device->loan_end_date))
-                                        bis {{ \Carbon\Carbon::parse($device->loan_end_date)->format('d.m.Y') }}
+                                    {{ $loan->borrower_name }}
+                                    @if ($loan->loan_start_date && $loan->loan_end_date)
+                                        <br><span class="text-gray-400">{{ $loan->loan_start_date->format('d.m.Y') }} bis {{ $loan->loan_end_date->format('d.m.Y') }}</span>
                                     @endif
-                                    @if (!empty($device->loan_purpose))
+                                    @if (!empty($loan->loan_purpose))
                                         <div class="text-sm text-gray-400 mt-1">
-                                            {{ $device->loan_purpose }}
+                                            {{ $loan->loan_purpose }}
                                         </div>
                                     @endif
                                 </td>
                                 <td class="border-b px-4 py-2 border-gray-600 text-sm text-right">
                                     <form action="{{ route('devices.return') }}" method="POST" class="inline-block"
-                                          onsubmit="return confirm('Wurde {{ $device->title }} vollständig und korrekt angenommen?');">
+                                          onsubmit="return confirm('Wurde {{ $device->title }} ({{ $loan->quantity }} Stück) von {{ $loan->borrower_name }} vollständig und korrekt angenommen?');">
                                         @csrf
-                                        <input type="hidden" name="device_id" value="{{ $device->id }}">
+                                        <input type="hidden" name="loan_id" value="{{ $loan->id }}">
                                         <button type="submit"
                                                 class="bg-gray-200 hover:bg-white text-black font-bold py-2 px-4 rounded text-xs"
-                                                title="Gerät annehmnen">
+                                                title="Gerät annehmen">
                                             Annehmen
                                         </button>
                                     </form>
@@ -249,6 +254,9 @@
                                         @default {{ $dev->group }}
                                     @endswitch
                                 </td>
+                                <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-300">
+                                    {{ $res->quantity ?? 1 }} Stück
+                                </td>
                                 <td class="border-b px-4 py-2 border-gray-600 text-xs">
                                     @if ($res->status === 'approved')
                                         <span class="text-white bg-purple-600 rounded-full py-1 px-2 inline-flex">Vorgemerkt</span>
@@ -260,13 +268,10 @@
                                 </td>
                                 <td class="border-b px-4 py-2 border-gray-600 text-sm text-gray-400 ">
                                     <div class="text-sm text-gray-300 mb-1">
-                                        {{ $res->reserved_by_name ?? optional($res->user)->name ?? 'Unbekannt' }}:
-                                        {{ $res->start_at->timezone(config('app.timezone'))->format('d.m.Y') }}
+                                        {{ $res->reserved_by_name ?? optional($res->user)->name ?? 'Unbekannt' }}
+                                        <br><span class="text-gray-400">{{ $res->start_at->timezone(config('app.timezone'))->format('d.m.Y') }}
                                         bis
-                                        {{ $res->end_at->timezone(config('app.timezone'))->format('d.m.Y') }}
-                                        @if(($res->quantity ?? 1) > 1)
-                                            <span class="text-gray-400">({{ $res->quantity }} Stück)</span>
-                                        @endif
+                                        {{ $res->end_at->timezone(config('app.timezone'))->format('d.m.Y') }}</span>
                                     </div>
                                     {{ $res->purpose ?? 'Keine Beschreibung vorhanden' }}
                                 </td>
@@ -282,6 +287,7 @@
                                             data-start="{{ $res->start_at->timezone(config('app.timezone'))->format('Y-m-d') }}"
                                             data-end="{{ $res->end_at->timezone(config('app.timezone'))->format('Y-m-d') }}"
                                             data-purpose="{{ e($res->purpose) }}"
+                                            data-quantity="{{ $res->quantity ?? 1 }}"
                                         >
                                             <span class="hidden xl:inline">Verleihen</span>
                                             <span class="xl:hidden">V</span>
@@ -313,9 +319,10 @@
             
             <!-- Mobile Card View -->
             <div class="md:hidden space-y-4" id="mixCardContainer">
-                {{-- Ausgeliehene Geräte --}}
-                @foreach ($devices as $device)
-                    @if ($device->status == 'loaned')
+                {{-- Ausgeliehene Geräte (jetzt individuelle Ausleihen) --}}
+                @foreach ($loans as $loan)
+                    @php $device = $loan->device; @endphp
+                    @if ($device)
                         <div class="mix-card bg-gray-700 rounded-lg p-4" data-type="loaned" data-group="{{ $device->category->name ?? $device->group }}">
                             <div class="flex items-start gap-3">
                                 <img src="{{ $device->image ? Storage::url($device->image) : asset('img/filler.png') }}"
@@ -327,20 +334,24 @@
                                     <p class="text-gray-400 text-sm truncate">{{ $device->description }}</p>
                                     <div class="flex items-center gap-2 mt-2 flex-wrap">
                                         <span class="text-white bg-yellow-600 rounded-full py-1 px-2 text-xs">Verliehen</span>
+                                        <span class="text-gray-300 text-xs">({{ $loan->quantity }} Stück)</span>
                                     </div>
-                                    <p class="text-gray-400 text-sm mt-2">
-                                        {{ $device->borrower_name }}
-                                        @if (!empty($device->loan_end_date))
-                                            bis {{ \Carbon\Carbon::parse($device->loan_end_date)->format('d.m.Y') }}
-                                        @endif
+                                    <p class="text-gray-300 text-sm mt-2">
+                                        {{ $loan->borrower_name }}
                                     </p>
+                                    <p class="text-gray-400 text-sm">
+                                        {{ $loan->loan_start_date->format('d.m.Y') }} bis {{ $loan->loan_end_date->format('d.m.Y') }}
+                                    </p>
+                                    @if (!empty($loan->loan_purpose))
+                                        <p class="text-gray-400 text-xs mt-1">{{ $loan->loan_purpose }}</p>
+                                    @endif
                                 </div>
                             </div>
                             <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-600">
                                 <form action="{{ route('devices.return') }}" method="POST" class="flex-1"
-                                    onsubmit="return confirm('Wurde {{ $device->title }} vollständig und korrekt angenommen?');">
+                                    onsubmit="return confirm('Wurde {{ $device->title }} ({{ $loan->quantity }} Stück) von {{ $loan->borrower_name }} vollständig und korrekt angenommen?');">
                                     @csrf
-                                    <input type="hidden" name="device_id" value="{{ $device->id }}">
+                                    <input type="hidden" name="loan_id" value="{{ $loan->id }}">
                                     <button type="submit"
                                         class="w-full bg-gray-200 hover:bg-white text-black font-bold py-2 px-4 rounded text-xs">
                                         Annehmen
@@ -366,12 +377,12 @@
                                     <p class="text-gray-400 text-sm truncate">{{ $dev->description }}</p>
                                     <div class="flex items-center gap-2 mt-2 flex-wrap">
                                         <span class="text-white bg-purple-600 rounded-full py-1 px-2 text-xs">Vorgemerkt</span>
-                                        @if(($res->quantity ?? 1) > 1)
-                                            <span class="text-gray-300 text-xs">({{ $res->quantity }} Stück)</span>
-                                        @endif
+                                        <span class="text-gray-300 text-xs">({{ $res->quantity ?? 1 }} Stück)</span>
                                     </div>
-                                    <p class="text-gray-400 text-sm mt-2">
-                                        {{ $res->reserved_by_name ?? optional($res->user)->name ?? 'Unbekannt' }}:
+                                    <p class="text-gray-300 text-sm mt-2">
+                                        {{ $res->reserved_by_name ?? optional($res->user)->name ?? 'Unbekannt' }}
+                                    </p>
+                                    <p class="text-gray-400 text-sm">
                                         {{ $res->start_at->timezone(config('app.timezone'))->format('d.m.Y') }} bis
                                         {{ $res->end_at->timezone(config('app.timezone'))->format('d.m.Y') }}
                                     </p>
@@ -384,7 +395,8 @@
                                     data-borrower="{{ e($res->reserved_by_name ?? optional($res->user)->name) }}"
                                     data-start="{{ $res->start_at->timezone(config('app.timezone'))->format('Y-m-d') }}"
                                     data-end="{{ $res->end_at->timezone(config('app.timezone'))->format('Y-m-d') }}"
-                                    data-purpose="{{ e($res->purpose) }}">
+                                    data-purpose="{{ e($res->purpose) }}"
+                                    data-quantity="{{ $res->quantity ?? 1 }}">
                                     Verleihen
                                 </button>
                                 @if ($res->status === 'pending' && $res->user_id === auth()->id())
@@ -423,6 +435,18 @@
                                 <form id="loanForm" action="{{ route('devices.loan') }}" method="POST" class="w-full">
                                     @csrf
                                     <input type="hidden" name="device_id" id="device_id">
+
+                                    <!-- Quantity field -->
+                                    <div class="mb-4" id="loan_quantity_container">
+                                        <label for="loan_quantity" class="block text-gray-700 text-sm font-bold mb-2">
+                                            Anzahl ausleihen:
+                                        </label>
+                                        <div class="flex items-center gap-2">
+                                            <input type="number" name="loan_quantity" id="loan_quantity" min="1" value="1"
+                                                class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-24 py-2 px-3 text-gray-700 leading-tight">
+                                            <span class="text-gray-600 text-sm">Stück</span>
+                                        </div>
+                                    </div>
 
                                     <div class="mb-4">
                                         <label for="borrower_name" class="block text-gray-700 text-sm font-bold mb-2">Name der Person:</label>
@@ -676,11 +700,13 @@
             const $start    = document.getElementById('loan_start_date');
             const $end      = document.getElementById('loan_end_date');
             const $purpose  = document.getElementById('loan_purpose');
+            const $quantity = document.getElementById('loan_quantity');
 
             if ($borrower) $borrower.value = defaults.borrower_name ?? '';
             if ($start)    $start.value    = defaults.start_date ?? '';
             if ($end)      $end.value      = defaults.end_date ?? '';
             if ($purpose)  $purpose.value  = defaults.purpose ?? '';
+            if ($quantity) $quantity.value = defaults.quantity ?? 1;
 
             document.getElementById('loanModal').classList.remove('hidden');
         }
@@ -701,7 +727,8 @@
                 borrower_name: btn.dataset.borrower || '',
                 start_date:    btn.dataset.start    || '',
                 end_date:      btn.dataset.end      || '',
-                purpose:       btn.dataset.purpose  || ''
+                purpose:       btn.dataset.purpose  || '',
+                quantity:      btn.dataset.quantity || 1
             });
         });
     </script>

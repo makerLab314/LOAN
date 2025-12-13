@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Device;
 use App\Models\DeviceHistory;
+use App\Models\DeviceLoan;
 use App\Models\DeviceReservation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -14,8 +15,8 @@ class DeviceController extends Controller
 {
     public function index()
     {
-        // Optional: Eager Loading für die Kategorie
-        $devices = Device::with('category')->get();
+        // Optional: Eager Loading für die Kategorie und aktive Ausleihen
+        $devices = Device::with(['category', 'loans'])->get();
         return view('devices.index', compact('devices'));
     }
 
@@ -42,6 +43,17 @@ class DeviceController extends Controller
 
         $loanQuantity = $request->loan_quantity ?? 1;
         
+        // Create a new loan record
+        DeviceLoan::create([
+            'device_id' => $device->id,
+            'borrower_name' => $request->borrower_name,
+            'quantity' => $loanQuantity,
+            'loan_start_date' => $request->loan_start_date,
+            'loan_end_date' => $request->loan_end_date,
+            'loan_purpose' => $request->loan_purpose,
+            'loaned_by' => Auth::id(),
+        ]);
+        
         // Update loaned quantity
         $device->loaned_quantity = $device->loaned_quantity + $loanQuantity;
         
@@ -50,10 +62,11 @@ class DeviceController extends Controller
             $device->status = 'loaned';
         }
         
+        // Keep legacy fields for backward compatibility (store last borrower)
         $device->borrower_name = $request->borrower_name;
         $device->loan_start_date = $request->loan_start_date;
         $device->loan_end_date = $request->loan_end_date;
-        $device->loan_purpose    = $request->loan_purpose;
+        $device->loan_purpose = $request->loan_purpose;
         $device->save();
 
         DeviceHistory::create([
@@ -69,12 +82,12 @@ class DeviceController extends Controller
         return redirect()->route('devices.index')->with('status', $message);
     }
 
-    public function return(Request $request)
+    public function returnLoan(Request $request)
     {
-        $device = Device::findOrFail($request->device_id);
+        $loan = DeviceLoan::findOrFail($request->loan_id);
+        $device = $loan->device;
         
-        $returnQuantity = $request->return_quantity ?? $device->loaned_quantity;
-        $returnQuantity = min($returnQuantity, $device->loaned_quantity); // Don't return more than loaned
+        $returnQuantity = $loan->quantity;
         
         // Update loaned quantity
         $device->loaned_quantity = max(0, $device->loaned_quantity - $returnQuantity);
@@ -86,29 +99,39 @@ class DeviceController extends Controller
             $device->loan_start_date = null;
             $device->loan_end_date = null;
             $device->loan_purpose = null;
+        } else {
+            // Update legacy fields with a remaining loan
+            $remainingLoan = $device->loans()->where('id', '!=', $loan->id)->first();
+            if ($remainingLoan) {
+                $device->borrower_name = $remainingLoan->borrower_name;
+                $device->loan_start_date = $remainingLoan->loan_start_date;
+                $device->loan_end_date = $remainingLoan->loan_end_date;
+                $device->loan_purpose = $remainingLoan->loan_purpose;
+            }
         }
         $device->save();
 
         DeviceHistory::create([
             'device_id' => $device->id,
             'action'    => 'returned',
-            'user_name' => Auth::user()->name . ' (' . $returnQuantity . ' Stück)',
+            'user_name' => $loan->borrower_name . ' (' . $returnQuantity . ' Stück)',
             'action_by' => Auth::user()->name,
         ]);
+
+        // Delete the loan record
+        $loan->delete();
 
         $message = $returnQuantity === 1 
             ? '1 Gerät wurde erfolgreich zurückgegeben.' 
             : $returnQuantity . ' Geräte wurden erfolgreich zurückgegeben.';
-        return redirect()->route('devices.index')->with('status', $message);
+        return redirect()->route('devices.overview')->with('status', $message);
     }
 
     public function overview()
     {
-        // Geräte, die ausgeliehen sind (Reihenfolge bleibt kompatibel)
-        $devices = Device::query()
-            ->where('status', 'loaned')
-            ->orderBy('group')
-            ->orderBy('title')
+        // Get all active loans with device info
+        $loans = DeviceLoan::with(['device.category'])
+            ->orderBy('loan_end_date')
             ->get();
 
         // Vormerkungen inkl. Device/Kategorie
@@ -118,7 +141,7 @@ class DeviceController extends Controller
             ->orderBy('start_at')
             ->get();
 
-        return view('devices.overview', compact('devices', 'reservations'));
+        return view('devices.overview', compact('loans', 'reservations'));
     }
 
     public function create()
