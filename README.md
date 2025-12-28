@@ -11,7 +11,7 @@
 
 - **Stack:** Ubuntu 24.04, Nginx, Postgres, PHP 8.3, Laravel, TailwindCSS
 - **Purpose:** Effortless device booking, transparent loan processes, and smooth user management.
-- **Open Source License:** [CC-BY-NC-SA-4.0](#license)
+- **Open Source License:** MIT
 
 ---
 
@@ -197,12 +197,7 @@ Visit [http://localhost:8080](http://localhost:8080) and log in with the seeded 
 
 ## License
 
-**CC-BY-NC-SA-4.0** (Creative Commons Attribution–NonCommercial–ShareAlike 4.0 International)
-
-- **Allowed:** Non-commercial use, modification, and redistribution with attribution, under the same license.
-- **Not allowed:** Commercial use without prior permission.
-
-SPDX-License-Identifier: `CC-BY-NC-SA-4.0`
+<em>LOAN | A free loan management system</em> is made with <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. Content Language: lang="de". Similar to the Laravel framework, LOAN is open-sourced software licensed under the <a href="https://opensource.org/licenses/MIT"target="_blank">MIT License</a>.
 
 > For commercial licensing, please [open a GitHub issue](https://github.com/makerLab314/LOAN/issues).
 
