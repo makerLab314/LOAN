@@ -89,7 +89,7 @@ git tag v2.1.0
 git push origin v2.1.0
 ```
 
-Der Workflow `.github/workflows/release.yml` führt die CI aus, baut das Image für amd64 und arm64,
+Der Workflow `.github/workflows/release.yml` führt die CI aus, baut das Image (nur amd64),
 veröffentlicht es als `ghcr.io/makerlab314/loan:2.1.0`, `:2.1`, `:2` und `:latest` und legt ein
 GitHub-Release mit den Änderungen an. Tags mit Bindestrich (`v2.1.0-rc.1`) werden Vorabversionen:
 kein `latest`, und `./deploy.sh` ohne Versionsangabe überspringt sie.

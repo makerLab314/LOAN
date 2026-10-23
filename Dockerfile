@@ -34,8 +34,7 @@ RUN composer install --no-dev --no-interaction --no-scripts --no-autoloader --pr
 # ---------------------------------------------------------------------------
 # Frontend-Build (Vite + Tailwind)
 # ---------------------------------------------------------------------------
-# Läuft immer auf der Build-Plattform – die Assets sind plattformunabhängig
-FROM --platform=$BUILDPLATFORM node:22-bookworm-slim AS assets
+FROM node:22-bookworm-slim AS assets
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
