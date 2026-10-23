@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main, renovation]
+  pull_request:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  php:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: gd, intl, pdo_sqlite, zip, bcmath
+          coverage: none
+
+      - name: Composer install
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Sicherheitslücken in PHP-Abhängigkeiten
+        run: composer audit
+
+      - name: Code-Stil (Pint)
+        run: vendor/bin/pint --test app routes database/factories database/seeders database/migrations/2026_* tests config/loan.php bootstrap/app.php
+
+      - name: Statische Analyse (Larastan)
+        run: vendor/bin/phpstan analyse --memory-limit=1G --no-progress
+
+      - name: Tests
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan test
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Sicherheitslücken in JS-Abhängigkeiten (Laufzeit)
+        run: npm audit --omit=dev
+      - run: npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Image bauen
+        run: docker build --target production -t loan:ci .

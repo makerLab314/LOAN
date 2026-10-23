@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Throwable;
 
 class PasswordResetLinkController extends Controller
 {
@@ -21,7 +23,7 @@ class PasswordResetLinkController extends Controller
     /**
      * Handle an incoming password reset link request.
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
@@ -32,13 +34,15 @@ class PasswordResetLinkController extends Controller
         // We will send the password reset link to this user. Once we have attempted
         // to send the link, we will examine the response then see the message we
         // need to show to the user. Finally, we'll send out a proper response.
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        // Mailfehler nicht als 500 durchreichen – nur bei existierenden Konten wird
+        // überhaupt eine Mail verschickt, ein Fehler würde das Konto also verraten.
+        try {
+            Password::sendResetLink($request->only('email'));
+        } catch (Throwable $e) {
+            report($e);
+        }
 
-        return $status == Password::RESET_LINK_SENT
-                    ? back()->with('status', __($status))
-                    : back()->withInput($request->only('email'))
-                            ->withErrors(['email' => __($status)]);
+        // Immer dieselbe Antwort – verrät nicht, ob ein Konto existiert
+        return back()->with('status', __('Falls ein Konto mit dieser E-Mail-Adresse existiert, wurde ein Link zum Zurücksetzen verschickt.'));
     }
 }

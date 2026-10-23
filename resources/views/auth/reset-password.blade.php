@@ -1,39 +1,23 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('password.store') }}">
-        @csrf
+@extends('layouts.guest')
+@section('title', __('Neues Passwort'))
 
-        <!-- Password Reset Token -->
-        <input type="hidden" name="token" value="{{ $request->route('token') }}">
+@section('content')
+    <div class="card p-6">
+        <h1 class="text-lg font-semibold">{{ __('Neues Passwort festlegen') }}</h1>
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
-
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                                type="password"
-                                name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+        <form method="POST" action="{{ route('password.store') }}" class="mt-6 space-y-4">
+            @csrf
+            <input type="hidden" name="token" value="{{ $request->route('token') }}">
+            <x-field :label="__('E-Mail')" name="email">
+                <input id="email" type="email" name="email" value="{{ old('email', $request->email) }}" class="input" required autocomplete="username">
+            </x-field>
+            <x-field :label="__('Neues Passwort')" name="password" :hint="__('Mind. :n Zeichen, Buchstaben und Zahlen.', ['n' => max(8, (int) $settings->get('security.password_min'))])">
+                <input id="password" type="password" name="password" class="input" required autofocus autocomplete="new-password">
+            </x-field>
+            <x-field :label="__('Wiederholen')" name="password_confirmation">
+                <input id="password_confirmation" type="password" name="password_confirmation" class="input" required autocomplete="new-password">
+            </x-field>
+            <button class="btn btn-primary w-full">{{ __('Passwort speichern') }}</button>
+        </form>
+    </div>
+@endsection

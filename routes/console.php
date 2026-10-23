@@ -1,19 +1,9 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
-/*
-|--------------------------------------------------------------------------
-| Console Routes
-|--------------------------------------------------------------------------
-|
-| This file is where you may define all of your Closure based console
-| commands. Each Closure is bound to a command instance allowing a
-| simple approach to interacting with each command's IO methods.
-|
-*/
+// Tägliches Backup von Datenbank und Uploads (abschaltbar unter Einstellungen → Backups)
+Schedule::command('loan:backup')->dailyAt('02:30')->withoutOverlapping()->onOneServer();
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+// Abgelaufene Sitzungen & Passwort-Reset-Tokens aufräumen
+Schedule::command('auth:clear-resets')->daily();
