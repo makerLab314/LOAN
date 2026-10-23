@@ -2,7 +2,9 @@
 # Konfiguration erfolgt ausschließlich über die Datei .env (siehe .env.example / UPGRADE.md).
 
 x-app: &app
-  image: loan:latest
+  # Fertiges Image aus dem Release (setzt ./deploy.sh). Mit "docker compose build" bzw.
+  # "./deploy.sh --build" entsteht es stattdessen lokal unter demselben Namen.
+  image: ${LOAN_IMAGE:-ghcr.io/makerlab314/loan}:${LOAN_VERSION:-latest}
   build:
     context: .
     target: production
@@ -75,6 +77,9 @@ services:
       MARIADB_DATABASE: ${DB_DATABASE:-loan}
       MARIADB_USER: ${DB_USERNAME:-loan}
       MARIADB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD in .env setzen}
+      # Nach einem neueren MariaDB-Image die Systemtabellen anpassen und bei alten
+      # Datenbanken den Benutzer für den Healthcheck nachrüsten
+      MARIADB_AUTO_UPGRADE: "1"
     volumes:
       - ./data/db:/var/lib/mysql
     healthcheck:

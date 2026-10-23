@@ -35,15 +35,23 @@ mobil nutzbar, Inventar-IDs mit QR- und Barcode-Etiketten, Kalender, Rechteverwa
 ## Installation (Docker)
 
 ```bash
-git clone <repo> loan && cd loan
+git clone https://github.com/makerLab314/LOAN.git loan && cd loan
 cp .env.example .env
 # In .env zuerst DB_PASSWORD, DB_ROOT_PASSWORD, APP_URL und MAIL_* setzen.
-docker compose build
 # APP_KEY erzeugen und in .env eintragen:
 docker compose run --rm --no-deps --entrypoint php loan artisan key:generate --show
-docker compose up -d
+./deploy.sh
 docker compose exec loan php artisan loan:create-admin du@example.org --name="Dein Name"
 ```
+
+`./deploy.sh` holt das neueste Release: den passenden Stand des Repos und das fertige Image von
+`ghcr.io/makerlab314/loan`. Es ist auch der Weg für alle späteren Updates:
+
+| Aufruf | Wirkung |
+|---|---|
+| `./deploy.sh` | Backup, dann Update auf das neueste Release |
+| `./deploy.sh v2.1.0` | bestimmte Version, z. B. zurück auf die vorige (Datenbank-Migrationen werden dabei nicht zurückgedreht) |
+| `./deploy.sh --build` | aktuellen Branch holen und das Image selbst bauen statt herunterladen |
 
 nginx lauscht standardmäßig nur auf `127.0.0.1:8080` (`APP_BIND`, `APP_PORT`). Für HTTPS einen Reverse Proxy
 (Caddy, Traefik, nginx) auf demselben Host davorschalten; `TRUSTED_PROXIES` ist für Docker-Netze vorbelegt.
@@ -73,6 +81,18 @@ npm ci && npm run dev
 ```
 
 Die CI (`.github/workflows/ci.yml`) prüft Tests, Pint, Larastan, `composer audit`, `npm audit` und den Docker-Build.
+
+### Release erstellen
+
+```bash
+git tag v2.1.0
+git push origin v2.1.0
+```
+
+Der Workflow `.github/workflows/release.yml` führt die CI aus, baut das Image für amd64 und arm64,
+veröffentlicht es als `ghcr.io/makerlab314/loan:2.1.0`, `:2.1`, `:2` und `:latest` und legt ein
+GitHub-Release mit den Änderungen an. Tags mit Bindestrich (`v2.1.0-rc.1`) werden Vorabversionen:
+kein `latest`, und `./deploy.sh` ohne Versionsangabe überspringt sie.
 
 ## Lizenz
 

@@ -17,11 +17,26 @@ Beim ersten Start migriert LOAN die Datenbank automatisch:
 
 ## 2. Code holen
 
+Wer ursprünglich vom Original [dusanvin/LOAN](https://github.com/dusanvin/LOAN) installiert hat, stellt
+zuerst die Quelle um:
+
+```bash
+git remote set-url origin https://github.com/makerLab314/LOAN.git
+```
+
+Dann:
+
 ```bash
 cd /pfad/zu/LOAN
-git fetch
-git checkout renovation   # bzw. main, sobald gemergt
+git stash                 # lokale Anpassungen (z. B. Port in compose.yml) beiseitelegen
+git fetch origin
+git checkout main         # vor dem Merge: renovation
+git pull --ff-only
 ```
+
+Ohne `git stash` bricht `git pull` ab, sobald eine mitgelieferte Datei lokal geändert wurde. Beim Original
+war das fast immer `compose.yml` (fehlerhaftes `depends_on: app`). Port und Adresse stehen künftig in der
+`.env` (`APP_PORT`, `APP_BIND`), Änderungen an `compose.yml` sind nicht mehr nötig.
 
 ## 3. `.env` anlegen bzw. ergänzen
 
@@ -47,6 +62,11 @@ cp .env.example .env
 > Die DB-Passwörter in der `.env` müssen zu der **bestehenden** Datenbank passen. MariaDB übernimmt neue
 > Werte aus der Umgebung nur bei einer leeren Datenbank.
 
+> **Ohne Reverse Proxy** (bisher üblich: direkt `http://server:8080`) ist LOAN nach dem Update sonst nicht
+> mehr erreichbar, denn nginx lauscht jetzt standardmäßig nur auf `127.0.0.1`. Dann setzen:
+> `APP_BIND=0.0.0.0`, `TRUSTED_PROXIES=` (leer), `SESSION_SECURE_COOKIE=false` und
+> `APP_URL=http://server:8080` (genau die Adresse, die im Browser steht; andere Hostnamen werden abgewiesen).
+
 ## 4. Update ausführen
 
 ```bash
@@ -56,9 +76,12 @@ chmod +x deploy.sh
 
 Das Skript erledigt Folgendes:
 
-1. Es sichert die Datenbank nach `./data/backups/`.
+1. Es sichert die Datenbank nach `./data/backups/` und bricht ab, falls das nicht klappt.
 2. Es kopiert hochgeladene Bilder **aus dem alten Container** nach `./data/storage/`. Bisher lagen sie nur im Container und wären beim Neubau verloren gegangen.
-3. Es baut das neue Image und startet alles neu. Migrationen laufen automatisch.
+3. Es wechselt auf das neueste Release, lädt dessen fertiges Image von `ghcr.io` und startet alles neu.
+   Migrationen laufen automatisch. Die Version steht danach als `LOAN_VERSION` in der `.env`.
+
+Wer das Image lieber selbst baut (oder falls noch kein Release existiert): `./deploy.sh --build`.
 
 Danach erreichst du LOAN wie gewohnt. Zum Prüfen:
 
@@ -101,22 +124,31 @@ Anschließend `DB_PASSWORD` und `DB_ROOT_PASSWORD` in `.env` anpassen und `docke
 ## Künftige Updates
 
 ```bash
-./deploy.sh
+./deploy.sh              # neuestes Release
+./deploy.sh v2.1.0       # bestimmte Version, auch zurück auf eine ältere
+./deploy.sh --build      # Image selbst bauen
 ```
 
 Das Skript erstellt vorher ein Backup (`php artisan loan:backup`). Tägliche Backups laufen
 zusätzlich um 02:30 Uhr (Container `loan_scheduler`), einstellbar unter Einstellungen → Backups.
+
+Beim Zurückgehen auf eine ältere Version bleibt die Datenbank auf dem neuen Stand. Hat die neuere
+Version Migrationen mitgebracht, vorher das Backup aus `./data/backups/` zurückspielen.
 
 ## Zurück zur alten Version
 
 ```bash
 docker compose down
 git checkout <alter-commit>
+git stash pop             # nur falls in Schritt 2 etwas beiseitegelegt wurde
 # Datenbank aus ./data/backups/loan-db-pre-update-*.sql.gz zurückspielen:
 docker compose up -d db
 gunzip -c data/backups/loan-db-pre-update-XXXX.sql.gz | docker compose exec -T db mariadb -uloan -p<passwort> loan
-docker compose up -d
+docker compose up -d --build   # --build, sonst startet das neue Image mit der alten Konfiguration
 ```
+
+Die alte Version speichert Bilder nur im Container. Die gesicherten Dateien aus `./data/storage/public/`
+müssen dafür per `docker cp` zurück nach `loan_app:/var/www/html/storage/app/public/`.
 
 ## Hinweise
 

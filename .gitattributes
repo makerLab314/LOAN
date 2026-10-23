@@ -1,4 +1,6 @@
 * text=auto
+# Shell-Skripte laufen im Container bzw. auf Linux-Servern – auch unter Windows mit LF auschecken
+*.sh text eol=lf
 
 *.blade.php diff=html
 *.css diff=css

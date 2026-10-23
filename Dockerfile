@@ -34,7 +34,8 @@ RUN composer install --no-dev --no-interaction --no-scripts --no-autoloader --pr
 # ---------------------------------------------------------------------------
 # Frontend-Build (Vite + Tailwind)
 # ---------------------------------------------------------------------------
-FROM node:22-bookworm-slim AS assets
+# Läuft immer auf der Build-Plattform – die Assets sind plattformunabhängig
+FROM --platform=$BUILDPLATFORM node:22-bookworm-slim AS assets
 WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
@@ -46,6 +47,10 @@ RUN npm run build
 # Produktion
 # ---------------------------------------------------------------------------
 FROM base AS production
+
+# Wird vom Release-Workflow gesetzt (z. B. 2.1.0), lokal gebaut: "dev"
+ARG LOAN_VERSION=dev
+ENV LOAN_VERSION=$LOAN_VERSION
 
 COPY --from=vendor /var/www/html/vendor ./vendor
 COPY . .
