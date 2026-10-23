@@ -19,18 +19,23 @@ export function searchPalette() {
         async search() {
             const q = this.query.trim();
             if (q === '') {
+                this.controller?.abort();
+                this.loading = false;
                 this.results = [];
                 this.searched = false;
                 return;
             }
 
+            // Ältere, noch laufende Suche abbrechen – sonst kann ihre Antwort später
+            // eintreffen und die Ergebnisse der neueren Eingabe überschreiben
             this.controller?.abort();
-            this.controller = new AbortController();
+            const controller = new AbortController();
+            this.controller = controller;
             this.loading = true;
 
             try {
                 const url = `${this.$root.dataset.url}?q=${encodeURIComponent(q)}`;
-                const data = await getJson(url);
+                const data = await getJson(url, { signal: controller.signal });
                 let previousGroup = null;
                 this.results = (data.results || []).map((item) => {
                     const firstOfGroup = item.group !== previousGroup;
@@ -40,9 +45,10 @@ export function searchPalette() {
                 this.active = 0;
                 this.searched = true;
             } catch (e) {
+                if (e.name === 'AbortError') return; // abgelöst durch neuere Suche
                 this.results = [];
             } finally {
-                this.loading = false;
+                if (this.controller === controller) this.loading = false;
             }
         },
 

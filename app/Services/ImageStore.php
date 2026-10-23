@@ -19,12 +19,14 @@ class ImageStore
         $name = Str::uuid()->toString().'.webp';
         $disk = Storage::disk('public');
 
-        $image = $manager->read($file->getRealPath())->orient();
-        $disk->put($dir.'/'.$name, (string) $image->scaleDown($max, $max)->toWebp(82));
+        // Nur einmal dekodieren: ein großes Foto belegt unkomprimiert schnell >100 MB,
+        // ein zweites read() würde den Speicherbedarf verdoppeln. scaleDown() ändert das
+        // Bild in place – das Thumbnail entsteht aus der bereits verkleinerten Fassung.
+        $image = $manager->read($file->getRealPath())->orient()->scaleDown($max, $max);
+        $disk->put($dir.'/'.$name, (string) $image->toWebp(82));
 
         if ($thumb > 0) {
-            $small = $manager->read($file->getRealPath())->orient()->scaleDown($thumb, $thumb);
-            $disk->put($dir.'/thumbs/'.$name, (string) $small->toWebp(78));
+            $disk->put($dir.'/thumbs/'.$name, (string) $image->scaleDown($thumb, $thumb)->toWebp(78));
         }
 
         return $dir.'/'.$name;

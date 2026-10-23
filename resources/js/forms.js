@@ -23,13 +23,28 @@ export function loanForm() {
 export function returnForm() {
     return {
         mode: 'all',
+        outstanding: 1,
+        quantity: 1,
+        units: 0,
         init() {
             this.mode = this.$root.dataset.mode || 'all';
+            this.outstanding = parseInt(this.$root.dataset.outstanding || '1', 10);
+            this.count();
             this.$root.closest('dialog')?.addEventListener('opened', () => { this.mode = 'all'; });
+        },
+        count() {
+            this.quantity = parseInt(this.$root.querySelector('input[name="quantity"]')?.value || '0', 10) || 0;
+            this.units = this.$root.querySelectorAll('input[name="units[]"]:checked').length;
         },
         get isAll() { return this.mode === 'all'; },
         get isQuantity() { return this.mode === 'quantity'; },
         get isUnits() { return this.mode === 'units'; },
+        /** Schließt diese Rückgabe die Ausleihe ab? Dann gehört die Zubehör-Checkliste dazu. */
+        get completes() {
+            return this.isAll
+                || (this.isQuantity && this.quantity >= this.outstanding)
+                || (this.isUnits && this.units >= this.outstanding);
+        },
     };
 }
 

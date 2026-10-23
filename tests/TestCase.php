@@ -16,8 +16,14 @@ abstract class TestCase extends BaseTestCase
         $this->withoutVite();
     }
 
+    /**
+     * Admin mit frisch bestätigtem Passwort (Middleware password.confirm in der Verwaltung).
+     * Ohne Bestätigung: User::factory()->admin()->create().
+     */
     protected function admin(array $attributes = []): User
     {
+        $this->withSession(['auth.password_confirmed_at' => time()]);
+
         return User::factory()->admin()->create($attributes);
     }
 

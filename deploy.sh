@@ -12,7 +12,7 @@ fi
 
 echo "==> Backup vor dem Update"
 if docker compose ps --status running loan >/dev/null 2>&1 && docker compose exec -T loan php artisan list loan 2>/dev/null | grep -q "loan:backup"; then
-    if ! docker compose exec -T loan php artisan loan:backup --force; then
+    if ! docker compose exec -T -u www-data loan php artisan loan:backup --force; then
         echo "WARNUNG: Backup fehlgeschlagen – Abbruch mit Strg+C, sonst geht es in 10 s weiter."
         sleep 10
     fi

@@ -43,6 +43,15 @@ class LoanService
             /** @var Device $device */
             $device = Device::query()->whereKey($device->id)->lockForUpdate()->firstOrFail();
 
+            // Status unter Sperre erneut prüfen – sonst wird eine Vormerkung bei zwei
+            // gleichzeitigen Klicks zweimal ausgegeben
+            if ($fromReservation) {
+                $fromReservation = DeviceReservation::query()->whereKey($fromReservation->id)->lockForUpdate()->firstOrFail();
+                if (! $fromReservation->isActive()) {
+                    throw ValidationException::withMessages(['reservation' => __('Diese Vormerkung wurde bereits ausgegeben oder widerrufen.')]);
+                }
+            }
+
             $start = Carbon::parse($data['loan_start_date'])->startOfDay();
             $end = Carbon::parse($data['loan_end_date'])->endOfDay();
             $this->assertDuration($start, $end, 'loan_end_date');
@@ -52,6 +61,12 @@ class LoanService
 
             if ($quantity < 1) {
                 throw ValidationException::withMessages(['quantity' => __('Die Menge muss mindestens 1 sein.')]);
+            }
+            if ($fromReservation && $units && count($units) !== $fromReservation->quantity) {
+                throw ValidationException::withMessages(['units' => trans_choice(
+                    'Bitte genau :count Exemplar auswählen (vorgemerkte Menge).|Bitte genau :count Exemplare auswählen (vorgemerkte Menge).',
+                    $fromReservation->quantity, ['count' => $fromReservation->quantity],
+                )]);
             }
             if ($this->settings->get('loans.units_required') && $device->total_quantity > 1 && ! $units) {
                 throw ValidationException::withMessages(['units' => __('Bitte die Exemplar-Nummern angeben.')]);
@@ -142,15 +157,23 @@ class LoanService
                 throw ValidationException::withMessages(['quantity' => __('Ungültige Rückgabemenge (offen: :n).', ['n' => $loan->outstanding_quantity])]);
             }
 
-            // Ohne ausgewählte Exemplare bei Komplettrückgabe alle offenen Exemplare schließen
-            if (! $units && $quantity === $loan->outstanding_quantity) {
-                $units = $outstandingUnits;
+            // Mit Exemplar-Nummern verliehen: Teilrückgaben nur mit Angabe der Exemplare,
+            // sonst weiß niemand mehr, welche Nummern noch draußen sind
+            if ($outstandingUnits && ! $units && $quantity < $loan->outstanding_quantity) {
+                throw ValidationException::withMessages(['units' => __('Bitte die zurückgegebenen Exemplare auswählen.')]);
             }
 
             $loan->returned_quantity += $quantity;
             $fullyReturned = $loan->quantity - $loan->returned_quantity <= 0;
 
-            if ($units) {
+            // Bei Komplettrückgabe alle noch offenen Exemplare schließen (auch Altfälle,
+            // in denen Menge und Exemplar-Liste nicht übereinstimmen)
+            if ($fullyReturned) {
+                $units = $units ?: $outstandingUnits;
+                DeviceLoanUnit::query()->where('device_loan_id', $loan->id)
+                    ->whereNull('returned_at')
+                    ->update(['returned_at' => now()]);
+            } elseif ($units) {
                 DeviceLoanUnit::query()->where('device_loan_id', $loan->id)
                     ->whereIn('unit_no', $units)->whereNull('returned_at')
                     ->update(['returned_at' => now()]);

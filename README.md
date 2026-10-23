@@ -45,8 +45,12 @@ docker compose up -d
 docker compose exec loan php artisan loan:create-admin du@example.org --name="Dein Name"
 ```
 
-LOAN läuft dann auf `http://<server>:8080` (Port über `APP_PORT`). Für HTTPS einen Reverse Proxy
-(Caddy, Traefik, nginx) davorschalten und `TRUSTED_PROXIES=*` setzen.
+nginx lauscht standardmäßig nur auf `127.0.0.1:8080` (`APP_BIND`, `APP_PORT`). Für HTTPS einen Reverse Proxy
+(Caddy, Traefik, nginx) auf demselben Host davorschalten; `TRUSTED_PROXIES` ist für Docker-Netze vorbelegt.
+Ohne Proxy direkt im Netz: `APP_BIND=0.0.0.0` und `TRUSTED_PROXIES=` (leer).
+
+`APP_URL` muss die öffentliche Adresse sein: Links in E-Mails werden daraus gebaut, Anfragen an
+andere Hostnamen werden abgewiesen.
 
 Daten liegen auf dem Host:
 

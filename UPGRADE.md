@@ -39,9 +39,10 @@ cp .env.example .env
 | `DB_USERNAME` / `DB_PASSWORD` | bisher `loan` / `loan` (siehe 6.) |
 | `DB_ROOT_PASSWORD` | bisher `rootpassword` |
 | `SESSION_SECURE_COOKIE` | `true` bei HTTPS, sonst `false` |
-| `TRUSTED_PROXIES` | `*`, wenn ein Reverse Proxy (z. B. Traefik, Caddy, nginx) davor sitzt |
+| `TRUSTED_PROXIES` | IP-Bereich des Reverse Proxys (Vorgabe: private Docker-Netze), leer ohne Proxy – nicht `*` |
 | `MAIL_*` | SMTP-Zugang für „Passwort vergessen“ |
 | `APP_PORT` | Host-Port für nginx (Standard 8080) |
+| `APP_BIND` | `127.0.0.1` (Standard, nur für einen Proxy auf demselben Host) oder `0.0.0.0` (direkt im Netz erreichbar) |
 
 > Die DB-Passwörter in der `.env` müssen zu der **bestehenden** Datenbank passen. MariaDB übernimmt neue
 > Werte aus der Umgebung nur bei einer leeren Datenbank.

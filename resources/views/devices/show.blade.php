@@ -331,7 +331,8 @@
         @foreach ($activeLoans as $loan)
             @php $outstandingUnits = $loan->outstandingUnitNumbers(); @endphp
             <x-modal :id="'return-dialog-'.$loan->id" :title="__('Rückgabe: :name', ['name' => $loan->borrower_name])" :open-on-load="$form === 'return-'.$loan->id">
-                <form method="POST" action="{{ route('loans.return', $loan) }}" class="space-y-4" x-data="returnForm" data-mode="{{ $form === 'return-'.$loan->id ? old('mode', 'all') : 'all' }}">
+                <form method="POST" action="{{ route('loans.return', $loan) }}" class="space-y-4" x-data="returnForm" @change="count" @input="count"
+                      data-mode="{{ $form === 'return-'.$loan->id ? old('mode', 'all') : 'all' }}" data-outstanding="{{ $loan->outstanding_quantity }}">
                     @csrf
                     <input type="hidden" name="_form" value="return-{{ $loan->id }}">
                     <input type="hidden" name="redirect" value="{{ $here }}">
@@ -343,12 +344,14 @@
                             <label class="flex items-center gap-2 rounded-lg border border-line p-2.5 text-sm has-checked:border-accent has-checked:bg-accent-soft">
                                 <input type="radio" name="mode" value="all" x-model="mode" class="accent-[var(--accent)]"> {{ __('Alles') }}
                             </label>
-                            <label class="flex items-center gap-2 rounded-lg border border-line p-2.5 text-sm has-checked:border-accent has-checked:bg-accent-soft">
-                                <input type="radio" name="mode" value="quantity" x-model="mode" class="accent-[var(--accent)]"> {{ __('Teilmenge') }}
-                            </label>
                             @if ($outstandingUnits)
+                                {{-- Mit Exemplar-Nummern verliehen: Teilrückgabe nur über die Exemplare --}}
                                 <label class="flex items-center gap-2 rounded-lg border border-line p-2.5 text-sm has-checked:border-accent has-checked:bg-accent-soft">
                                     <input type="radio" name="mode" value="units" x-model="mode" class="accent-[var(--accent)]"> {{ __('Exemplare') }}
+                                </label>
+                            @else
+                                <label class="flex items-center gap-2 rounded-lg border border-line p-2.5 text-sm has-checked:border-accent has-checked:bg-accent-soft">
+                                    <input type="radio" name="mode" value="quantity" x-model="mode" class="accent-[var(--accent)]"> {{ __('Teilmenge') }}
                                 </label>
                             @endif
                         </div>
@@ -374,15 +377,19 @@
                         $given = collect($loan->accessories ?? [])->filter(fn ($a) => $a['checked'] ?? true);
                     @endphp
                     @if ($given->isNotEmpty())
-                        <div x-show="isAll">
-                            @include('devices.partials.accessory-checklist', [
-                                'items' => $given->map(fn ($a, $i) => ['key' => $i, 'name' => $a['name'], 'quantity' => $a['quantity']])->values()->all(),
-                                'legend' => __('Zubehör vollständig zurück?'),
-                                'checked' => false,
-                                'hint' => __('Nicht angehaktes Zubehör wird als fehlend vermerkt.'),
-                            ])
+                        {{-- Nur wenn die Rückgabe die Ausleihe abschließt; sonst deaktiviert,
+                             damit keine (unsichtbaren) "fehlt"-Häkchen mitgeschickt werden --}}
+                        <div x-show="completes">
+                            <fieldset class="contents" :disabled="!completes" data-return-checklist>
+                                @include('devices.partials.accessory-checklist', [
+                                    'items' => $given->map(fn ($a, $i) => ['key' => $i, 'name' => $a['name'], 'quantity' => $a['quantity']])->values()->all(),
+                                    'legend' => __('Zubehör vollständig zurück?'),
+                                    'checked' => false,
+                                    'hint' => __('Nicht angehaktes Zubehör wird als fehlend vermerkt.'),
+                                ])
+                            </fieldset>
                         </div>
-                        <p x-show="isAll" class="error">{{ $errors->first('accessories') }}</p>
+                        <p x-show="completes" class="error">{{ $errors->first('accessories') }}</p>
                     @endif
 
                     <x-field :label="__('Notiz (optional)')" name="note">

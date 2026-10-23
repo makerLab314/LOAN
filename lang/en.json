@@ -477,5 +477,13 @@
     "Übersicht": "Overview",
     "öffnen mit": "open with",
     "überfällig": "overdue",
-    "überfällig seit :date": "overdue since :date"
+    "überfällig seit :date": "overdue since :date",
+    "Gelöschtes Konto wiederhergestellt.": "Deleted account restored.",
+    "Sitzung beendet. „Angemeldet bleiben“ wurde auf allen Geräten zurückgesetzt.": "Session ended. “Remember me” has been reset on all devices.",
+    "Bitte die zurückgegebenen Exemplare auswählen.": "Please select the returned units.",
+    "Höchstens :max Etiketten auf einmal (ausgewählt: :count). Bitte weniger Geräte oder nur Geräte-Etiketten wählen.": "At most :max labels at once (selected: :count). Please choose fewer devices or device labels only.",
+    "Diese Vormerkung wurde bereits ausgegeben oder widerrufen.": "This reservation has already been issued or cancelled.",
+    "Bitte genau :count Exemplar auswählen (vorgemerkte Menge).|Bitte genau :count Exemplare auswählen (vorgemerkte Menge).": "Please select exactly :count unit (reserved quantity).|Please select exactly :count units (reserved quantity).",
+    "Exemplar :units ist noch verliehen – erst zurücknehmen, dann die Menge verringern.": "Unit :units is still on loan – return it first, then reduce the quantity.",
+    "Es sind bis zu :n Exemplare gleichzeitig vorgemerkt – die Gesamtmenge kann nicht kleiner sein.": "Up to :n units are reserved at the same time – the total cannot be lower."
 }

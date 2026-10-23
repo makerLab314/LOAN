@@ -39,6 +39,8 @@ services:
   scheduler:
     <<: *app
     container_name: loan_scheduler
+    # Wie php-fpm als www-data, damit Backups und Cache-Dateien dieselben Rechte haben
+    user: www-data
     command: ["php", "artisan", "schedule:work"]
     depends_on:
       loan:
@@ -49,7 +51,8 @@ services:
     container_name: nginx
     restart: unless-stopped
     ports:
-      - "${APP_PORT:-8080}:80"
+      # Standard: nur lokal erreichbar (Reverse Proxy auf demselben Host). Ohne Proxy: APP_BIND=0.0.0.0
+      - "${APP_BIND:-127.0.0.1}:${APP_PORT:-8080}:80"
     volumes:
       - ./conf/default.conf:/etc/nginx/conf.d/default.conf:ro
       - public_assets:/var/www/html/public:ro

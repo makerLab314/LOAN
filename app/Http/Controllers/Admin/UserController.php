@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Support\Audit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -41,24 +42,31 @@ class UserController extends Controller
     {
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users', 'email')],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users', 'email')->whereNull('deleted_at')],
             'password' => ['required', 'confirmed', Password::defaults()],
             'role' => ['required', Rule::in(User::ROLES)],
             'locale' => ['required', Rule::in(['de', 'en'])],
         ], [], $this->attributeNames());
 
-        $user = new User([
+        // Gelöschtes Konto mit derselben E-Mail wiederherstellen (E-Mail ist in der DB eindeutig,
+        // und so bleiben frühere Ausleihen/Buchungen dem Konto zugeordnet)
+        $user = User::onlyTrashed()->where('email', $data['email'])->first() ?? new User;
+        $restored = $user->exists;
+
+        $user->fill([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'locale' => $data['locale'],
         ]);
         $user->role = $data['role'];
+        $user->remember_token = Str::random(60);
+        $user->deleted_at = null;
         $user->save();
 
-        Audit::log('user.created', $user, ['role' => $user->role]);
+        Audit::log($restored ? 'user.restored' : 'user.created', $user, ['role' => $user->role]);
 
-        return redirect()->route('admin.users.index')->with('success', __('Nutzer angelegt.'));
+        return redirect()->route('admin.users.index')->with('success', $restored ? __('Gelöschtes Konto wiederhergestellt.') : __('Nutzer angelegt.'));
     }
 
     public function edit(Request $request, User $user): View
@@ -93,10 +101,19 @@ class UserController extends Controller
             $user->password = Hash::make($data['password']);
             $user->remember_token = Str::random(60);
             // Vom Admin gesetztes Passwort: alle Sitzungen des Nutzers beenden
-            DB::table('sessions')->where('user_id', $user->id)->delete();
+            // (bei sich selbst bis auf die aktuelle)
+            DB::table('sessions')->where('user_id', $user->id)
+                ->when($user->is($request->user()), fn ($q) => $q->where('id', '!=', $request->session()->getId()))
+                ->delete();
         }
 
         $user->save();
+
+        // Eigenes Konto: den angemeldeten Nutzer aktualisieren, damit AuthenticateSession
+        // den neuen Passwort-Hash speichert und die aktuelle Sitzung nicht beendet
+        if ($user->is($request->user())) {
+            Auth::guard('web')->setUser($user);
+        }
 
         Audit::log('user.updated', $user, array_filter([
             'role' => $roleChanged ? $user->role : null,

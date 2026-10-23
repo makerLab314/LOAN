@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Device;
 use App\Models\DeviceAccessory;
 use App\Models\DeviceLoan;
+use App\Services\Availability;
 use App\Services\ImageStore;
 use App\Services\InventoryNumbers;
 use App\Support\Audit;
@@ -21,6 +22,7 @@ class DeviceController extends Controller
     public function __construct(
         private ImageStore $images,
         private InventoryNumbers $numbers,
+        private Availability $availability,
     ) {}
 
     public function index(Request $request): View
@@ -117,9 +119,8 @@ class DeviceController extends Controller
     {
         $data = $this->validated($request, $device);
 
-        $loaned = $device->loaned_quantity;
-        if ($data['total_quantity'] < $loaned) {
-            return back()->withInput()->withErrors(['total_quantity' => __('Es sind gerade :n Exemplare verliehen – die Gesamtmenge kann nicht kleiner sein.', ['n' => $loaned])]);
+        if ($error = $this->quantityConflict($device, (int) $data['total_quantity'])) {
+            return back()->withInput()->withErrors(['total_quantity' => $error]);
         }
 
         $before = $device->only(['inventory_number', 'title', 'category_id', 'total_quantity']);
@@ -166,10 +167,46 @@ class DeviceController extends Controller
     }
 
     /**
+     * Darf die Gesamtmenge auf $total sinken? Verliehene Menge, verliehene Exemplar-Nummern
+     * und künftige Vormerkungen müssen weiterhin hineinpassen.
+     */
+    private function quantityConflict(Device $device, int $total): ?string
+    {
+        if ($total >= $device->total_quantity) {
+            return null;
+        }
+
+        $loaned = $device->loaned_quantity;
+        if ($total < $loaned) {
+            return __('Es sind gerade :n Exemplare verliehen – die Gesamtmenge kann nicht kleiner sein.', ['n' => $loaned]);
+        }
+
+        $highUnits = array_filter(array_keys($device->loanedUnits()), fn (int $u) => $u > $total);
+        if ($highUnits) {
+            return __('Exemplar :units ist noch verliehen – erst zurücknehmen, dann die Menge verringern.', [
+                'units' => implode(', ', array_map(fn ($u) => $device->unitLabel($u), $highUnits)),
+            ]);
+        }
+
+        $reserved = $this->availability->peakReserved($device, now(), now()->addYears(100));
+        if ($total < $reserved) {
+            return __('Es sind bis zu :n Exemplare gleichzeitig vorgemerkt – die Gesamtmenge kann nicht kleiner sein.', ['n' => $reserved]);
+        }
+
+        return null;
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function validated(Request $request, ?Device $device = null): array
     {
+        // Vor der Prüfung vereinheitlichen – die Eindeutigkeit wird sonst je nach
+        // Datenbank-Kollation case-sensitiv geprüft (Fehler 500 statt Meldung)
+        if (is_string($request->input('inventory_number'))) {
+            $request->merge(['inventory_number' => strtoupper(trim($request->input('inventory_number')))]);
+        }
+
         $data = $request->validate([
             'inventory_number' => ['nullable', 'string', 'max:32', 'regex:/^[A-Za-z0-9][A-Za-z0-9._-]*$/',
                 Rule::unique('devices', 'inventory_number')->ignore($device?->id)],
@@ -188,10 +225,6 @@ class DeviceController extends Controller
             'total_quantity' => __('Anzahl'),
             'category_id' => __('Kategorie'),
         ]);
-
-        if (! empty($data['inventory_number'])) {
-            $data['inventory_number'] = strtoupper($data['inventory_number']);
-        }
 
         return $data;
     }

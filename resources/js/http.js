@@ -2,10 +2,11 @@ export function csrf() {
     return document.querySelector('meta[name="csrf-token"]')?.content || '';
 }
 
-export async function getJson(url) {
+export async function getJson(url, { signal } = {}) {
     const response = await fetch(url, {
         headers: { Accept: 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
         credentials: 'same-origin',
+        signal,
     });
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return response.json();

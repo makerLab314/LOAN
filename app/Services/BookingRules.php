@@ -99,6 +99,13 @@ class BookingRules
     {
         $this->assertNotPast($start);
 
+        // Gleiche Höchstdauer wie bei Ausleihen – sonst ließe sich Bestand auf Jahre blockieren
+        // (und die Vormerkung später gar nicht in eine Ausleihe umwandeln)
+        $maxDays = (int) $this->settings->get('loans.max_days');
+        if ($maxDays > 0 && $start->copy()->startOfDay()->diffInDays($end->copy()->startOfDay()) > $maxDays) {
+            throw ValidationException::withMessages(['end_date' => __('Maximale Ausleihdauer: :n Tage.', ['n' => $maxDays])]);
+        }
+
         return DB::transaction(function () use ($device, $start, $end, $quantity, $purpose, $reservedFor, $actor) {
             $device = Device::query()->whereKey($device->id)->lockForUpdate()->firstOrFail();
 

@@ -16,6 +16,13 @@ if [ "$1" = "php-fpm" ]; then
         storage/framework/views storage/logs
     chown -R www-data:www-data storage
 
+    # Backups schreiben php-fpm (Button "Backup jetzt"), Scheduler und deploy.sh – alle als www-data
+    if [ -n "${BACKUP_PATH:-}" ]; then
+        mkdir -p "$BACKUP_PATH"
+        chown -R www-data:www-data "$BACKUP_PATH"
+        chmod 750 "$BACKUP_PATH"
+    fi
+
     # Auf die Datenbank warten
     tries=0
     until php artisan db:show --counts >/dev/null 2>&1; do

@@ -80,7 +80,10 @@ class InventoryTest extends TestCase
         Storage::disk('public')->assertExists($path);
         Storage::disk('public')->assertExists(dirname($path).'/thumbs/'.basename($path));
         [$w] = getimagesize(Storage::disk('public')->path($path));
-        $this->assertLessThanOrEqual(1600, $w);
+        $this->assertSame(1600, $w);
+        // Thumbnail entsteht aus demselben (einmal dekodierten) Bild
+        [$tw] = getimagesize(Storage::disk('public')->path(dirname($path).'/thumbs/'.basename($path)));
+        $this->assertSame(400, $tw);
     }
 
     public function test_non_images_are_rejected(): void

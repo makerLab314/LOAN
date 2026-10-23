@@ -39,7 +39,13 @@ class AppServiceProvider extends ServiceProvider
         Model::preventLazyLoading(! $this->app->isProduction());
         Model::preventSilentlyDiscardingAttributes(! $this->app->isProduction());
 
-        if (str_starts_with((string) config('app.url'), 'https://')) {
+        // Links (z. B. in Passwort-Reset-Mails) immer aus APP_URL bauen, nie aus dem
+        // Host-Header der Anfrage – sonst lassen sich Reset-Links auf fremde Domains umbiegen.
+        $appUrl = rtrim((string) config('app.url'), '/');
+        if ($appUrl !== '' && ! $this->app->environment('local')) {
+            URL::forceRootUrl($appUrl);
+        }
+        if (str_starts_with($appUrl, 'https://')) {
             URL::forceScheme('https');
         }
 

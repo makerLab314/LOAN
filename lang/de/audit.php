@@ -42,6 +42,7 @@ return [
     ],
     'user' => [
         'created' => 'Nutzer angelegt',
+        'restored' => 'Gelöschtes Konto wiederhergestellt',
         'updated' => 'Nutzer geändert',
         'deleted' => 'Nutzer gelöscht',
         'self_deleted' => 'Konto selbst gelöscht',

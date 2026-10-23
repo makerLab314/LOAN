@@ -41,6 +41,7 @@ return [
     ],
     'user' => [
         'created' => 'User created',
+        'restored' => 'Deleted account restored',
         'updated' => 'User changed',
         'deleted' => 'User deleted',
         'self_deleted' => 'Account deleted by user',

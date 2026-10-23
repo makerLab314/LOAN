@@ -38,14 +38,15 @@ class AuditLogController extends Controller
             fputcsv($out, ['Zeit', 'Nutzer', 'Aktion', 'Objekt', 'Details', 'IP'], ';');
             $query->chunk(500, function ($logs) use ($out) {
                 foreach ($logs as $log) {
-                    fputcsv($out, [
+                    // Jede Zelle absichern – auch Nutzernamen sind frei wählbar
+                    fputcsv($out, array_map(fn ($v) => self::csvSafe((string) $v), [
                         $log->created_at?->format('d.m.Y H:i:s'),
                         $log->user_name,
                         $log->description(),
-                        self::csvSafe((string) $log->subject_label),
-                        self::csvSafe($log->properties ? json_encode($log->properties, JSON_UNESCAPED_UNICODE) : ''),
+                        $log->subject_label,
+                        $log->properties ? json_encode($log->properties, JSON_UNESCAPED_UNICODE) : '',
                         $log->ip_address,
-                    ], ';');
+                    ]), ';');
                 }
             });
             fclose($out);
@@ -57,7 +58,8 @@ class AuditLogController extends Controller
      */
     private static function csvSafe(string $value): string
     {
-        return preg_match('/^[=+\-@\t\r]/', $value) ? "'".$value : $value;
+        // Auch mit führenden Leerzeichen/Steuerzeichen, die Excel beim Import entfernt
+        return preg_match('/^[\s\x00-\x1f]*[=+\-@]|^[\t\r]/u', $value) ? "'".$value : $value;
     }
 
     /**

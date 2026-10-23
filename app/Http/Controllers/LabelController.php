@@ -9,6 +9,7 @@ use App\Support\Settings;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 /**
@@ -16,6 +17,9 @@ use Illuminate\View\View;
  */
 class LabelController extends Controller
 {
+    /** Etiketten pro Druckauftrag (≈ 40 A4-Bögen) */
+    public const MAX_LABELS = 1000;
+
     public function index(Request $request, Settings $settings): View
     {
         $devices = Device::with('category')->orderBy('inventory_number')->get();
@@ -46,6 +50,16 @@ class LabelController extends Controller
         ]);
 
         $devices = Device::whereIn('id', $data['devices'])->orderBy('inventory_number')->get();
+
+        // Obergrenze vor dem Erzeugen der Codes (500 Geräte × 9999 Exemplare wären Millionen SVGs)
+        $count = $devices->sum(fn (Device $d) => $d->total_quantity <= 1
+            ? 1
+            : (in_array($data['mode'], ['device', 'both'], true) ? 1 : 0) + (in_array($data['mode'], ['units', 'both'], true) ? $d->total_quantity : 0));
+        if ($count > self::MAX_LABELS) {
+            throw ValidationException::withMessages(['devices' => __('Höchstens :max Etiketten auf einmal (ausgewählt: :count). Bitte weniger Geräte oder nur Geräte-Etiketten wählen.', [
+                'max' => self::MAX_LABELS, 'count' => $count,
+            ])]);
+        }
 
         $labels = [];
         foreach ($devices as $device) {

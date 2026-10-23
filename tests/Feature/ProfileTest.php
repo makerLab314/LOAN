@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\SessionController;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -97,10 +98,10 @@ class ProfileTest extends TestCase
         $this->actingAs($user)->get(route('sessions.index'))->assertOk()->assertSee('iPhone')->assertSee('10.0.0.5')->assertDontSee('10.0.0.9');
 
         // Fremde Sitzungen kann man nicht beenden
-        $this->delete(route('sessions.destroy', 'fremd'))->assertRedirect();
+        $this->delete(route('sessions.destroy', SessionController::sessionKey('fremd')))->assertRedirect();
         $this->assertDatabaseHas('sessions', ['id' => 'fremd']);
 
-        $this->delete(route('sessions.destroy', 'mein-handy'))->assertRedirect();
+        $this->delete(route('sessions.destroy', SessionController::sessionKey('mein-handy')))->assertRedirect();
         $this->assertDatabaseMissing('sessions', ['id' => 'mein-handy']);
     }
 }

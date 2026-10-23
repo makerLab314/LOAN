@@ -112,11 +112,11 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::post('/profile/theme', [ProfileController::class, 'theme'])->name('profile.theme');
     Route::get('/profile/sessions', [SessionController::class, 'index'])->name('sessions.index');
     Route::delete('/profile/sessions/others', [SessionController::class, 'destroyOthers'])->middleware('throttle:6,1')->name('sessions.destroy-others');
-    Route::delete('/profile/sessions/{id}', [SessionController::class, 'destroy'])->name('sessions.destroy');
+    Route::delete('/profile/sessions/{id}', [SessionController::class, 'destroy'])->where('id', '[0-9a-f]{32}')->name('sessions.destroy');
 
-    // Verwaltung
+    // Verwaltung – Nutzer & Einstellungen verlangen das Passwort erneut (gilt 3 Stunden)
     Route::prefix('admin')->name('admin.')->group(function () {
-        Route::middleware('can:users.manage')->group(function () {
+        Route::middleware(['can:users.manage', 'password.confirm'])->group(function () {
             Route::resource('users', UserController::class)->except(['show']);
             Route::delete('/users/{user}/sessions', [SessionController::class, 'destroyForUser'])->name('users.sessions.destroy');
         });
@@ -126,7 +126,7 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
             Route::get('/audit/export', [AuditLogController::class, 'export'])->name('audit.export');
         });
 
-        Route::middleware('can:settings.manage')->group(function () {
+        Route::middleware(['can:settings.manage', 'password.confirm'])->group(function () {
             Route::post('/settings/backups/run', [SettingsController::class, 'runBackup'])->middleware('throttle:3,10')->name('settings.backup');
             Route::get('/settings/{section?}', [SettingsController::class, 'edit'])->name('settings');
             Route::put('/settings/{section}', [SettingsController::class, 'update'])->name('settings.update');
