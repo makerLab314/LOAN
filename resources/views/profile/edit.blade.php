@@ -1,56 +1,74 @@
 @extends('layouts.app')
-
-@section('title', 'Profil bearbeiten')
+@section('title', __('Profil'))
 
 @section('content')
-    <div class="container mx-auto">
-        <h1 class="text-2xl font-bold mb-4">Profil bearbeiten</h1>
-        <p class="mb-8 flex items-center text-sm">Ändere deine Profildaten.
-            <!-- <a href="{{ route('profile.show') }}" class="hover:underline text-yellow-700 flex items-center pl-1">
-                Zurück zu Ihrem Profil
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" height="18" width="18" class="ml-1">
-                    <path fill-rule="evenodd" d="M19.902 4.098a3.75 3.75 0 0 0-5.304 0l-4.5 4.5a3.75 3.75 0 0 0 1.035 6.037.75.75 0 0 1-.646 1.353 5.25 5.25 0 0 1-1.449-8.45l4.5-4.5a5.25 5.25 0 1 1 7.424 7.424l-1.757 1.757a.75.75 0 1 1-1.06-1.06l1.757-1.757a3.75 3.75 0 0 0 0-5.304Zm-7.389 4.267a.75.75 0 0 1 1-.353 5.25 5.25 0 0 1 1.449 8.45l-4.5 4.5a5.25 5.25 0 1 1-7.424-7.424l1.757-1.757a.75.75 0 1 1 1.06 1.06l-1.757 1.757a3.75 3.75 0 1 0 5.304 5.304l4.5-4.5a3.75 3.75 0 0 0-1.035-6.037.75.75 0 0 1-.354-1Z" clip-rule="evenodd" />
-                </svg>
-            </a> -->
-        </p>
-        @if ($errors->any())
-            <div class="bg-red-500 text-white p-2 mb-4">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+    <x-page-header :title="__('Profil')">
+        <x-slot:actions>
+            <a href="{{ route('sessions.index') }}" class="btn btn-secondary"><x-icon name="smartphone"/>{{ __('Sitzungen') }}</a>
+        </x-slot:actions>
+    </x-page-header>
+
+    <div class="grid max-w-4xl gap-6">
+        <form method="POST" action="{{ route('profile.update') }}" class="card">
+            @csrf @method('PATCH')
+            <div class="card-header"><h2 class="card-title">{{ __('Angaben') }}</h2></div>
+            <div class="card-body grid gap-4 sm:grid-cols-2">
+                <x-field :label="__('Name')" name="name" bag="profile">
+                    <input id="name" name="name" class="input" value="{{ old('name', $user->name) }}" required maxlength="255" autocomplete="name">
+                </x-field>
+                <x-field :label="__('E-Mail')" name="email" bag="profile">
+                    <input id="email" type="email" name="email" class="input" value="{{ old('email', $user->email) }}" required autocomplete="email">
+                </x-field>
+                <x-field :label="__('Sprache')" name="locale" bag="profile">
+                    <select id="locale" name="locale" class="input">
+                        <option value="de" @selected(old('locale', $user->locale) === 'de')>Deutsch</option>
+                        <option value="en" @selected(old('locale', $user->locale) === 'en')>English</option>
+                    </select>
+                </x-field>
+                <x-field :label="__('Aktuelles Passwort')" name="current_password" bag="profile" :hint="__('Nur nötig, wenn du die E-Mail-Adresse änderst.')">
+                    <input id="current_password" type="password" name="current_password" class="input" autocomplete="current-password">
+                </x-field>
             </div>
-        @endif
-
-        <form method="POST" action="{{ route('profile.update') }}" class="w-full">
-            @csrf
-            @method('PATCH')
-
-            <div class="mb-4">
-                <label for="name" class="block text-gray-700 text-sm font-bold mb-2">Name:</label>
-                <input type="text" name="name" id="name" class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" value="{{ old('name', $user->name) }}" required>
-            </div>
-
-            <div class="mb-4">
-                <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-                <input type="email" name="email" id="email" class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" value="{{ old('email', $user->email) }}" required>
-            </div>
-
-            <div class="mb-4">
-                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Passwort:</label>
-                <input type="password" name="password" id="password" class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight">
-                <p class="text-gray-600 text-xs italic mt-1">Lasse das Feld leer, wenn du das Passwort nicht ändern möchtest.</p>
-            </div>
-
-            <div class="mb-4">
-                <label for="password_confirmation" class="block text-gray-700 text-sm font-bold mb-2">Passwort bestätigen:</label>
-                <input type="password" name="password_confirmation" id="password_confirmation" class="bg-gray-50 focus:ring-gray-500 focus:border-gray-500 border-gray-300 appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight">
-            </div>
-
-            <div class="mb-4">
-                <button type="submit" class="bg-gray-600 hover:bg-gray-800 border-gray-300 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Profil aktualisieren</button>
+            <div class="flex justify-end border-t border-line px-4 py-3 sm:px-5">
+                <button class="btn btn-primary"><x-icon name="check"/>{{ __('Speichern') }}</button>
             </div>
         </form>
+
+        <form method="POST" action="{{ route('password.update') }}" class="card">
+            @csrf @method('PUT')
+            <div class="card-header">
+                <div>
+                    <h2 class="card-title">{{ __('Passwort ändern') }}</h2>
+                    <p class="text-xs text-muted">{{ __('Danach werden alle anderen Geräte abgemeldet.') }}</p>
+                </div>
+            </div>
+            <div class="card-body grid gap-4 sm:grid-cols-3">
+                <x-field :label="__('Aktuelles Passwort')" name="current_password" bag="password">
+                    <input type="password" name="current_password" class="input" required autocomplete="current-password">
+                </x-field>
+                <x-field :label="__('Neues Passwort')" name="password" bag="password" :hint="__('Mind. :n Zeichen, Buchstaben und Zahlen.', ['n' => max(8, (int) $settings->get('security.password_min'))])">
+                    <input type="password" name="password" class="input" required autocomplete="new-password" minlength="8">
+                </x-field>
+                <x-field :label="__('Wiederholen')" name="password_confirmation" bag="password">
+                    <input type="password" name="password_confirmation" class="input" required autocomplete="new-password">
+                </x-field>
+            </div>
+            <div class="flex justify-end border-t border-line px-4 py-3 sm:px-5">
+                <button class="btn btn-primary"><x-icon name="key"/>{{ __('Passwort ändern') }}</button>
+            </div>
+        </form>
+
+        @if ($settings->get('security.allow_self_delete'))
+            <form method="POST" action="{{ route('profile.destroy') }}" class="card border-danger/30" data-confirm="{{ __('Konto endgültig löschen?') }}">
+                @csrf @method('DELETE')
+                <div class="card-header"><h2 class="card-title text-danger">{{ __('Konto löschen') }}</h2></div>
+                <div class="card-body flex flex-col gap-3 sm:flex-row sm:items-end">
+                    <x-field :label="__('Passwort zur Bestätigung')" name="password" bag="userDeletion" class="flex-1">
+                        <input type="password" name="password" class="input" required autocomplete="current-password">
+                    </x-field>
+                    <button class="btn btn-danger"><x-icon name="trash"/>{{ __('Konto löschen') }}</button>
+                </div>
+            </form>
+        @endif
     </div>
 @endsection

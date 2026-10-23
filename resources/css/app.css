@@ -1,3 +1,291 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+/* Dark Mode über die Klasse "dark" an <html> (System/Hell/Dunkel wählbar) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+ * Design-Tokens. --accent (+ --accent-fg) setzt das Layout aus den Einstellungen.
+ * ------------------------------------------------------------------------- */
+:root {
+    --accent: #d97706;
+    --accent-fg: #ffffff;
+
+    --bg: #f6f6f4;
+    --surface: #ffffff;
+    --surface-2: #f1f1ef;
+    --border: #e4e4e0;
+    --fg: #1c1c1a;
+    --muted: #6b6b66;
+
+    --ok: #15803d;
+    --warn: #b45309;
+    --danger: #dc2626;
+    --info: #2563eb;
+
+    color-scheme: light;
+}
+
+.dark {
+    --bg: #111110;
+    --surface: #1a1a19;
+    --surface-2: #232321;
+    --border: #2f2f2c;
+    --fg: #ecece8;
+    --muted: #9b9b94;
+
+    --ok: #4ade80;
+    --warn: #fbbf24;
+    --danger: #f87171;
+    --info: #60a5fa;
+
+    color-scheme: dark;
+}
+
+@theme inline {
+    --color-accent: var(--accent);
+    --color-accent-fg: var(--accent-fg);
+    --color-accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
+    --color-bg: var(--bg);
+    --color-surface: var(--surface);
+    --color-surface-2: var(--surface-2);
+    --color-line: var(--border);
+    --color-fg: var(--fg);
+    --color-muted: var(--muted);
+    --color-ok: var(--ok);
+    --color-warn: var(--warn);
+    --color-danger: var(--danger);
+    --color-info: var(--info);
+
+    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, monospace;
+}
+
+@layer base {
+    html {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+        @apply bg-bg text-fg antialiased;
+        font-feature-settings: 'cv11', 'ss01';
+    }
+
+    ::selection {
+        background: color-mix(in oklab, var(--accent) 30%, transparent);
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+
+    dialog::backdrop {
+        background: rgb(0 0 0 / 0.45);
+        backdrop-filter: blur(2px);
+    }
+}
+
+@layer components {
+    /* Buttons */
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium whitespace-nowrap
+            transition select-none disabled:opacity-50 disabled:pointer-events-none;
+    }
+    .btn svg {
+        @apply size-4 shrink-0;
+    }
+    .btn-primary {
+        @apply bg-accent text-accent-fg shadow-sm hover:brightness-110 active:brightness-95;
+    }
+    .btn-secondary {
+        @apply border border-line bg-surface text-fg shadow-sm hover:bg-surface-2;
+    }
+    .btn-ghost {
+        @apply text-muted hover:bg-surface-2 hover:text-fg;
+    }
+    .btn-danger {
+        @apply bg-danger text-white shadow-sm hover:brightness-110;
+    }
+    .btn-danger-ghost {
+        @apply text-danger hover:bg-danger/10;
+    }
+    .btn-sm {
+        @apply px-2.5 py-1.5 text-xs;
+    }
+    .btn-icon {
+        @apply p-2;
+    }
+
+    /* Formulare */
+    .label {
+        @apply mb-1.5 block text-sm font-medium text-fg;
+    }
+    .hint {
+        @apply mt-1 text-xs text-muted;
+    }
+    .input {
+        @apply block w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-fg shadow-sm
+            placeholder:text-muted/70 transition
+            focus:border-accent focus:ring-2 focus:ring-accent/25 focus:outline-none
+            disabled:bg-surface-2 disabled:text-muted;
+    }
+    select.input {
+        @apply pr-8;
+    }
+    .input-error {
+        @apply border-danger focus:border-danger focus:ring-danger/25;
+    }
+    .error {
+        @apply mt-1 text-xs font-medium text-danger;
+    }
+    .checkbox {
+        @apply size-4 rounded border-line accent-[var(--accent)];
+    }
+
+    /* Flächen */
+    .card {
+        @apply rounded-xl border border-line bg-surface shadow-sm;
+    }
+    .card-header {
+        @apply flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5;
+    }
+    .card-title {
+        @apply text-sm font-semibold;
+    }
+    .card-body {
+        @apply p-4 sm:p-5;
+    }
+
+    /* Badges */
+    .badge {
+        @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap;
+    }
+    .badge-ok {
+        @apply bg-ok/12 text-ok;
+    }
+    .badge-warn {
+        @apply bg-warn/12 text-warn;
+    }
+    .badge-danger {
+        @apply bg-danger/12 text-danger;
+    }
+    .badge-info {
+        @apply bg-info/12 text-info;
+    }
+    .badge-muted {
+        @apply bg-surface-2 text-muted;
+    }
+    .badge-accent {
+        @apply bg-accent-soft text-accent;
+    }
+
+    /* Tabellen */
+    .table {
+        @apply w-full text-left text-sm;
+    }
+    .table th {
+        @apply border-b border-line px-4 py-2.5 text-xs font-medium tracking-wide text-muted uppercase;
+    }
+    .table td {
+        @apply border-b border-line px-4 py-3 align-middle;
+    }
+    .table tr:last-child td {
+        @apply border-b-0;
+    }
+    .table tbody tr {
+        @apply transition hover:bg-surface-2/60;
+    }
+
+    /* Navigation */
+    .nav-link {
+        @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted transition hover:bg-surface-2 hover:text-fg;
+    }
+    .nav-link svg {
+        @apply size-[18px] shrink-0;
+    }
+    .nav-link.active {
+        @apply bg-accent-soft text-accent;
+    }
+
+    .kbd {
+        @apply rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-[10px] text-muted;
+    }
+
+    .id-chip {
+        @apply inline-flex items-center rounded-md border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-fg;
+    }
+
+    .modal {
+        @apply m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-line bg-surface p-0 text-fg shadow-2xl;
+    }
+
+    .prose-legal h1 { @apply mt-6 mb-3 text-2xl font-semibold; }
+    .prose-legal h2 { @apply mt-6 mb-2 text-lg font-semibold; }
+    .prose-legal h3 { @apply mt-4 mb-2 font-semibold; }
+    .prose-legal p { @apply mb-3 leading-relaxed; }
+    .prose-legal ul { @apply mb-3 list-disc pl-5; }
+    .prose-legal ol { @apply mb-3 list-decimal pl-5; }
+    .prose-legal a { @apply text-accent underline; }
+}
+
+/* ---------------------------------------------------------------------------
+ * FullCalendar an das Theme anpassen
+ * ------------------------------------------------------------------------- */
+.fc {
+    --fc-border-color: var(--border);
+    --fc-page-bg-color: var(--surface);
+    --fc-neutral-bg-color: var(--surface-2);
+    --fc-list-event-hover-bg-color: var(--surface-2);
+    --fc-today-bg-color: color-mix(in oklab, var(--accent) 8%, transparent);
+    --fc-button-bg-color: var(--surface);
+    --fc-button-border-color: var(--border);
+    --fc-button-text-color: var(--fg);
+    --fc-button-hover-bg-color: var(--surface-2);
+    --fc-button-hover-border-color: var(--border);
+    --fc-button-active-bg-color: var(--accent);
+    --fc-button-active-border-color: var(--accent);
+    --fc-event-border-color: transparent;
+    font-size: 0.8125rem;
+}
+.fc .fc-button {
+    @apply rounded-lg text-sm font-medium shadow-sm;
+}
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+    color: var(--accent-fg);
+}
+.fc .fc-toolbar-title {
+    @apply text-base font-semibold sm:text-lg;
+}
+.fc .ev-room { background: #2563eb; color: #fff; }
+.fc .ev-reservation { background: #7c3aed; color: #fff; }
+.fc .ev-loan { background: var(--accent); color: var(--accent-fg); }
+.fc .ev-overdue { background: var(--danger); color: #fff; }
+/* In der Listenansicht nur der Punkt farbig, nicht die ganze Zeile */
+.fc .fc-list-event.ev-room,
+.fc .fc-list-event.ev-reservation,
+.fc .fc-list-event.ev-loan,
+.fc .fc-list-event.ev-overdue { background: transparent; color: var(--fg); cursor: pointer; }
+.fc .fc-list-event.ev-room .fc-list-event-dot { border-color: #2563eb; }
+.fc .fc-list-event.ev-reservation .fc-list-event-dot { border-color: #7c3aed; }
+.fc .fc-list-event.ev-loan .fc-list-event-dot { border-color: var(--accent); }
+.fc .fc-list-event.ev-overdue .fc-list-event-dot { border-color: var(--danger); }
+.fc .fc-list-event.ev-overdue .fc-list-event-title { color: var(--danger); }
+.fc-theme-standard .fc-list-day-cushion { background: var(--surface-2); }
+
+/* ---------------------------------------------------------------------------
+ * Druck (Etiketten werden separat gestylt)
+ * ------------------------------------------------------------------------- */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}

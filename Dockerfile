@@ -1,42 +1,66 @@
-# 1. Base image with PHP and Composer
-FROM php:8.2-fpm
+# syntax=docker/dockerfile:1
 
-# 2. Install system dependencies
-RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    libzip-dev \
-    libonig-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install \
-        pdo_mysql \
-        mbstring \
-        zip \
-        gd \
-    && pecl install xdebug \
-    && docker-php-ext-enable xdebug \
+# ---------------------------------------------------------------------------
+# Basis: PHP-FPM mit den benötigten Extensions
+# ---------------------------------------------------------------------------
+FROM php:8.4-fpm-bookworm AS base
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libzip-dev libpng-dev libjpeg62-turbo-dev libwebp-dev libfreetype6-dev \
+        libicu-dev unzip mariadb-client \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install -j"$(nproc)" pdo_mysql gd zip intl opcache bcmath \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# 3. Install Composer (if not included)
+COPY docker/php.ini /usr/local/etc/php/conf.d/zz-loan.ini
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# 4. Set workdir
 WORKDIR /var/www/html
 
-# 5. Copy project files
+# ---------------------------------------------------------------------------
+# Dev/Test: Composer-Abhängigkeiten inkl. dev, ohne opcache-Caching
+# (docker build --target dev -t loan:dev .)
+# ---------------------------------------------------------------------------
+FROM base AS dev
+RUN echo "opcache.validate_timestamps=1" > /usr/local/etc/php/conf.d/zz-dev.ini
+
+# ---------------------------------------------------------------------------
+# PHP-Abhängigkeiten (ohne dev)
+# ---------------------------------------------------------------------------
+FROM base AS vendor
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --no-scripts --no-autoloader --prefer-dist
+
+# ---------------------------------------------------------------------------
+# Frontend-Build (Vite + Tailwind)
+# ---------------------------------------------------------------------------
+FROM node:22-bookworm-slim AS assets
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY vite.config.js ./
+COPY resources ./resources
+RUN npm run build
+
+# ---------------------------------------------------------------------------
+# Produktion
+# ---------------------------------------------------------------------------
+FROM base AS production
+
+COPY --from=vendor /var/www/html/vendor ./vendor
 COPY . .
+COPY --from=assets /app/public/build ./public/build
 
-# 6. Install PHP dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+RUN composer dump-autoload --no-dev --optimize --classmap-authoritative \
+    && php artisan package:discover --ansi \
+    && mkdir -p storage/app/public storage/framework/cache storage/framework/sessions \
+        storage/framework/views storage/logs bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    # Kopie von public/ für den nginx-Container (wird beim Start in das Shared Volume gespiegelt)
+    && cp -a public /opt/public-dist
 
-# 7. Set permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+COPY docker/entrypoint.sh /usr/local/bin/loan-entrypoint
+RUN chmod +x /usr/local/bin/loan-entrypoint
 
-# 8. Expose port (built-in server) or leave for external webserver
-EXPOSE 9000
-
-# 9. Run Laravel via PHP-FPM
+ENTRYPOINT ["loan-entrypoint"]
 CMD ["php-fpm"]

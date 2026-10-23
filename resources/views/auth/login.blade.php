@@ -1,40 +1,30 @@
-@extends('layouts.app')
+@extends('layouts.guest')
+@section('title', __('Anmelden'))
 
 @section('content')
-<div class="container mx-auto mt-8 min-h-screen flex justify-center items-center">
-    <div class="w-full max-w-md">
-        <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
-        <div class="mb-8 text-sm text-center px-2">
-            {{ __('Willkommen') }}<a href="{{ url('/product') }}" class="hover:underline text-yellow-700 pl-1 mb-1">LOAN | {{ __('Das System zur Geräteausleihe') }}</a> {{ __('für wissenschaftliche und medienpädagogische Einrichtungen') }}
-            <div class="flex items-center mt-6 p-4 text-sm text-gray-800 rounded-lg bg-gray-200 dark:bg-gray-800 dark:text-gray-300 text-center" role="alert">
-                <svg class="flex-shrink-0 w-4 h-4 me-3 mr-2 hidden md:inline" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-                </svg>
-                <span class="sr-only mr-2">Info</span>
-                <div>
-                  {{ __('Dieser Dienst ist ein System für interessierte Einrichtungen') }}.
-                </div>
-              </div>
-        </div>
-        <form method="POST" action="{{ route('login') }}">
+    <div class="card p-6">
+        <h1 class="text-lg font-semibold">{{ __('Anmelden') }}</h1>
+        @if ($branding->tagline())
+            <p class="mt-1 text-sm text-muted">{{ $branding->tagline() }}</p>
+        @endif
+
+        <form method="POST" action="{{ route('login') }}" class="mt-6 space-y-4">
             @csrf
-            <div class="mb-4 mx-2">
-                <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email:</label>
-                <input type="email" name="email" id="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+            <x-field :label="__('E-Mail')" name="email">
+                <input id="email" type="email" name="email" value="{{ old('email') }}" class="input @error('email') input-error @enderror"
+                       required autofocus autocomplete="username" inputmode="email">
+            </x-field>
+            <x-field :label="__('Passwort')" name="password">
+                <input id="password" type="password" name="password" class="input" required autocomplete="current-password">
+            </x-field>
+            <div class="flex items-center justify-between">
+                <label class="flex items-center gap-2 text-sm">
+                    <input type="checkbox" name="remember" value="1" class="checkbox" @checked(old('remember'))> {{ __('Angemeldet bleiben') }}
+                </label>
+                <a href="{{ route('password.request') }}" class="text-sm text-accent hover:underline">{{ __('Passwort vergessen?') }}</a>
             </div>
-            <div class="mb-6 mx-2">
-                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">{{ __('Passwort') }}:</label>
-                <input type="password" name="password" id="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" required>
-            </div>
-            <div class="flex items-center justify-between mx-2">
-                <button type="submit" class="bg-gray-600 hover:bg-gray-800 border-gray-300 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Login
-                </button>
-            </div>
+            <button class="btn btn-primary w-full">{{ __('Anmelden') }}</button>
         </form>
-        <div class="text-xs text-right hover:underline text-yellow-700 pr-2"><a href="mailto:vincent.dusanek@gmail.com">{{ __('Passwort vergessen?') }}</a></div>
     </div>
-</div>
+    <p class="mt-4 text-center text-xs text-muted">{{ __('Zugänge werden von der Administration vergeben.') }}</p>
 @endsection
-
-

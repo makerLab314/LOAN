@@ -1,213 +1,75 @@
-# LOAN (Fork by makerLab314)
+# LOAN – Geräteausleihe & Raumbuchung
 
-> ⚡️ **This is a maintained, enhanced fork of the original LOAN [https://github.com/OriginalOwner/LOAN](https://github.com/OriginalOwner/LOAN) project. All core features remain, with improvements and ongoing support from makerLab314's team.**  
-> Please report issues or suggest new features via GitHub Issues!
+Fork von [LOAN](https://github.com/dusanvin/LOAN) (MIT), umfassend überarbeitet: neues Design mit Dark Mode,
+mobil nutzbar, Inventar-IDs mit QR- und Barcode-Etiketten, Kalender, Rechteverwaltung und Audit-Log.
 
----
+**Stack:** Laravel 12 · PHP 8.4 · MariaDB · Tailwind CSS 4 · Alpine.js (CSP-Build) · Docker Compose
 
-## Overview
+## Funktionen
 
-**LOAN** is a flexible, modern system for device and equipment management, designed for scientific and media-education institutions.
+- **Dashboard**: fällige, überfällige und anstehende Rückgaben, Vormerkungen, Raumbelegung
+- **Geräte** mit Kategorie, Bild, Bestand und **Zubehör-Checkliste** (z. B. Kaltgerätekabel)
+- **Inventar-IDs** aus Kategorie-Kürzel und Nummer (`KAB-0042`), Exemplare mit Endung (`KAB-0042-3`)
+  - **Etiketten** mit QR-Code, Code-128-Barcode oder nur Text (A4-Bögen oder Etikettenrollen)
+  - **Scannen**: Handy-Kamera, Scanner-Seite im Browser, Hand-Scanner oder ID eintippen
+  - Doppelt ausgegebene Exemplare werden erkannt
+- **Ausleihe**:
+  - Menge oder einzelne Exemplare
+  - **Teilrückgabe**, **Verlängerung**
+  - Fehlendes Zubehör wird vermerkt
+- **Vormerkungen** mit Prüfung auf Verfügbarkeit, **mit einem Klick als Ausleihe ausgeben**
+- **Raumbuchungen** mit Überschneidungsprüfung, auch über mehrere Tage
+- **Kalender** für Räume, Vormerkungen und Ausleihen (Monat, Woche, Liste)
+- **Globale Suche** (Strg+K) nach Gerät, ID, Person oder Raum
+- **Einstellungen**:
+  - Name, Logo, Farbe, Zeitzone
+  - Ausleihregeln
+  - **Rechte-Matrix je Rolle**
+  - Passwortregeln, Etiketten, Impressum/Datenschutz, Backups
+- **Sicherheit**:
+  - Content-Security-Policy, Rechteprüfung serverseitig
+  - Sitzungsübersicht mit „überall abmelden“
+  - Login-Drosselung, vollständiges Protokoll (CSV-Export)
+- **Dark Mode** (System, Hell, Dunkel), Deutsch und Englisch
 
-- **Stack:** Ubuntu 24.04, Nginx, Postgres, PHP 8.3, Laravel, TailwindCSS
-- **Purpose:** Effortless device booking, transparent loan processes, and smooth user management.
-- **Open Source License:** MIT
-
----
-
-## Features
-
-- User-friendly web interface in German and English
-- LNPP architecture: modern, scalable, robust
-- Local or Dockerized deployment
-- Role-based access (users/admins), seed admin creation
-- Onboarding scripts, assets, and migrations included
-
----
-
-## Table of Contents
-
-- [Demo Previews](#demo-previews)
-- [Quick Start (Non-Docker)](#quick-start-non-docker)
-- [Quick Start (Docker)](#quick-start-docker)
-- [FAQ & Troubleshooting](#faq--troubleshooting)
-- [License](#license)
-- [Credits & Upstream](#credits--upstream)
-
----
-
-## Demo Previews
-
-**Verleihprozess / Loan Process:**  
-![Loan process GIF](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-2.gif)
-
-**Login:**  
-![Login](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-1-login.png)
-
-**Geräte / Devices:**  
-![Devices](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-2-devices.png)
-
-**Gerät Details / Device Details:**  
-![Device Detail](https://digillab.uni-augsburg.de/wp-content/uploads/2025/08/loan-3-device.png)
-
----
-
-## Quick Start (Non-Docker)
-
-These steps assume you're running on Linux/macOS. Use PowerShell on Windows where needed.
-
-### 1. Prerequisites
-
-- PHP 8.3+, Composer
-- PostgreSQL or SQLite
-- Node.js & npm (for frontend assets)
-- [Optional] Redis (recommended for queues)
-
-### 2. Clone and Setup
+## Installation (Docker)
 
 ```bash
-git clone https://github.com/makerLab314/LOAN.git
-cd LOAN
-composer install
+git clone <repo> loan && cd loan
 cp .env.example .env
-```
-
-### 3. Generate App Key
-
-```bash
-php artisan key:generate
-```
-
-### 4. Configure Database
-
-- **SQLite (simplest):**
-  ```bash
-  touch database/database.sqlite
-  ```
-  Then edit `.env`:
-  ```
-  DB_CONNECTION=sqlite
-  DB_DATABASE=/absolute/path/to/your/project/database/database.sqlite
-  ```
-- **PostgreSQL:**  
-  Update `.env` with your DB credentials:
-  ```
-  DB_CONNECTION=pgsql
-  DB_HOST=127.0.0.1
-  DB_PORT=5432
-  DB_DATABASE=loan
-  DB_USERNAME=youruser
-  DB_PASSWORD=yourpassword
-  ```
-
-### 5. Migrate & Seed
-
-```bash
-php artisan migrate --seed
-```
-> This creates the first admin user:  
-> **Email**: `admin@test.com`  
-> **Password**: `geheimespasswort`  
-> (Change after first login!)
-
-### 6. Build Frontend Assets
-
-```bash
-npm install
-npm run build
-```
-
-### 7. Setup Storage Symlink
-
-```bash
-php artisan storage:link
-```
-
-### 8. Run the Server
-
-```bash
-php artisan serve
-```
-Visit [http://127.0.0.1:8000](http://127.0.0.1:8000).
-
----
-
-## Quick Start (Docker)
-
-An all-in-one solution running via Docker Compose, including `php-fpm`, Redis, and MariaDB.
-
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/makerLab314/LOAN.git
-cd LOAN
-```
-
-### 2. Create the `.env` file and set the `APP_KEY`
-
-```bash
-cp .env.example .env
-echo "APP_KEY=base64:$(openssl rand -base64 32)" >> .env
-```
-Or manually edit `.env` and insert the key.
-
-### 3. Start Services
-
-```bash
+# In .env zuerst DB_PASSWORD, DB_ROOT_PASSWORD, APP_URL und MAIL_* setzen.
+docker compose build
+# APP_KEY erzeugen und in .env eintragen:
+docker compose run --rm --no-deps --entrypoint php loan artisan key:generate --show
 docker compose up -d
+docker compose exec loan php artisan loan:create-admin du@example.org --name="Dein Name"
 ```
 
-### 4. Run Database Migrations and Seed Admin
+LOAN läuft dann auf `http://<server>:8080` (Port über `APP_PORT`). Für HTTPS einen Reverse Proxy
+(Caddy, Traefik, nginx) davorschalten und `TRUSTED_PROXIES=*` setzen.
+
+Daten liegen auf dem Host:
+
+| Ordner | Inhalt |
+|---|---|
+| `./data/db` | Datenbank |
+| `./data/storage` | Bilder und Logos |
+| `./data/backups` | tägliche Backups |
+
+**Bestehende Installation aktualisieren:** siehe [UPGRADE.md](UPGRADE.md), danach immer `./deploy.sh`.
+
+## Entwicklung
 
 ```bash
-docker compose run loan php artisan migrate --seed
+docker build --target dev -t loan:dev .
+docker run --rm -v "$PWD:/var/www/html" loan:dev composer install
+docker run --rm -v "$PWD:/var/www/html" loan:dev php artisan test
+docker run --rm -v "$PWD:/var/www/html" loan:dev vendor/bin/phpstan analyse
+npm ci && npm run dev
 ```
 
-### 5. Build Assets (if needed)
+Die CI (`.github/workflows/ci.yml`) prüft Tests, Pint, Larastan, `composer audit`, `npm audit` und den Docker-Build.
 
-```bash
-docker compose run loan npm install
-docker compose run loan npm run build
-```
+## Lizenz
 
-### 6. Log In
-
-Visit [http://localhost:8080](http://localhost:8080) and log in with the seeded admin account.
-
----
-
-## FAQ & Troubleshooting
-
-- **Change Admin Password**:  
-  After setup, immediately log in as admin and change the password via the user interface.
-
-- **.env values:**  
-  Refer to Laravel documentation for advanced `.env` configuration.
-
-- **File uploads not working?**  
-  Ensure the `storage/` directory is writable and `php artisan storage:link` was run.
-
-- **Asset build issues:**  
-  If frontend styling/JS is missing, ensure `npm run build` finished without errors.
-
-- **Database connection errors in Docker:**  
-  Wait a few seconds after `docker compose up` before running migrations.
-
----
-
-## License
-
-<em>LOAN | A free loan management system</em> is made with <a href="https://laravel.com" target="_blank">Laravel</a> and <a href="https://github.com/tailwindlabs/tailwindcss" target="_blank">TailwindCSS</a>. Content Language: lang="de". Similar to the Laravel framework, LOAN is open-sourced software licensed under the <a href="https://opensource.org/licenses/MIT"target="_blank">MIT License</a>.
-
-> For commercial licensing, please [open a GitHub issue](https://github.com/makerLab314/LOAN/issues).
-
----
-
-## Credits & Upstream
-
-- **Origin:** Forked from [dusanvin/LOAN](https://github.com/dusanvin/LOAN)
-- **This fork:** [makerLab314/LOAN](https://github.com/makerLab314/LOAN)
-- **Frameworks & Tools:**  
-    [Laravel](https://laravel.com) | [TailwindCSS](https://tailwindcss.com)
-
-> We thank the original authors and contributors for their substantial initial work!
+MIT – siehe [LICENSE](LICENSE). Ursprüngliches Projekt von Vincent Dusanek.

@@ -1,113 +1,137 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\SettingsController;
+use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\DeviceLoanController;
 use App\Http\Controllers\DeviceReservationController;
+use App\Http\Controllers\LabelController;
+use App\Http\Controllers\LegalController;
+use App\Http\Controllers\LookupController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RoomBookingController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SessionController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\UserController;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+/*
+|--------------------------------------------------------------------------
+| Öffentlich
+|--------------------------------------------------------------------------
+*/
+Route::get('/impressum', [LegalController::class, 'imprint'])->name('legal.imprint');
+Route::get('/datenschutz', [LegalController::class, 'privacy'])->name('legal.privacy');
+Route::post('/locale', [ProfileController::class, 'locale'])->name('locale.switch');
 
-Route::post('/locale', function (Request $request) {
-    $data = $request->validate([
-        'locale' => 'required|in:de,en'
-    ]);
+/*
+|--------------------------------------------------------------------------
+| Angemeldet
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'auth.session'])->group(function () {
+    Route::get('/', DashboardController::class)->name('home');
+    Route::get('/search', SearchController::class)->middleware('throttle:search')->name('search');
 
-    // Session immer setzen
-    session(['locale' => $data['locale']]);
+    // Inventar-ID / Scanner
+    Route::get('/scan', [LookupController::class, 'scan'])->name('scan');
+    Route::post('/lookup', [LookupController::class, 'lookup'])->middleware('throttle:search')->name('lookup');
+    Route::get('/d/{code}', [LookupController::class, 'show'])->where('code', '[^/]{1,64}')->name('lookup.show');
 
-    // Falls eingeloggt: auch im User speichern
-    if (Auth::check()) {
-        $user = Auth::user();
-        if ($user->locale !== $data['locale']) {
-            $user->locale = $data['locale'];
-            $user->save();
-        }
-    }
+    // Geräte
+    Route::middleware('can:devices.manage')->group(function () {
+        Route::get('/devices/create', [DeviceController::class, 'create'])->name('devices.create');
+        Route::post('/devices', [DeviceController::class, 'store'])->name('devices.store');
+        Route::get('/devices/{device}/edit', [DeviceController::class, 'edit'])->name('devices.edit');
+        Route::put('/devices/{device}', [DeviceController::class, 'update'])->name('devices.update');
+        Route::delete('/devices/{device}', [DeviceController::class, 'destroy'])->name('devices.destroy');
+    });
+    Route::get('/devices', [DeviceController::class, 'index'])->name('devices.index');
+    Route::get('/devices/{device}', [DeviceController::class, 'show'])->name('devices.show');
+    Route::get('/devices/{device}/qr/{unit?}', [LabelController::class, 'qr'])->whereNumber('unit')->name('devices.qr');
 
-    // Zurück auf die vorherige Seite
-    return back();
-})->name('locale.switch');
+    // Ausleihen
+    Route::get('/loans', [DeviceLoanController::class, 'index'])->name('loans.index');
+    Route::get('/loans/history', [DeviceLoanController::class, 'history'])->name('loans.history');
+    Route::post('/devices/{device}/loans', [DeviceLoanController::class, 'store'])->middleware('can:loans.create')->name('loans.store');
+    Route::middleware('can:loans.return')->group(function () {
+        Route::post('/loans/{loan}/return', [DeviceLoanController::class, 'return'])->name('loans.return');
+        Route::post('/loans/{loan}/extend', [DeviceLoanController::class, 'extend'])->name('loans.extend');
+        Route::post('/loans/{loan}/resolve', [DeviceLoanController::class, 'resolveIssues'])->name('loans.resolve');
+    });
 
+    // Vormerkungen
+    Route::middleware('can:reservations.create')->group(function () {
+        Route::get('/devices/{device}/reserve', [DeviceReservationController::class, 'create'])->name('reservations.create');
+        Route::post('/devices/{device}/reserve', [DeviceReservationController::class, 'store'])->name('reservations.store');
+    });
+    Route::delete('/reservations/{reservation}', [DeviceReservationController::class, 'destroy'])->name('reservations.destroy');
+    Route::post('/reservations/{reservation}/convert', [DeviceReservationController::class, 'convert'])->name('reservations.convert');
 
-Route::resource('categories', CategoryController::class)->middleware(['auth']); 
+    // Kategorien
+    Route::resource('categories', CategoryController::class)->except(['show'])->middleware('can:categories.manage');
 
-Route::get('/logs', function () {
-    return view('layouts.logs');
-});
-
-Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect()->route('devices.overview');
-    } else {
-        return view('auth.login');
-    }
-});
-
-Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
-Route::post('/login', [AuthenticatedSessionController::class, 'store']);
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/devices/overview', [DeviceController::class, 'overview'])->name('devices.overview');
-    Route::get('/devices/{device}/reserve',  [DeviceReservationController::class, 'create'])->name('devices.reservations.create');
-    Route::post('/devices/{device}/reserve', [DeviceReservationController::class, 'store'])->name('devices.reservations.store');
-    Route::delete('/devices/reservations/{reservation}', [DeviceReservationController::class, 'destroy'])
-    ->name('devices.reservations.destroy')
-    ->middleware('auth');
-
-
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-
-    Route::resource('devices', DeviceController::class);
-    Route::post('/devices/loan', [DeviceController::class, 'loan'])->name('devices.loan');
-    Route::post('/devices/return', [DeviceController::class, 'returnLoan'])->name('devices.return');
-
+    // Räume & Raumbuchungen
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
-    Route::get('/rooms/{room}/reserve', [RoomController::class, 'reserve'])->name('rooms.reserve');
-    Route::post('/rooms/{room}/reserve', [RoomController::class, 'storeReservation'])->name('rooms.storeReservation');
+    Route::middleware('can:rooms.manage')->group(function () {
+        Route::get('/rooms/create', [RoomController::class, 'create'])->name('rooms.create');
+        Route::post('/rooms', [RoomController::class, 'store'])->name('rooms.store');
+        Route::get('/rooms/{room}/edit', [RoomController::class, 'edit'])->name('rooms.edit');
+        Route::put('/rooms/{room}', [RoomController::class, 'update'])->name('rooms.update');
+        Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
+    });
+    Route::middleware('can:rooms.book')->group(function () {
+        Route::get('/rooms/{room}/book', [RoomBookingController::class, 'create'])->name('bookings.create');
+        Route::post('/rooms/{room}/book', [RoomBookingController::class, 'store'])->name('bookings.store');
+    });
+    Route::get('/bookings', [RoomBookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/archive', [RoomBookingController::class, 'archived'])->name('bookings.archived');
+    Route::get('/bookings/{booking}/edit', [RoomBookingController::class, 'edit'])->name('bookings.edit');
+    Route::put('/bookings/{booking}', [RoomBookingController::class, 'update'])->name('bookings.update');
+    Route::delete('/bookings/{booking}', [RoomBookingController::class, 'destroy'])->name('bookings.destroy');
 
-    Route::get('/rooms/create', [RoomController::class, 'create'])->name('rooms.create');
-    Route::post('/rooms', [RoomController::class, 'store'])->name('rooms.store');
-    Route::get('/rooms/{room}/edit', [RoomController::class, 'edit'])->name('rooms.edit');
-    Route::patch('/rooms/{room}', [RoomController::class, 'update'])->name('rooms.update');
-    Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
+    // Kalender
+    Route::get('/calendar', [CalendarController::class, 'index'])->name('calendar');
+    Route::get('/calendar/events', [CalendarController::class, 'events'])->name('calendar.events');
 
-    Route::get('/reservations', [RoomController::class, 'reservations'])->name('reservations.index');
-    Route::delete('/reservations/{reservation}', [RoomController::class, 'cancelReservation'])->name('reservations.cancel');
-    Route::get('/reservations/{reservation}/edit', [RoomController::class, 'editReservation'])->name('reservations.edit');
-    Route::patch('/reservations/{reservation}', [RoomController::class, 'updateReservation'])->name('reservations.update');
-    Route::get('/reservations/archived', [RoomController::class, 'archived'])->name('reservations.archived');
+    // Etiketten
+    Route::middleware('can:labels.print')->group(function () {
+        Route::get('/labels', [LabelController::class, 'index'])->name('labels.index');
+        Route::get('/labels/print', [LabelController::class, 'print'])->name('labels.print');
+    });
 
+    // Profil & Sitzungen
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->middleware('throttle:6,1')->name('password.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/profile/theme', [ProfileController::class, 'theme'])->name('profile.theme');
+    Route::get('/profile/sessions', [SessionController::class, 'index'])->name('sessions.index');
+    Route::delete('/profile/sessions/others', [SessionController::class, 'destroyOthers'])->middleware('throttle:6,1')->name('sessions.destroy-others');
+    Route::delete('/profile/sessions/{id}', [SessionController::class, 'destroy'])->name('sessions.destroy');
 
+    // Verwaltung
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::middleware('can:users.manage')->group(function () {
+            Route::resource('users', UserController::class)->except(['show']);
+            Route::delete('/users/{user}/sessions', [SessionController::class, 'destroyForUser'])->name('users.sessions.destroy');
+        });
 
-});
+        Route::middleware('can:audit.view')->group(function () {
+            Route::get('/audit', [AuditLogController::class, 'index'])->name('audit');
+            Route::get('/audit/export', [AuditLogController::class, 'export'])->name('audit.export');
+        });
 
-// Administratoren können Räume erstellen, bearbeiten und löschen
-Route::middleware(['auth', 'role:administration'])->group(function () {
-    Route::resource('users', UserController::class)->except(['show']);
-    Route::get('/log', [DeviceController::class, 'log'])->name('devices.log');
-});
-
-Route::get('/impressum', function () {
-    return view('layouts.impressum');
-});
-Route::get('/datenschutz', function () {
-    return view('layouts.datenschutz');
-});
-Route::get('/product', function () {
-    return view('layouts.product');
+        Route::middleware('can:settings.manage')->group(function () {
+            Route::post('/settings/backups/run', [SettingsController::class, 'runBackup'])->middleware('throttle:3,10')->name('settings.backup');
+            Route::get('/settings/{section?}', [SettingsController::class, 'edit'])->name('settings');
+            Route::put('/settings/{section}', [SettingsController::class, 'update'])->name('settings.update');
+        });
+    });
 });
 
 require __DIR__.'/auth.php';

@@ -4,116 +4,89 @@ namespace App\Http\Controllers;
 
 use App\Models\Device;
 use App\Models\DeviceReservation;
+use App\Services\BookingRules;
+use App\Services\LoanService;
+use App\Support\Audit;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class DeviceReservationController extends Controller
 {
-    public function __construct()
+    public function __construct(
+        private BookingRules $rules,
+        private LoanService $loans,
+    ) {}
+
+    public function create(Device $device): View
     {
-        $this->middleware('auth');
+        $upcoming = $device->activeReservations()->with('user')->where('end_at', '>', now())->orderBy('start_at')->get();
+
+        return view('reservations.create', compact('device', 'upcoming'));
     }
 
-    // Formular anzeigen (wie bei Räumen, nur für Devices)
-    public function create(Device $device)
+    public function store(Request $request, Device $device): RedirectResponse
     {
-        return view('devices.reservations.create', [
-            'device' => $device
-        ]);
-    }
-
-    // Vormerkung speichern
-    public function store(Request $request, Device $device)
-    {
-        // 1) Basiseingaben prüfen
-        $validated = $request->validate([
-            'start_date' => ['required','date'],
-            'start_time' => ['required','date_format:H:i'],
-            'end_date'   => ['required','date','after_or_equal:start_date'],
-            'end_time'   => ['required','date_format:H:i'],
-            'purpose'    => ['nullable','string','max:255'],
-            'reserved_by_name' => ['nullable','string','max:255'],
-            'quantity'   => ['nullable','integer','min:1'],
-        ]);
-
-        $start = Carbon::createFromFormat('Y-m-d H:i', $validated['start_date'].' '.$validated['start_time']);
-        $end   = Carbon::createFromFormat('Y-m-d H:i', $validated['end_date'].' '.$validated['end_time']);
-
-        if ($end->lessThanOrEqualTo($start)) {
-            return back()->withErrors(['end_time' => 'Ende muss nach dem Start liegen.'])
-                         ->withInput();
-        }
-
-        // 2) Wortlimit (<= 100 Wörter) serverseitig erzwingen
-        $wordCount = str_word_count((string)($validated['purpose'] ?? ''), 0, 'ÄÖÜäöüß');
-        if ($wordCount > 100) {
-            return back()->withErrors(['purpose' => 'Bitte höchstens 100 Wörter. (Aktuell: '.$wordCount.')'])
-                         ->withInput();
-        }
-
-        // Get requested quantity (default to 1)
-        $requestedQuantity = $validated['quantity'] ?? 1;
-
-        // 3) Calculate reserved quantity during the requested time period
-        $reservedQuantity = $device->reservations()
-            ->where('status', '!=', 'cancelled')
-            ->where(function ($q) use ($start, $end) {
-                $q->whereBetween('start_at', [$start, $end])
-                  ->orWhereBetween('end_at', [$start, $end])
-                  ->orWhere(function ($q2) use ($start, $end) {
-                      $q2->where('start_at', '<=', $start)
-                         ->where('end_at', '>=', $end);
-                  });
-            })
-            ->sum('quantity');
-
-        // Available quantity = total - loaned - reserved during this time period
-        $availableForReservation = $device->total_quantity - $device->loaned_quantity - $reservedQuantity;
-
-        // Validate requested quantity doesn't exceed available
-        if ($requestedQuantity > $availableForReservation) {
-            $message = $availableForReservation <= 0
-                ? 'Für diesen Zeitraum sind keine Geräte mehr verfügbar.'
-                : 'Für diesen Zeitraum sind nur noch ' . $availableForReservation . ' Gerät(e) verfügbar.';
-            return back()->withErrors(['quantity' => $message])
-                         ->withInput();
-        }
-
-        // 4) Vormerkung anlegen
-        DeviceReservation::create([
-            'device_id' => $device->id,
-            'user_id'   => Auth::id(),
-            'start_at'  => $start,
-            'end_at'    => $end,
-            'purpose'   => $validated['purpose'] ?? null,
-            'quantity'  => $requestedQuantity,
-            'reserved_by_name' => $request->input('reserved_by_name'),
-            'status'    => 'pending',
+        $data = $request->validate([
+            'start_date' => ['required', 'date_format:Y-m-d'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:start_date'],
+            'end_time' => ['required', 'date_format:H:i'],
+            'purpose' => ['nullable', 'string', 'max:255'],
+            'reserved_by_name' => ['nullable', 'string', 'max:255'],
+            'quantity' => ['required', 'integer', 'min:1', 'max:'.$device->total_quantity],
+        ], [], [
+            'start_date' => __('Startdatum'),
+            'end_date' => __('Enddatum'),
+            'quantity' => __('Menge'),
+            'purpose' => __('Zweck'),
         ]);
 
-        $message = $requestedQuantity === 1
-            ? 'Gerät wurde erfolgreich vorgemerkt.'
-            : $requestedQuantity . ' Geräte wurden erfolgreich vorgemerkt.';
-        return redirect()
-            ->route('devices.show', $device) // passe an, falls deine Show‑Route anders heißt
-            ->with('success', $message);
+        [$start, $end] = $this->rules->period($data['start_date'], $data['start_time'], $data['end_date'], $data['end_time']);
+
+        $reservation = $this->rules->reserveDevice(
+            $device, $start, $end, (int) $data['quantity'],
+            $data['purpose'] ?? null, $data['reserved_by_name'] ?? null, $request->user(),
+        );
+
+        return redirect()->route('devices.show', $device)->with('success', trans_choice(
+            ':count Exemplar vorgemerkt.|:count Exemplare vorgemerkt.',
+            $reservation->quantity,
+            ['count' => $reservation->quantity],
+        ));
     }
-    public function destroy(DeviceReservation $reservation)
+
+    public function destroy(Request $request, DeviceReservation $reservation): RedirectResponse
     {
-        // Nur der Ersteller darf seine Vormerkung widerrufen
-        if ($reservation->user_id !== auth()->id()) {
-            abort(403, 'Unbefugt');
-        }
+        $this->authorize('cancel', $reservation);
 
-        // Entweder löschen...
-        // $reservation->delete();
+        $reservation->update(['status' => DeviceReservation::STATUS_CANCELLED]);
+        Audit::log('device_reservation.cancelled', $reservation);
 
-        // ...oder Status auf "cancelled" setzen (empfohlen, falls du Historie behalten willst):
-        $reservation->update(['status' => 'cancelled']);
-
-        return back()->with('status', 'Die Vormerkung wurde widerrufen.');
+        return back()->with('success', __('Vormerkung widerrufen.'));
     }
 
+    public function convert(Request $request, DeviceReservation $reservation): RedirectResponse
+    {
+        $this->authorize('convert', $reservation);
+
+        $data = $request->validate([
+            'borrower_name' => ['nullable', 'string', 'max:255'],
+            'units' => ['nullable', 'array'],
+            'units.*' => ['integer', 'min:1'],
+            'accessories' => ['nullable', 'array'],
+            'accessories.*' => ['boolean'],
+            'accessories_present' => ['nullable', 'boolean'],
+        ]);
+
+        $accessories = $request->boolean('accessories_present') ? ($data['accessories'] ?? []) : null;
+
+        $loan = $this->loans->convertReservation(
+            $reservation, $request->user(), $data['borrower_name'] ?? null, $data['units'] ?? null, $accessories,
+        );
+
+        return redirect()->route('devices.show', $loan->device_id)->with('success', __('Vormerkung in Ausleihe umgewandelt (bis :date).', [
+            'date' => $loan->loan_end_date->format('d.m.Y'),
+        ]));
+    }
 }
-

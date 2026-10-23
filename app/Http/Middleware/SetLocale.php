@@ -2,24 +2,23 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\Settings;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\Response;
 
 class SetLocale
 {
-    public function handle(Request $request, Closure $next)
+    private const SUPPORTED = ['de', 'en'];
+
+    public function handle(Request $request, Closure $next): Response
     {
-        // 1) Eingeloggter User hat Vorrang
-        if (Auth::check() && Auth::user()->locale) {
-            App::setLocale(Auth::user()->locale);
-            session(['locale' => Auth::user()->locale]); // Session synchron halten
-        } else {
-            // 2) Gäste: Session oder Default 'de'
-            $locale = session('locale', 'de');
-            App::setLocale($locale);
-        }
+        $locale = $request->user()?->locale
+            ?: $request->session()->get('locale')
+            ?: app(Settings::class)->get('general.default_locale', 'de');
+
+        App::setLocale(in_array($locale, self::SUPPORTED, true) ? $locale : 'de');
 
         return $next($request);
     }

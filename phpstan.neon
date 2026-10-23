@@ -1,0 +1,19 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 5
+    paths:
+        - app
+        - routes
+        - database
+    excludePaths:
+        - database/migrations/2014_*
+        - database/migrations/2019_*
+        - database/migrations/2024_*
+        - database/migrations/2025_*
+    # Relationen/Zeitstempel können bei inkonsistenten Altdaten null sein –
+    # die defensiven ?->-Zugriffe sind beabsichtigt.
+    treatPhpDocTypesAsCertain: false
+    ignoreErrors:
+        - identifier: nullsafe.neverNull

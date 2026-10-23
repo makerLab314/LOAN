@@ -2,51 +2,79 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $email
+ * @property string $role
+ * @property string $locale
+ * @property string $theme
+ * @property Carbon|null $deleted_at
+ */
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    /** @use HasFactory<UserFactory> */
+    use HasFactory, Notifiable, SoftDeletes;
+
+    public const ROLE_ADMIN = 'administration';
+
+    public const ROLE_MODERATOR = 'moderation';
+
+    public const ROLES = [self::ROLE_ADMIN, self::ROLE_MODERATOR];
+
+    public const THEMES = ['system', 'light', 'dark'];
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
+     * "role" ist bewusst NICHT mass-assignable – Rollen werden nur explizit gesetzt.
      */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'role',
         'locale',
+        'theme',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    // Beziehung zur Reservation-Tabelle
-    public function reservations()
+    protected function casts(): array
     {
-        return $this->hasMany(Reservation::class);
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    /** @return HasMany<RoomBooking, $this> */
+    public function roomBookings(): HasMany
+    {
+        return $this->hasMany(RoomBooking::class);
+    }
+
+    /** @return HasMany<DeviceReservation, $this> */
+    public function deviceReservations(): HasMany
+    {
+        return $this->hasMany(DeviceReservation::class);
+    }
+
+    public static function activeAdminCount(): int
+    {
+        return static::query()->where('role', self::ROLE_ADMIN)->count();
     }
 }
