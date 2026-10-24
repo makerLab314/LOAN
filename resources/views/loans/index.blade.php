@@ -5,7 +5,9 @@
 <div x-data="tabs" data-initial="loans">
     <x-page-header :title="__('Ausleihen & Vormerkungen')">
         <x-slot:actions>
-            <a href="{{ route('loans.history') }}" class="btn btn-secondary"><x-icon name="history"/>{{ __('Abgeschlossene') }}</a>
+            @unless (auth()->user()->isKiosk())
+                <a href="{{ route('loans.history') }}" class="btn btn-secondary"><x-icon name="history"/>{{ __('Abgeschlossene') }}</a>
+            @endunless
         </x-slot:actions>
     </x-page-header>
 
@@ -121,7 +123,7 @@
                             · {{ $loan->borrower_name }}
                             <p class="text-muted">{{ collect($loan->return_issues)->map(fn ($i) => $i['missing'].'× '.$i['name'])->join(', ') }}</p>
                         </div>
-                        @can('loans.return')
+                        @can('loans.resolve')
                             <form method="POST" action="{{ route('loans.resolve', $loan) }}" class="flex gap-2">
                                 @csrf
                                 <input type="hidden" name="redirect" value="{{ '/'.request()->path() }}">

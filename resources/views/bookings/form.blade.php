@@ -40,6 +40,11 @@
                     @error('end_time')<p class="error">{{ $message }}</p>@enderror
                 </x-field>
             </div>
+            @if (! $booking->exists && auth()->user()->isKiosk())
+                <x-field :label="__('Dein Name')" name="booked_by_name">
+                    <input name="booked_by_name" class="input" value="{{ old('booked_by_name') }}" required maxlength="255" autocomplete="off" placeholder="{{ __('Name, Klasse oder Gruppe') }}">
+                </x-field>
+            @endif
             <x-field :label="__('Zweck')" name="purpose">
                 <input name="purpose" class="input" value="{{ old('purpose', $booking->purpose) }}" required maxlength="255" placeholder="{{ __('z. B. Elternabend 7b') }}">
             </x-field>
@@ -58,7 +63,7 @@
                     @foreach ($upcoming as $b)
                         <li class="px-4 py-2.5 sm:px-5">
                             <p class="font-medium">{{ $b->start_at->translatedFormat('D d.m.') }}, {{ $b->start_at->format('H:i') }}–{{ $b->end_at->format($b->end_at->isSameDay($b->start_at) ? 'H:i' : 'd.m. H:i') }}</p>
-                            <p class="text-xs text-muted">{{ $b->purpose }} · {{ $b->user?->name }}</p>
+                            <p class="text-xs text-muted">{{ $b->purpose }} · {{ $b->displayName() }}</p>
                         </li>
                     @endforeach
                 </ul>

@@ -36,6 +36,11 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
+        // Kiosk nur mit Passwort abmelden (siehe KioskController)
+        if ($request->user()?->isKiosk()) {
+            return redirect()->route('kiosk.exit');
+        }
+
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();

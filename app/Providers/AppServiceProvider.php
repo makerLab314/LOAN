@@ -99,6 +99,11 @@ class AppServiceProvider extends ServiceProvider
                 return in_array($permission, app(Settings::class)->permissionsFor($user->role), true);
             });
         }
+
+        // Verlängern und Zubehör-Probleme abschließen gehören zur Rücknahme –
+        // aber nicht am gemeinsamen Kiosk-Tablet.
+        Gate::define('loans.extend', fn (User $user) => ! $user->isKiosk() && $user->can('loans.return'));
+        Gate::define('loans.resolve', fn (User $user) => ! $user->isKiosk() && $user->can('loans.return'));
     }
 
     private function registerRateLimiters(): void

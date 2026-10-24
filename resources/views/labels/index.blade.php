@@ -64,8 +64,16 @@
                         <option value="text" @selected($defaults['code_type'] === 'text')>{{ __('Nur Text') }}</option>
                     </select>
                 </x-field>
-                <x-field :label="__('Leere Etiketten überspringen')" name="skip" :hint="__('Für angebrochene Bögen.')">
-                    <input type="number" name="skip" class="input w-24" min="0" max="100" value="0">
+                <div class="grid grid-cols-2 gap-3">
+                    <x-field :label="__('Kopien je Etikett')" name="copies" :hint="__('z. B. für Gerät und Netzteil.')">
+                        <input type="number" name="copies" class="input w-24" min="1" max="10" value="1">
+                    </x-field>
+                    <x-field :label="__('Leere Etiketten überspringen')" name="skip" :hint="__('Für angebrochene Bögen.')">
+                        <input type="number" name="skip" class="input w-24" min="0" max="100" value="0">
+                    </x-field>
+                </div>
+                <x-field :label="__('Zusatzzeile')" name="note" :hint="__('Optional, z. B. „Eigentum des MakerLab“.')">
+                    <input name="note" class="input" maxlength="40" value="{{ $defaults['note'] }}">
                 </x-field>
                 <label class="flex items-center gap-2 text-sm">
                     <input type="checkbox" name="show_title" value="1" class="checkbox" @checked($defaults['show_title'])> {{ __('Gerätename aufdrucken') }}

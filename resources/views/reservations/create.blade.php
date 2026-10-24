@@ -29,9 +29,15 @@
                 <x-field :label="__('Menge')" name="quantity">
                     <input type="number" name="quantity" class="input" min="1" max="{{ $device->total_quantity }}" value="{{ old('quantity', 1) }}" required>
                 </x-field>
-                <x-field :label="__('Für (optional)')" name="reserved_by_name" :hint="__('Wenn nicht für dich selbst.')">
-                    <input name="reserved_by_name" class="input" value="{{ old('reserved_by_name') }}" maxlength="255">
-                </x-field>
+                @if (auth()->user()->isKiosk())
+                    <x-field :label="__('Dein Name')" name="reserved_by_name">
+                        <input name="reserved_by_name" class="input" value="{{ old('reserved_by_name') }}" maxlength="255" required autocomplete="off" placeholder="{{ __('Name, Klasse oder Gruppe') }}">
+                    </x-field>
+                @else
+                    <x-field :label="__('Für (optional)')" name="reserved_by_name" :hint="__('Wenn nicht für dich selbst.')">
+                        <input name="reserved_by_name" class="input" value="{{ old('reserved_by_name') }}" maxlength="255">
+                    </x-field>
+                @endif
             </div>
 
             <x-field :label="__('Zweck (optional)')" name="purpose">

@@ -33,6 +33,7 @@ class LabelController extends Controller
                 'format' => $settings->get('labels.format'),
                 'code_type' => $settings->get('labels.code_type'),
                 'show_title' => (bool) $settings->get('labels.show_title'),
+                'note' => (string) $settings->get('labels.note'),
             ],
         ]);
     }
@@ -47,14 +48,17 @@ class LabelController extends Controller
             'code_type' => ['required', Rule::in(['qr', 'barcode', 'both', 'text'])],
             'show_title' => ['nullable', 'boolean'],
             'skip' => ['nullable', 'integer', 'min:0', 'max:100'],
+            'copies' => ['nullable', 'integer', 'min:1', 'max:10'],
+            'note' => ['nullable', 'string', 'max:40'],
         ]);
+        $copies = (int) ($data['copies'] ?? 1);
 
         $devices = Device::whereIn('id', $data['devices'])->orderBy('inventory_number')->get();
 
         // Obergrenze vor dem Erzeugen der Codes (500 Geräte × 9999 Exemplare wären Millionen SVGs)
         $count = $devices->sum(fn (Device $d) => $d->total_quantity <= 1
             ? 1
-            : (in_array($data['mode'], ['device', 'both'], true) ? 1 : 0) + (in_array($data['mode'], ['units', 'both'], true) ? $d->total_quantity : 0));
+            : (in_array($data['mode'], ['device', 'both'], true) ? 1 : 0) + (in_array($data['mode'], ['units', 'both'], true) ? $d->total_quantity : 0)) * $copies;
         if ($count > self::MAX_LABELS) {
             throw ValidationException::withMessages(['devices' => __('Höchstens :max Etiketten auf einmal (ausgewählt: :count). Bitte weniger Geräte oder nur Geräte-Etiketten wählen.', [
                 'max' => self::MAX_LABELS, 'count' => $count,
@@ -81,12 +85,18 @@ class LabelController extends Controller
         }
         unset($label);
 
+        // Kopien direkt hintereinander (z. B. Gerät + Netzteil), Codes nur einmal erzeugt
+        if ($copies > 1) {
+            $labels = array_merge(...array_map(fn (array $l) => array_fill(0, $copies, $l), $labels));
+        }
+
         return view('labels.print', [
             'labels' => $labels,
             'format' => config('loan.label_formats')[$data['format']],
             'codeType' => $data['code_type'],
             'showTitle' => $request->boolean('show_title'),
             'skip' => (int) ($data['skip'] ?? 0),
+            'note' => trim((string) ($data['note'] ?? '')),
             'appName' => $settings->get('labels.show_app_name') ? $settings->get('general.app_name') : null,
         ]);
     }

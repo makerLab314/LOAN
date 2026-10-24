@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\DenyKiosk;
 use App\Http\Middleware\SecurityHeaders;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
@@ -32,6 +33,8 @@ return Application::configure(basePath: dirname(__DIR__))
             SetLocale::class,
             SecurityHeaders::class,
         ]);
+
+        $middleware->alias(['not-kiosk' => DenyKiosk::class]);
 
         $middleware->redirectGuestsTo('/login');
         $middleware->redirectUsersTo('/');

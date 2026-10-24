@@ -9,6 +9,7 @@
     <meta name="robots" content="noindex">
     <title>@hasSection('title')@yield('title') · @endif{{ $branding->name() }}</title>
     <link rel="icon" href="{{ $branding->faviconUrl() }}">
+    @include('layouts.partials.pwa-head')
     @include('layouts.partials.theme-script')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>

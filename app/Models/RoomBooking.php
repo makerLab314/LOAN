@@ -15,6 +15,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int $room_id
  * @property int $user_id
+ * @property string|null $booked_by_name
  * @property Carbon $start_at
  * @property Carbon $end_at
  * @property string|null $purpose
@@ -28,6 +29,7 @@ class RoomBooking extends Model
     protected $fillable = [
         'room_id',
         'user_id',
+        'booked_by_name',
         'start_at',
         'end_at',
         'purpose',
@@ -48,6 +50,12 @@ class RoomBooking extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class)->withTrashed();
+    }
+
+    /** Am Kiosk gebucht: eingetragener Name, sonst das Konto */
+    public function displayName(): string
+    {
+        return $this->booked_by_name ?: ($this->user?->name ?? '—');
     }
 
     public function scopeOverlapping(Builder $query, Carbon $from, Carbon $to): Builder

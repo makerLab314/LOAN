@@ -1,3 +1,4 @@
+@php $kiosk = (bool) auth()->user()?->isKiosk(); @endphp
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full"
       data-theme="{{ auth()->user()?->theme ?? 'system' }}"
@@ -9,10 +10,11 @@
     <meta name="theme-color" content="{{ $branding->accent() }}">
     <title>@hasSection('title')@yield('title') · @endif{{ $branding->name() }}</title>
     <link rel="icon" href="{{ $branding->faviconUrl() }}">
+    @include('layouts.partials.pwa-head')
     @include('layouts.partials.theme-script')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="h-full">
+<body class="h-full" @if ($kiosk) data-kiosk-idle="120" data-kiosk-home="{{ route('home') }}" @endif>
 <div x-data="shell" class="min-h-full" @keydown.window="onKey">
 
     {{-- Sidebar (Desktop) --}}
@@ -39,16 +41,22 @@
                     @include('layouts.partials.logo', ['size' => 'size-7'])
                 </a>
 
-                <button type="button" data-search-open
-                        class="ml-auto flex h-9 items-center gap-2 rounded-lg border border-line bg-surface-2/60 px-3 text-sm text-muted transition hover:border-accent/50 lg:ml-0 lg:w-80">
-                    <x-icon name="search"/>
-                    <span class="hidden sm:inline">{{ __('Suchen oder ID eingeben…') }}</span>
-                    <span class="kbd ml-auto hidden lg:inline">Strg K</span>
-                </button>
+                @unless ($kiosk)
+                    <button type="button" data-search-open
+                            class="ml-auto flex h-9 items-center gap-2 rounded-lg border border-line bg-surface-2/60 px-3 text-sm text-muted transition hover:border-accent/50 lg:ml-0 lg:w-80">
+                        <x-icon name="search"/>
+                        <span class="hidden sm:inline">{{ __('Suchen oder ID eingeben…') }}</span>
+                        <span class="kbd ml-auto hidden lg:inline">Strg K</span>
+                    </button>
+                @endunless
 
-                <div class="flex items-center gap-1 lg:ml-auto">
+                <div class="ml-auto flex items-center gap-1">
                     @include('layouts.partials.theme-toggle')
-                    @include('layouts.partials.user-menu')
+                    @if ($kiosk)
+                        <a href="{{ route('kiosk.exit') }}" class="btn btn-ghost btn-icon" title="{{ __('Kiosk beenden') }}" aria-label="{{ __('Kiosk beenden') }}"><x-icon name="key" class="size-5"/></a>
+                    @else
+                        @include('layouts.partials.user-menu')
+                    @endif
                 </div>
             </div>
         </header>
@@ -67,8 +75,10 @@
     {{-- Bottom-Navigation (Mobil) --}}
     @include('layouts.partials.bottom-nav')
 
-    {{-- Globale Suche --}}
-    @include('layouts.partials.search')
+    {{-- Globale Suche (nicht am Kiosk: sie findet auch Namen aus dem Verlauf) --}}
+    @unless ($kiosk)
+        @include('layouts.partials.search')
+    @endunless
 </div>
 @stack('scripts')
 </body>

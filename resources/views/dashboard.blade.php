@@ -1,14 +1,43 @@
 @extends('layouts.app')
 @section('title', __('Übersicht'))
 
+@php $kiosk = auth()->user()->isKiosk(); @endphp
+
 @section('content')
-    <x-page-header :title="__('Hallo, :name', ['name' => Str::before(auth()->user()->name, ' ')])">
+    <x-page-header :title="$kiosk ? __('Willkommen!') : __('Hallo, :name', ['name' => Str::before(auth()->user()->name, ' ')])">
         <x-slot:subtitle>{{ now()->translatedFormat('l, j. F Y') }}</x-slot:subtitle>
         <x-slot:actions>
             <a href="{{ route('calendar') }}" class="btn btn-secondary"><x-icon name="calendar"/>{{ __('Kalender') }}</a>
-            <a href="{{ route('devices.index') }}" class="btn btn-primary"><x-icon name="devices"/>{{ __('Gerät ausleihen') }}</a>
         </x-slot:actions>
     </x-page-header>
+
+    {{-- Hauptaktionen: groß und eindeutig, auch für Erstbesucher (am Kiosk mit Vormerken) --}}
+    <div @class(['mb-6 grid gap-3 sm:grid-cols-3', 'sm:grid-rows-2' => $kiosk])>
+        <a href="{{ route('devices.index') }}" @class(['group flex items-center gap-4 rounded-xl bg-accent p-5 text-accent-fg shadow-md transition hover:brightness-110 active:brightness-95 sm:col-span-2 sm:p-6', 'sm:row-span-2 sm:p-8' => $kiosk])>
+            <span class="grid size-14 shrink-0 place-items-center rounded-xl bg-white/20"><x-icon name="devices" class="size-7"/></span>
+            <span class="min-w-0 flex-1">
+                <span @class(['block font-semibold', 'text-xl sm:text-2xl' => ! $kiosk, 'text-2xl sm:text-4xl' => $kiosk])>{{ auth()->user()->can('loans.create') ? __('Gerät ausleihen') : __('Geräte ansehen') }}</span>
+                <span class="mt-0.5 block text-sm opacity-90">{{ __('Gerät aussuchen, Zeitraum wählen, fertig.') }}</span>
+            </span>
+            <x-icon name="chevron-right" class="size-6 shrink-0 transition group-hover:translate-x-1"/>
+        </a>
+        <a href="{{ route('loans.index') }}" class="card group flex items-center gap-4 p-5 transition hover:border-accent/40 sm:p-6">
+            <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent"><x-icon name="undo" class="size-6"/></span>
+            <span class="min-w-0 flex-1">
+                <span class="block text-lg font-semibold">{{ __('Zurückgeben') }}</span>
+                <span class="block text-sm text-muted">{{ __('Laufende Ausleihen') }}</span>
+            </span>
+        </a>
+        @if ($kiosk && auth()->user()->can('reservations.create'))
+            <a href="{{ route('devices.index') }}" class="card group flex items-center gap-4 p-5 transition hover:border-accent/40 sm:p-6">
+                <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent"><x-icon name="bookmark" class="size-6"/></span>
+                <span class="min-w-0 flex-1">
+                    <span class="block text-lg font-semibold">{{ __('Vormerken') }}</span>
+                    <span class="block text-sm text-muted">{{ __('Gerät für später reservieren') }}</span>
+                </span>
+            </a>
+        @endif
+    </div>
 
     {{-- ID eingeben / scannen --}}
     <form method="POST" action="{{ route('lookup') }}" class="card mb-6 flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
@@ -133,7 +162,7 @@
                                 <p class="text-xs text-muted">
                                     {{ $b->start_at->isToday() ? __('Heute') : $b->start_at->translatedFormat('D d.m.') }},
                                     {{ $b->start_at->format('H:i') }}–{{ $b->end_at->format($b->end_at->isSameDay($b->start_at) ? 'H:i' : 'd.m. H:i') }}
-                                    · {{ $b->user?->name }}
+                                    · {{ $b->displayName() }}
                                 </p>
                                 @if ($b->purpose)<p class="mt-0.5 truncate text-xs text-muted">{{ $b->purpose }}</p>@endif
                             </li>
@@ -162,7 +191,7 @@
             @endif
 
             {{-- Eigene Vormerkungen --}}
-            @if ($myReservations->isNotEmpty())
+            @if ($myReservations->isNotEmpty() && ! $kiosk)
                 <section class="card">
                     <div class="card-header"><h2 class="card-title">{{ __('Meine Vormerkungen') }}</h2></div>
                     <ul class="divide-y divide-line">

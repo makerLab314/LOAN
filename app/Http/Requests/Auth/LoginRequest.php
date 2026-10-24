@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -42,7 +43,10 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        // Das Kiosk-Tablet bleibt immer angemeldet (Remember-Cookie, ~400 Tage)
+        $kiosk = User::query()->where('email', (string) $this->input('email'))->value('role') === User::ROLE_KIOSK;
+
+        if (! Auth::attempt($this->only('email', 'password'), $kiosk || $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([

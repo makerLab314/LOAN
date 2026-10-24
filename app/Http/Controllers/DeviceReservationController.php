@@ -33,9 +33,11 @@ class DeviceReservationController extends Controller
             'end_date' => ['required', 'date_format:Y-m-d', 'after_or_equal:start_date'],
             'end_time' => ['required', 'date_format:H:i'],
             'purpose' => ['nullable', 'string', 'max:255'],
-            'reserved_by_name' => ['nullable', 'string', 'max:255'],
+            // Am Kiosk bucht ein gemeinsames Konto – deshalb muss dort ein Name dabei sein
+            'reserved_by_name' => [$request->user()->isKiosk() ? 'required' : 'nullable', 'string', 'max:255'],
             'quantity' => ['required', 'integer', 'min:1', 'max:'.$device->total_quantity],
         ], [], [
+            'reserved_by_name' => __('Name'),
             'start_date' => __('Startdatum'),
             'end_date' => __('Enddatum'),
             'quantity' => __('Menge'),

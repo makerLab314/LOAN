@@ -9,7 +9,7 @@
         <form method="POST" action="{{ route('password.confirm') }}" class="mt-6 space-y-4">
             @csrf
             <x-field :label="__('Passwort')" name="password">
-                <input id="password" type="password" name="password" class="input" required autofocus autocomplete="current-password">
+                <x-password id="password" name="password" required autofocus autocomplete="current-password"/>
             </x-field>
             <button class="btn btn-primary w-full">{{ __('Bestätigen') }}</button>
         </form>

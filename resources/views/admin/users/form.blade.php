@@ -24,6 +24,8 @@
                     @if ($user->is(auth()->user()))
                         <input type="hidden" name="role" value="{{ $user->role }}">
                         <p class="hint">{{ __('Die eigene Rolle kann nicht geändert werden.') }}</p>
+                    @else
+                        <p class="hint">{{ __('Kiosk: für ein fest montiertes Tablet. Bleibt dauerhaft angemeldet, Abmelden nur mit Passwort. Ein Admin kann es hier mit „Alle abmelden“ oder einem neuen Passwort abmelden.') }}</p>
                     @endif
                 </x-field>
                 <x-field :label="__('Sprache')" name="locale">
@@ -50,7 +52,8 @@
             <section class="card">
                 <div class="card-header">
                     <h2 class="card-title">{{ __('Aktive Sitzungen') }}</h2>
-                    @if ($sessions->isNotEmpty())
+                    {{-- Kiosk: auch ohne aktive Sitzung, denn das Remember-Cookie meldet sonst wieder an --}}
+                    @if ($sessions->isNotEmpty() || $user->isKiosk())
                         <form method="POST" action="{{ route('admin.users.sessions.destroy', $user) }}" data-confirm="{{ __('Alle Sitzungen von :name beenden?', ['name' => $user->name]) }}">
                             @csrf @method('DELETE')
                             <button class="btn btn-danger-ghost btn-sm"><x-icon name="logout"/>{{ __('Alle abmelden') }}</button>

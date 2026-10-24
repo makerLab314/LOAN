@@ -32,7 +32,7 @@
                         </div>
                         @if ($room->description)<p class="mt-3 line-clamp-3 text-sm text-muted">{{ $room->description }}</p>@endif
                         @if ($current)
-                            <p class="mt-3 text-xs text-muted">{{ __('bis :time · :name', ['time' => $current->end_at->format('H:i'), 'name' => $current->user?->name]) }}</p>
+                            <p class="mt-3 text-xs text-muted">{{ __('bis :time · :name', ['time' => $current->end_at->format('H:i'), 'name' => $current->displayName()]) }}</p>
                         @endif
                         <p class="mt-3 text-xs text-muted">{{ trans_choice(':count anstehende Buchung|:count anstehende Buchungen', $room->upcoming_count) }}</p>
                     </div>

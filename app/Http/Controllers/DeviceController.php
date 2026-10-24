@@ -68,6 +68,12 @@ class DeviceController extends Controller
         // Vorschläge für das Namensfeld (zuletzt verwendete Namen)
         $borrowers = DeviceLoan::query()->latest('id')->limit(300)->pluck('borrower_name')->unique()->take(80)->values();
 
+        // Am Kiosk keine früheren Ausleihenden – weder im Verlauf noch als Vorschläge
+        if ($request->user()->isKiosk()) {
+            $history = $history->take(0);
+            $borrowers = $borrowers->take(0);
+        }
+
         return view('devices.show', compact(
             'device', 'activeLoans', 'reservations', 'openIssues', 'history', 'loanedUnits', 'preselectUnit', 'borrowers',
         ));

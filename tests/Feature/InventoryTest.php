@@ -65,6 +65,19 @@ class InventoryTest extends TestCase
         $this->assertSame(3, substr_count($html, '<div class="bar">'));
     }
 
+    public function test_labels_print_copies_and_note(): void
+    {
+        $device = Device::factory()->create(['inventory_number' => 'LAP-0008']);
+
+        $html = $this->actingAs($this->moderator())->get(route('labels.print', [
+            'devices' => [$device->id], 'mode' => 'device', 'format' => 'a4_3x8', 'code_type' => 'qr',
+            'copies' => 3, 'note' => 'Eigentum <b>MakerLab</b>',
+        ]))->assertOk()->getContent();
+
+        $this->assertSame(3, substr_count($html, '<div class="qr">'));
+        $this->assertSame(3, substr_count($html, 'Eigentum &lt;b&gt;MakerLab&lt;/b&gt;'));
+    }
+
     public function test_uploaded_images_are_reencoded_without_metadata(): void
     {
         Storage::fake('public');

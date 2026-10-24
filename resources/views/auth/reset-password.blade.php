@@ -12,10 +12,10 @@
                 <input id="email" type="email" name="email" value="{{ old('email', $request->email) }}" class="input" required autocomplete="username">
             </x-field>
             <x-field :label="__('Neues Passwort')" name="password" :hint="__('Mind. :n Zeichen, Buchstaben und Zahlen.', ['n' => max(8, (int) $settings->get('security.password_min'))])">
-                <input id="password" type="password" name="password" class="input" required autofocus autocomplete="new-password">
+                <x-password id="password" name="password" required autofocus autocomplete="new-password"/>
             </x-field>
             <x-field :label="__('Wiederholen')" name="password_confirmation">
-                <input id="password_confirmation" type="password" name="password_confirmation" class="input" required autocomplete="new-password">
+                <x-password id="password_confirmation" name="password_confirmation" required autocomplete="new-password"/>
             </x-field>
             <button class="btn btn-primary w-full">{{ __('Passwort speichern') }}</button>
         </form>
