@@ -52,7 +52,7 @@ class CalendarController extends Controller
                         'classNames' => ['ev-room'],
                         'extendedProps' => [
                             'kind' => __('Raumbuchung'),
-                            'detail' => __('Gebucht von :name', ['name' => $b->user?->name ?? '—']),
+                            'detail' => __('Gebucht von :name', ['name' => $b->displayName()]),
                             'url' => $request->user()->can('update', $b) ? route('bookings.edit', $b) : null,
                         ],
                     ];

@@ -15,7 +15,7 @@
                        required autofocus autocomplete="username" inputmode="email">
             </x-field>
             <x-field :label="__('Passwort')" name="password">
-                <input id="password" type="password" name="password" class="input" required autocomplete="current-password">
+                <x-password id="password" name="password" required autocomplete="current-password"/>
             </x-field>
             <div class="flex items-center justify-between">
                 <label class="flex items-center gap-2 text-sm">

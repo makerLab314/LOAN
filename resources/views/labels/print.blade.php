@@ -29,6 +29,7 @@
         .id { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 700; font-size: {{ $h < 28 ? '9pt' : '11pt' }}; letter-spacing: .02em; white-space: nowrap; }
         .title { font-size: {{ $h < 28 ? '6.5pt' : '7.5pt' }}; line-height: 1.15; max-height: 2.3em; overflow: hidden; }
         .app { font-size: 5.5pt; color: #555; text-transform: uppercase; letter-spacing: .05em; }
+        .note { font-size: {{ $h < 28 ? '5.5pt' : '6.5pt' }}; color: #333; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         @media print {
             html, body { background: #fff; }
             .toolbar { display: none; }
@@ -54,6 +55,7 @@
                         @if ($appName)<span class="app">{{ $appName }}</span>@endif
                         <span class="id">{{ $label['id'] }}</span>
                         @if ($showTitle)<span class="title">{{ $label['title'] }}</span>@endif
+                        @if ($note !== '')<span class="note">{{ $note }}</span>@endif
                         @if ($label['barcode'])<div class="bar">{!! $label['barcode'] !!}</div>@endif
                     </div>
                 </div>

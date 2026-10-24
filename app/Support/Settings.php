@@ -93,9 +93,19 @@ class Settings
 
         $granted = (array) $this->get('permissions.'.$role, []);
 
-        return array_values(array_filter(
-            $granted,
-            fn ($p) => isset(config('loan.permissions')[$p]) && empty(config('loan.permissions')[$p]['admin_only']),
-        ));
+        return array_values(array_filter($granted, fn ($p) => self::assignable($role, $p)));
+    }
+
+    /**
+     * Darf das Recht dieser Rolle überhaupt gegeben werden? Admin-Rechte nie,
+     * der Kiosk-Rolle nur ausdrücklich freigegebene.
+     */
+    public static function assignable(string $role, mixed $permission): bool
+    {
+        $entry = is_string($permission) ? (config('loan.permissions')[$permission] ?? null) : null;
+
+        return $entry !== null
+            && empty($entry['admin_only'])
+            && ($role !== 'kiosk' || ! empty($entry['kiosk']));
     }
 }

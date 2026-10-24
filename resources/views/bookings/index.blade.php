@@ -7,7 +7,9 @@
             @if ($archived)
                 <a href="{{ route('bookings.index', array_filter(['room' => $roomId])) }}" class="btn btn-secondary">{{ __('Anstehende') }}</a>
             @else
-                <a href="{{ route('bookings.archived', array_filter(['room' => $roomId])) }}" class="btn btn-secondary"><x-icon name="history"/>{{ __('Archiv') }}</a>
+                @unless (auth()->user()->isKiosk())
+                    <a href="{{ route('bookings.archived', array_filter(['room' => $roomId])) }}" class="btn btn-secondary"><x-icon name="history"/>{{ __('Archiv') }}</a>
+                @endunless
             @endif
             <a href="{{ route('calendar') }}" class="btn btn-secondary"><x-icon name="calendar"/>{{ __('Kalender') }}</a>
         </x-slot:actions>
@@ -34,7 +36,7 @@
                         <div class="min-w-0 flex-1">
                             <p class="font-medium">{{ $b->room?->name }} <span class="font-normal text-muted">· {{ $b->start_at->format('H:i') }} – {{ $b->end_at->format($b->end_at->isSameDay($b->start_at) ? 'H:i' : 'd.m. H:i') }}</span></p>
                             <p class="text-sm text-muted">{{ $b->purpose }}</p>
-                            <p class="text-xs text-muted">{{ $b->user?->name }}</p>
+                            <p class="text-xs text-muted">{{ $b->displayName() }}</p>
                         </div>
                         @can('update', $b)
                             <div class="flex gap-2">

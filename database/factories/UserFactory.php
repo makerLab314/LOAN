@@ -37,4 +37,9 @@ class UserFactory extends Factory
     {
         return $this->afterMaking(fn (User $user) => $user->role = User::ROLE_ADMIN);
     }
+
+    public function kiosk(): static
+    {
+        return $this->afterMaking(fn (User $user) => $user->role = User::ROLE_KIOSK);
+    }
 }

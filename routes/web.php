@@ -9,10 +9,12 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceLoanController;
 use App\Http\Controllers\DeviceReservationController;
+use App\Http\Controllers\KioskController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\LegalController;
 use App\Http\Controllers\LookupController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PwaController;
 use App\Http\Controllers\RoomBookingController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\SearchController;
@@ -28,6 +30,11 @@ Route::get('/impressum', [LegalController::class, 'imprint'])->name('legal.impri
 Route::get('/datenschutz', [LegalController::class, 'privacy'])->name('legal.privacy');
 Route::post('/locale', [ProfileController::class, 'locale'])->name('locale.switch');
 
+// App-Installation (PWA): Browser laden Manifest und Icons ohne Cookies
+Route::get('/manifest.webmanifest', [PwaController::class, 'manifest'])->name('pwa.manifest');
+Route::get('/pwa/icon-{size}.png', [PwaController::class, 'icon'])->whereIn('size', PwaController::ICON_SIZES)->name('pwa.icon');
+Route::get('/pwa/icon-{size}-maskable.png', [PwaController::class, 'maskableIcon'])->whereIn('size', PwaController::ICON_SIZES)->name('pwa.icon.maskable');
+
 /*
 |--------------------------------------------------------------------------
 | Angemeldet
@@ -35,7 +42,11 @@ Route::post('/locale', [ProfileController::class, 'locale'])->name('locale.switc
 */
 Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::get('/', DashboardController::class)->name('home');
-    Route::get('/search', SearchController::class)->middleware('throttle:search')->name('search');
+    Route::get('/search', SearchController::class)->middleware(['not-kiosk', 'throttle:search'])->name('search');
+
+    // Kiosk verlassen: nur mit dem Passwort des Kiosk-Kontos
+    Route::get('/kiosk/exit', [KioskController::class, 'show'])->name('kiosk.exit');
+    Route::post('/kiosk/exit', [KioskController::class, 'logout'])->middleware('throttle:6,1');
 
     // Inventar-ID / Scanner
     Route::get('/scan', [LookupController::class, 'scan'])->name('scan');
@@ -56,13 +67,11 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
 
     // Ausleihen
     Route::get('/loans', [DeviceLoanController::class, 'index'])->name('loans.index');
-    Route::get('/loans/history', [DeviceLoanController::class, 'history'])->name('loans.history');
+    Route::get('/loans/history', [DeviceLoanController::class, 'history'])->middleware('not-kiosk')->name('loans.history');
     Route::post('/devices/{device}/loans', [DeviceLoanController::class, 'store'])->middleware('can:loans.create')->name('loans.store');
-    Route::middleware('can:loans.return')->group(function () {
-        Route::post('/loans/{loan}/return', [DeviceLoanController::class, 'return'])->name('loans.return');
-        Route::post('/loans/{loan}/extend', [DeviceLoanController::class, 'extend'])->name('loans.extend');
-        Route::post('/loans/{loan}/resolve', [DeviceLoanController::class, 'resolveIssues'])->name('loans.resolve');
-    });
+    Route::post('/loans/{loan}/return', [DeviceLoanController::class, 'return'])->middleware('can:loans.return')->name('loans.return');
+    Route::post('/loans/{loan}/extend', [DeviceLoanController::class, 'extend'])->middleware('can:loans.extend')->name('loans.extend');
+    Route::post('/loans/{loan}/resolve', [DeviceLoanController::class, 'resolveIssues'])->middleware('can:loans.resolve')->name('loans.resolve');
 
     // Vormerkungen
     Route::middleware('can:reservations.create')->group(function () {
@@ -89,7 +98,7 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         Route::post('/rooms/{room}/book', [RoomBookingController::class, 'store'])->name('bookings.store');
     });
     Route::get('/bookings', [RoomBookingController::class, 'index'])->name('bookings.index');
-    Route::get('/bookings/archive', [RoomBookingController::class, 'archived'])->name('bookings.archived');
+    Route::get('/bookings/archive', [RoomBookingController::class, 'archived'])->middleware('not-kiosk')->name('bookings.archived');
     Route::get('/bookings/{booking}/edit', [RoomBookingController::class, 'edit'])->name('bookings.edit');
     Route::put('/bookings/{booking}', [RoomBookingController::class, 'update'])->name('bookings.update');
     Route::delete('/bookings/{booking}', [RoomBookingController::class, 'destroy'])->name('bookings.destroy');
@@ -104,18 +113,20 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         Route::get('/labels/print', [LabelController::class, 'print'])->name('labels.print');
     });
 
-    // Profil & Sitzungen
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->middleware('throttle:6,1')->name('password.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Profil & Sitzungen (nicht am Kiosk: dort könnte jeder Name, Passwort oder Sitzungen ändern)
     Route::post('/profile/theme', [ProfileController::class, 'theme'])->name('profile.theme');
-    Route::get('/profile/sessions', [SessionController::class, 'index'])->name('sessions.index');
-    Route::delete('/profile/sessions/others', [SessionController::class, 'destroyOthers'])->middleware('throttle:6,1')->name('sessions.destroy-others');
-    Route::delete('/profile/sessions/{id}', [SessionController::class, 'destroy'])->where('id', '[0-9a-f]{32}')->name('sessions.destroy');
+    Route::middleware('not-kiosk')->group(function () {
+        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+        Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->middleware('throttle:6,1')->name('password.update');
+        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        Route::get('/profile/sessions', [SessionController::class, 'index'])->name('sessions.index');
+        Route::delete('/profile/sessions/others', [SessionController::class, 'destroyOthers'])->middleware('throttle:6,1')->name('sessions.destroy-others');
+        Route::delete('/profile/sessions/{id}', [SessionController::class, 'destroy'])->where('id', '[0-9a-f]{32}')->name('sessions.destroy');
+    });
 
     // Verwaltung – Nutzer & Einstellungen verlangen das Passwort erneut (gilt 3 Stunden)
-    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::prefix('admin')->name('admin.')->middleware('not-kiosk')->group(function () {
         Route::middleware(['can:users.manage', 'password.confirm'])->group(function () {
             Route::resource('users', UserController::class)->except(['show']);
             Route::delete('/users/{user}/sessions', [SessionController::class, 'destroyForUser'])->name('users.sessions.destroy');

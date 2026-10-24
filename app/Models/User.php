@@ -28,7 +28,10 @@ class User extends Authenticatable
 
     public const ROLE_MODERATOR = 'moderation';
 
-    public const ROLES = [self::ROLE_ADMIN, self::ROLE_MODERATOR];
+    /** Gemeinsames Konto für ein fest montiertes Tablet: dauerhaft angemeldet, stark eingeschränkt */
+    public const ROLE_KIOSK = 'kiosk';
+
+    public const ROLES = [self::ROLE_ADMIN, self::ROLE_MODERATOR, self::ROLE_KIOSK];
 
     public const THEMES = ['system', 'light', 'dark'];
 
@@ -59,6 +62,11 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isKiosk(): bool
+    {
+        return $this->role === self::ROLE_KIOSK;
     }
 
     /** @return HasMany<RoomBooking, $this> */

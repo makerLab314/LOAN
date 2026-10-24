@@ -42,7 +42,7 @@ class BookingRules
         return [$start->seconds(0), $end->seconds(0)];
     }
 
-    public function bookRoom(Room $room, Carbon $start, Carbon $end, ?string $purpose, User $actor, ?RoomBooking $existing = null): RoomBooking
+    public function bookRoom(Room $room, Carbon $start, Carbon $end, ?string $purpose, User $actor, ?RoomBooking $existing = null, ?string $bookedFor = null): RoomBooking
     {
         $this->assertNotPast($start, $existing?->start_at);
 
@@ -51,7 +51,7 @@ class BookingRules
             throw ValidationException::withMessages(['end_time' => __('Maximale Buchungsdauer: :n Stunden.', ['n' => $maxHours])]);
         }
 
-        return DB::transaction(function () use ($room, $start, $end, $purpose, $actor, $existing) {
+        return DB::transaction(function () use ($room, $start, $end, $purpose, $actor, $existing, $bookedFor) {
             Room::query()->whereKey($room->id)->lockForUpdate()->first();
 
             $conflict = RoomBooking::query()
@@ -66,7 +66,7 @@ class BookingRules
                 throw ValidationException::withMessages(['start_date' => __('Der Raum ist in diesem Zeitraum bereits gebucht (:from – :to, :name).', [
                     'from' => $conflict->start_at->format('d.m.Y H:i'),
                     'to' => $conflict->end_at->format('d.m.Y H:i'),
-                    'name' => $conflict->user?->name ?? '—',
+                    'name' => $conflict->displayName(),
                 ])]);
             }
 
@@ -83,6 +83,7 @@ class BookingRules
             $booking = RoomBooking::create([
                 'room_id' => $room->id,
                 'user_id' => $actor->id,
+                'booked_by_name' => $bookedFor,
                 'start_at' => $start,
                 'end_at' => $end,
                 'purpose' => $purpose,

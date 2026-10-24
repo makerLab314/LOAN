@@ -56,9 +56,13 @@ class RoomBookingController extends Controller
     public function store(Request $request, Room $room): RedirectResponse
     {
         $data = $this->validated($request);
+        // Am Kiosk bucht ein gemeinsames Konto – deshalb muss dort ein Name dabei sein
+        $name = $request->validate([
+            'booked_by_name' => [$request->user()->isKiosk() ? 'required' : 'nullable', 'string', 'max:255'],
+        ], [], ['booked_by_name' => __('Name')])['booked_by_name'] ?? null;
         [$start, $end] = $this->rules->period($data['start_date'], $data['start_time'], $data['end_date'], $data['end_time']);
 
-        $this->rules->bookRoom($room, $start, $end, $data['purpose'], $request->user());
+        $this->rules->bookRoom($room, $start, $end, $data['purpose'], $request->user(), bookedFor: $name);
 
         return redirect()->route('bookings.index')->with('success', __('Raum gebucht.'));
     }

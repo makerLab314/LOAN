@@ -10,7 +10,8 @@ class DeviceReservationPolicy
 {
     public function cancel(User $user, DeviceReservation $reservation): bool
     {
-        if (! $reservation->isActive()) {
+        // Am Kiosk gehören alle Vormerkungen demselben Konto – sonst könnte jeder fremde widerrufen
+        if (! $reservation->isActive() || $user->isKiosk()) {
             return false;
         }
 

@@ -15,14 +15,15 @@ return [
 
     /*
      * Rechtekatalog. "admin_only" = nicht an andere Rollen vergebbar
-     * (verhindert, dass man sich aussperrt).
+     * (verhindert, dass man sich aussperrt). "kiosk" = darf der Kiosk-Rolle
+     * gegeben werden (gemeinsames Tablet ohne persönliche Anmeldung).
      */
     'permissions' => [
-        'loans.create' => ['group' => 'Ausleihe', 'label' => 'Geräte ausleihen & Vormerkungen umwandeln'],
-        'loans.return' => ['group' => 'Ausleihe', 'label' => 'Rücknahme, Teilrückgabe & Verlängerung'],
-        'reservations.create' => ['group' => 'Ausleihe', 'label' => 'Geräte vormerken'],
+        'loans.create' => ['group' => 'Ausleihe', 'label' => 'Geräte ausleihen & Vormerkungen umwandeln', 'kiosk' => true],
+        'loans.return' => ['group' => 'Ausleihe', 'label' => 'Rücknahme, Teilrückgabe & Verlängerung', 'kiosk' => true],
+        'reservations.create' => ['group' => 'Ausleihe', 'label' => 'Geräte vormerken', 'kiosk' => true],
         'reservations.manage_others' => ['group' => 'Ausleihe', 'label' => 'Vormerkungen anderer widerrufen'],
-        'rooms.book' => ['group' => 'Räume', 'label' => 'Räume buchen'],
+        'rooms.book' => ['group' => 'Räume', 'label' => 'Räume buchen', 'kiosk' => true],
         'room_bookings.manage_others' => ['group' => 'Räume', 'label' => 'Raumbuchungen anderer bearbeiten & löschen'],
         'devices.manage' => ['group' => 'Stammdaten', 'label' => 'Geräte anlegen, bearbeiten & löschen'],
         'categories.manage' => ['group' => 'Stammdaten', 'label' => 'Kategorien verwalten'],
@@ -36,6 +37,7 @@ return [
     'roles' => [
         'administration' => 'Administration',
         'moderation' => 'Moderation',
+        'kiosk' => 'Kiosk',
     ],
 
     'defaults' => [
@@ -70,6 +72,7 @@ return [
         'labels.code_type' => 'qr',            // qr | barcode | both | text
         'labels.show_title' => true,
         'labels.show_app_name' => true,
+        'labels.note' => '',                   // Zusatzzeile, z. B. "Eigentum des MakerLab"
 
         // Rechtliches (Markdown)
         'legal.imprint' => '',
@@ -88,6 +91,13 @@ return [
             'reservations.create',
             'rooms.book',
             'labels.print',
+        ],
+        // Kiosk: nur Rechte mit "kiosk" => true sind überhaupt vergebbar
+        'permissions.kiosk' => [
+            'loans.create',
+            'loans.return',
+            'reservations.create',
+            'rooms.book',
         ],
     ],
 

@@ -139,6 +139,26 @@ document.addEventListener('click', (event) => {
     }
 });
 
+// Passwort anzeigen/verbergen (<x-password>)
+document.addEventListener('click', (event) => {
+    const toggle = event.target.closest('[data-password-toggle]');
+    if (!toggle) return;
+    const input = toggle.parentElement.querySelector('input');
+    const show = input.type === 'password';
+    input.type = show ? 'text' : 'password';
+    toggle.setAttribute('aria-pressed', String(show));
+    toggle.title = show ? toggle.dataset.labelHide : toggle.dataset.labelShow;
+    toggle.setAttribute('aria-label', toggle.title);
+    toggle.querySelector('[data-when-hidden]').hidden = show;
+    toggle.querySelector('[data-when-shown]').hidden = !show;
+    input.focus();
+});
+
+// Vor dem Absenden wieder verbergen, damit der Browser es nicht als Klartextfeld merkt
+document.addEventListener('submit', (event) => {
+    event.target.querySelectorAll('[data-password-toggle][aria-pressed="true"]').forEach((t) => t.click());
+}, true);
+
 // <form data-confirm="Wirklich?"> – Sicherheitsabfrage vor dem Absenden
 document.addEventListener('submit', (event) => {
     const form = event.target;
@@ -165,6 +185,24 @@ document.addEventListener('change', (event) => {
 if (document.querySelector('[data-calendar]')) import('./calendar').then((m) => m.mountCalendar());
 if (document.querySelector('[data-scanner]')) import('./scanner').then((m) => m.mountScanner());
 if (document.querySelector('[data-label-picker]')) import('./labels').then((m) => m.mountLabelPicker());
+
+// Installierbar als App (PWA); der Service Worker speichert keine Seiten mit Daten
+if ('serviceWorker' in navigator && window.isSecureContext) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+}
+
+// Kiosk: nach einer Weile ohne Bedienung zurück zur Startseite – frische Daten,
+// nichts halb Ausgefülltes für die nächste Person
+const kioskIdle = Number(document.body.dataset.kioskIdle || 0);
+if (kioskIdle > 0) {
+    let timer;
+    const reset = () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => window.location.assign(document.body.dataset.kioskHome), kioskIdle * 1000);
+    };
+    ['pointerdown', 'keydown', 'input', 'scroll'].forEach((type) => window.addEventListener(type, reset, { capture: true, passive: true }));
+    reset();
+}
 
 // Dialoge mit Validierungsfehlern nach dem Neuladen wieder öffnen
 document.querySelectorAll('dialog[data-open-on-load]').forEach((d) => d.showModal());

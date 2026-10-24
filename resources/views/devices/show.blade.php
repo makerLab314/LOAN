@@ -5,6 +5,7 @@
     $form = old('_form');
     $canLoan = Gate::allows('loans.create');
     $canReturn = Gate::allows('loans.return');
+    $canExtend = Gate::allows('loans.extend');
     $accessoryItems = $device->accessories->map(fn ($a) => ['key' => $a->id, 'name' => $a->name, 'quantity' => $a->quantity])->all();
     $defaultDays = (int) $settings->get('loans.default_days');
     $here = '/'.request()->path();
@@ -119,14 +120,14 @@
                                     <p class="font-medium">{{ $loan->borrower_name }} <span class="font-normal text-muted">· {{ __('Rückgabe am :date', ['date' => $loan->returned_at?->format('d.m.Y')]) }}</span></p>
                                     <p class="text-muted">{{ collect($loan->return_issues)->map(fn ($i) => $i['missing'].'× '.$i['name'])->join(', ') }}</p>
                                 </div>
-                                @if ($canReturn)
+                                @can('loans.resolve')
                                     <form method="POST" action="{{ route('loans.resolve', $loan) }}" class="flex gap-2">
                                         @csrf
                                         <input type="hidden" name="redirect" value="{{ $here }}">
                                         <input name="note" class="input py-1.5" placeholder="{{ __('Notiz (optional)') }}" maxlength="1000">
                                         <button class="btn btn-secondary btn-sm"><x-icon name="check"/>{{ __('Erledigt') }}</button>
                                     </form>
-                                @endif
+                                @endcan
                             </li>
                         @endforeach
                     </ul>
@@ -188,7 +189,9 @@
                                     @if ($canReturn)
                                         <div class="flex shrink-0 gap-2">
                                             <button type="button" class="btn btn-primary btn-sm" data-dialog="return-dialog-{{ $loan->id }}"><x-icon name="undo"/>{{ __('Rückgabe') }}</button>
-                                            <button type="button" class="btn btn-secondary btn-sm" data-dialog="extend-dialog-{{ $loan->id }}"><x-icon name="calendar-plus"/>{{ __('Verlängern') }}</button>
+                                            @if ($canExtend)
+                                                <button type="button" class="btn btn-secondary btn-sm" data-dialog="extend-dialog-{{ $loan->id }}"><x-icon name="calendar-plus"/>{{ __('Verlängern') }}</button>
+                                            @endif
                                         </div>
                                     @endif
                                 </div>
@@ -236,7 +239,7 @@
                 @endif
             </section>
 
-            <section class="card">
+            <section class="card" @if (auth()->user()->isKiosk()) hidden @endif>
                 <div class="card-header"><h2 class="card-title flex items-center gap-2"><x-icon name="history"/>{{ __('Verlauf') }}</h2></div>
                 @if ($history->isEmpty())
                     <x-empty icon="history" :title="__('Noch keine Einträge')"/>

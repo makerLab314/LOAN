@@ -110,10 +110,32 @@ export function mountScanner() {
             stopZxing = () => controls.stop();
         } catch (e) {
             stop();
-            setStatus(e && e.name === 'NotAllowedError'
-                ? 'Kamerazugriff wurde verweigert. Bitte im Browser erlauben oder die ID unten eingeben.'
-                : 'Kamera konnte nicht gestartet werden. Bitte die ID unten eingeben.', 'warn');
+            setStatus(await explain(e), 'warn');
         }
+    };
+
+    // Ursache möglichst genau benennen: Website-Recht, Betriebssystem, Proxy-Header oder belegte Kamera
+    const explain = async (e) => {
+        const name = e?.name || 'Error';
+        const policy = document.permissionsPolicy || document.featurePolicy;
+        if (policy?.allowsFeature && !policy.allowsFeature('camera')) {
+            return `Der Server verbietet der Seite die Kamera (Header „Permissions-Policy“, oft vom Reverse Proxy gesetzt). Bitte dort „camera=(self)“ erlauben. (${name})`;
+        }
+        if (name === 'NotAllowedError' || name === 'SecurityError') {
+            let state = '';
+            try { state = (await navigator.permissions.query({ name: 'camera' })).state; } catch (_) { /* nicht unterstützt */ }
+            if (state === 'granted' || /system/i.test(e?.message || '')) {
+                return `Die Website darf die Kamera nutzen, aber das Betriebssystem blockiert sie. Windows: Einstellungen → Datenschutz und Sicherheit → Kamera → „Desktop-Apps den Zugriff auf die Kamera erlauben“. macOS: Systemeinstellungen → Datenschutz → Kamera → Browser. Danach den Browser neu starten. (${name})`;
+            }
+            return `Kamerazugriff wurde verweigert. Bitte über das Schloss-Symbol in der Adressleiste erlauben und die Seite neu laden. (${name})`;
+        }
+        if (name === 'NotReadableError' || name === 'AbortError') {
+            return `Die Kamera ist belegt, z. B. von Teams, Zoom oder einem anderen Tab. Bitte dort schließen und erneut versuchen. (${name})`;
+        }
+        if (name === 'NotFoundError' || name === 'OverconstrainedError') {
+            return `Keine Kamera gefunden. Bitte die ID unten eingeben. (${name})`;
+        }
+        return `Kamera konnte nicht gestartet werden. Bitte die ID unten eingeben. (${name})`;
     };
 
     startButton.addEventListener('click', start);

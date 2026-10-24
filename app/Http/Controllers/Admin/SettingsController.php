@@ -64,6 +64,7 @@ class SettingsController extends Controller
                 'labels.code_type' => ['required', Rule::in(['qr', 'barcode', 'both', 'text'])],
                 'labels.show_title' => ['boolean'],
                 'labels.show_app_name' => ['boolean'],
+                'labels.note' => ['nullable', 'string', 'max:40'],
             ], ['labels.show_title', 'labels.show_app_name']),
             'legal' => $this->validateSection($request, [
                 'legal.imprint' => ['nullable', 'string', 'max:50000'],
@@ -159,18 +160,15 @@ class SettingsController extends Controller
      */
     private function permissions(Request $request): array
     {
-        $catalog = config('loan.permissions');
-        $assignable = array_keys(array_filter($catalog, fn ($p) => empty($p['admin_only'])));
-
         $values = [];
         foreach (array_keys(config('loan.roles')) as $role) {
             if ($role === 'administration') {
                 continue;
             }
-            $values['permissions.'.$role] = array_values(array_intersect(
+            $values['permissions.'.$role] = array_values(array_unique(array_filter(
                 (array) Arr::get($request->input('permissions', []), $role, []),
-                $assignable,
-            ));
+                fn ($p) => Settings::assignable($role, $p),
+            )));
         }
 
         return $values;

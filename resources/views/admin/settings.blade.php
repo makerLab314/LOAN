@@ -117,6 +117,7 @@
 
                 @if ($section === 'permissions')
                     <p class="text-sm text-muted">{{ __('Administration hat immer alle Rechte. Nutzerverwaltung und Einstellungen bleiben Admins vorbehalten.') }}</p>
+                    <p class="text-sm text-muted">{{ __('Kiosk ist für ein gemeinsames Tablet gedacht: Es bleibt angemeldet und kann höchstens ausleihen, zurückgeben, vormerken und Räume buchen – nie löschen, bearbeiten oder Vormerkungen und Buchungen widerrufen.') }}</p>
                     <div class="overflow-x-auto">
                         <table class="table">
                             <thead>
@@ -137,7 +138,7 @@
                                             <td class="text-center">
                                                 @if ($role === 'administration')
                                                     <x-icon name="check" class="mx-auto size-4 text-ok"/>
-                                                @elseif (! empty($permission['admin_only']))
+                                                @elseif (! \App\Support\Settings::assignable($role, $key))
                                                     <span class="text-muted">—</span>
                                                 @else
                                                     <input type="checkbox" name="permissions[{{ $role }}][]" value="{{ $key }}" class="checkbox"
@@ -193,6 +194,9 @@
                     </div>
                     <label class="flex items-center gap-3 text-sm"><input type="checkbox" name="{{ $f('labels.show_title') }}" value="1" class="checkbox" @checked($v('labels.show_title'))>{{ __('Gerätename aufdrucken') }}</label>
                     <label class="flex items-center gap-3 text-sm"><input type="checkbox" name="{{ $f('labels.show_app_name') }}" value="1" class="checkbox" @checked($v('labels.show_app_name'))>{{ __('Name der Anwendung aufdrucken') }}</label>
+                    <x-field :label="__('Zusatzzeile')" :name="$f('labels.note')" :hint="__('Steht klein auf jedem Etikett, z. B. „Eigentum des MakerLab“. Beim Drucken änderbar.')">
+                        <input name="{{ $f('labels.note') }}" class="input" maxlength="40" value="{{ $v('labels.note') }}">
+                    </x-field>
                 @endif
 
                 @if ($section === 'legal')

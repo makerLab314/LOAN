@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>Keine Verbindung</title>
+    <style>
+        :root { --bg: #f6f6f4; --surface: #fff; --border: #e4e4e0; --fg: #1c1c1a; --muted: #6b6b66; --accent: #d97706; color-scheme: light dark; }
+        @media (prefers-color-scheme: dark) {
+            :root { --bg: #111110; --surface: #1a1a19; --border: #2f2f2c; --fg: #ecece8; --muted: #9b9b94; }
+        }
+        * { box-sizing: border-box; }
+        body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 16px; background: var(--bg); color: var(--fg);
+               font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+        .card { max-width: 380px; width: 100%; padding: 28px 24px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); text-align: center; }
+        h1 { margin: 12px 0 4px; font-size: 18px; }
+        p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+        a { display: inline-block; margin-top: 20px; padding: 10px 16px; border-radius: 8px; background: var(--accent); color: #fff; font-weight: 600; font-size: 14px; text-decoration: none; }
+        svg { width: 40px; height: 40px; color: var(--muted); }
+    </style>
+</head>
+<body>
+<div class="card">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 20h.01M8.5 16.43a5 5 0 0 1 7 0M5 12.86a10 10 0 0 1 5.17-2.69M19 12.86a10 10 0 0 0-2-1.41M2 8.82a15 15 0 0 1 4.18-2.65M22 8.82a15 15 0 0 0-11.29-3.76M2 2l20 20"/>
+    </svg>
+    <h1>Keine Verbindung</h1>
+    <p>Ohne Netz lassen sich Ausleihen nicht prüfen. Bitte WLAN prüfen und erneut versuchen.<br>
+       <span lang="en">No connection – please check the network and try again.</span></p>
+    <a href="/">Erneut versuchen</a>
+</div>
+</body>
+</html>
