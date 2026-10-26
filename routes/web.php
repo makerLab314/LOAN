@@ -12,6 +12,8 @@ use App\Http\Controllers\DeviceReservationController;
 use App\Http\Controllers\KioskController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\LegalController;
+use App\Http\Controllers\LoanCheckoutController;
+use App\Http\Controllers\LoanReturnController;
 use App\Http\Controllers\LookupController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PwaController;
@@ -67,6 +69,20 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
 
     // Ausleihen
     Route::get('/loans', [DeviceLoanController::class, 'index'])->name('loans.index');
+
+    // Ausleihe per Scan – auch mehrere Geräte/Exemplare mit einer Eingabe
+    Route::middleware('can:loans.create')->group(function () {
+        Route::get('/loans/checkout', [LoanCheckoutController::class, 'create'])->name('loans.checkout');
+        Route::post('/loans/checkout', [LoanCheckoutController::class, 'store'])->name('loans.checkout.store');
+    });
+
+    // Rückgabe per Scan (am Kiosk der einzige Weg, siehe ReturnScans)
+    Route::middleware('can:loans.return')->group(function () {
+        Route::get('/loans/return', [LoanReturnController::class, 'create'])->name('loans.return-scan');
+        Route::post('/loans/return', [LoanReturnController::class, 'store'])->name('loans.return-scan.store');
+        Route::post('/loans/return/scan', [LoanReturnController::class, 'scan'])->middleware('throttle:search')->name('loans.return-scan.lookup');
+    });
+
     Route::get('/loans/history', [DeviceLoanController::class, 'history'])->middleware('not-kiosk')->name('loans.history');
     Route::post('/devices/{device}/loans', [DeviceLoanController::class, 'store'])->middleware('can:loans.create')->name('loans.store');
     Route::post('/loans/{loan}/return', [DeviceLoanController::class, 'return'])->middleware('can:loans.return')->name('loans.return');

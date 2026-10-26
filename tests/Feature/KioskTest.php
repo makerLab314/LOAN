@@ -112,6 +112,8 @@ class KioskTest extends TestCase
 
         $this->post(route('loans.extend', $loan), ['loan_end_date' => today()->addDays(10)->toDateString()])->assertForbidden();
         $this->post(route('loans.resolve', $loan))->assertForbidden();
+        // Rückgabe am Kiosk nur nach Scan bzw. ID-Eingabe (siehe ScanFlowTest)
+        $this->postJson(route('loans.return-scan.lookup'), ['code' => $device->inventory_number])->assertOk();
         $this->post(route('loans.return', $loan))->assertSessionHasNoErrors();
         $this->assertFalse($loan->fresh()->isActive());
     }

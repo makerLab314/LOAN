@@ -66,6 +66,7 @@ class ProfileController extends Controller
         $user = $request->user();
         $user->forceFill([
             'password' => Hash::make($data['password']),
+            'must_change_password' => false,
             'remember_token' => Str::random(60),
         ])->save();
 

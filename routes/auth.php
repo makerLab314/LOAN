@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
+use App\Http\Controllers\Auth\ForcedPasswordController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use Illuminate\Support\Facades\Route;
@@ -24,6 +25,10 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])->name('password.confirm');
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store'])->middleware('throttle:6,1');
+
+    // Vom Admin vergebenes Passwort ersetzen (siehe RequirePasswordChange)
+    Route::get('password/change', [ForcedPasswordController::class, 'show'])->middleware('auth.session')->name('password.force');
+    Route::put('password/change', [ForcedPasswordController::class, 'update'])->middleware(['auth.session', 'throttle:6,1'])->name('password.force.update');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });

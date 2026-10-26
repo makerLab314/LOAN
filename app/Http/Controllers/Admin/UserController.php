@@ -46,6 +46,7 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Password::defaults()],
             'role' => ['required', Rule::in(User::ROLES)],
             'locale' => ['required', Rule::in(['de', 'en'])],
+            'must_change_password' => ['nullable', 'boolean'],
         ], [], $this->attributeNames());
 
         // Gelöschtes Konto mit derselben E-Mail wiederherstellen (E-Mail ist in der DB eindeutig,
@@ -60,11 +61,13 @@ class UserController extends Controller
             'locale' => $data['locale'],
         ]);
         $user->role = $data['role'];
+        // Standard: bei der ersten Anmeldung ein eigenes Passwort verlangen (Kiosk ausgenommen)
+        $user->must_change_password = $request->boolean('must_change_password', true) && $user->role !== User::ROLE_KIOSK;
         $user->remember_token = Str::random(60);
         $user->deleted_at = null;
         $user->save();
 
-        Audit::log($restored ? 'user.restored' : 'user.created', $user, ['role' => $user->role]);
+        Audit::log($restored ? 'user.restored' : 'user.created', $user, ['role' => $user->role, 'must_change_password' => $user->must_change_password]);
 
         return redirect()->route('admin.users.index')->with('success', $restored ? __('Gelöschtes Konto wiederhergestellt.') : __('Nutzer angelegt.'));
     }
@@ -85,6 +88,7 @@ class UserController extends Controller
             'password' => ['nullable', 'confirmed', Password::defaults()],
             'role' => ['required', Rule::in(User::ROLES)],
             'locale' => ['required', Rule::in(['de', 'en'])],
+            'must_change_password' => ['nullable', 'boolean'],
         ], [], $this->attributeNames());
 
         $this->authorize('changeRole', [$user, $data['role']]);
@@ -100,11 +104,17 @@ class UserController extends Controller
         if (! empty($data['password'])) {
             $user->password = Hash::make($data['password']);
             $user->remember_token = Str::random(60);
+            // Neues Passwort vom Admin: beim nächsten Anmelden ein eigenes verlangen (nicht beim eigenen Konto)
+            $user->must_change_password = $request->boolean('must_change_password', true) && ! $user->is($request->user());
             // Vom Admin gesetztes Passwort: alle Sitzungen des Nutzers beenden
             // (bei sich selbst bis auf die aktuelle)
             DB::table('sessions')->where('user_id', $user->id)
                 ->when($user->is($request->user()), fn ($q) => $q->where('id', '!=', $request->session()->getId()))
                 ->delete();
+        }
+
+        if ($user->isKiosk()) {
+            $user->must_change_password = false;
         }
 
         $user->save();
@@ -118,6 +128,7 @@ class UserController extends Controller
         Audit::log('user.updated', $user, array_filter([
             'role' => $roleChanged ? $user->role : null,
             'password_reset' => ! empty($data['password']) ?: null,
+            'must_change_password' => ! empty($data['password']) && $user->must_change_password ?: null,
         ]));
 
         return redirect()->route('admin.users.index')->with('success', __('Nutzer gespeichert.'));

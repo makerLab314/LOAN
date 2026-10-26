@@ -4,6 +4,8 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import deLocale from '@fullcalendar/core/locales/de';
 
+const KINDS = ['ev-room', 'ev-reservation', 'ev-loan', 'ev-overdue'];
+
 export function mountCalendar() {
     const el = document.querySelector('[data-calendar]');
     if (!el) return;
@@ -31,10 +33,15 @@ export function mountCalendar() {
         height: 'auto',
         firstDay: 1,
         nowIndicator: true,
-        dayMaxEvents: 4,
+        dayMaxEvents: 3,
+        eventDisplay: 'block',
+        expandRows: true,
+        stickyHeaderDates: true,
+        weekNumbers: !mobile,
         slotMinTime: '07:00:00',
         slotMaxTime: '21:00:00',
         eventTimeFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+        slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
         events(info, success, failure) {
             const params = selected();
             params.set('start', info.startStr);
@@ -51,6 +58,9 @@ export function mountCalendar() {
             info.jsEvent.preventDefault();
             if (!detail) return;
             const props = info.event.extendedProps;
+            // Farbe der Art (ev-room, ev-loan …) für Streifen und Markierung im Dialog
+            detail.classList.remove(...KINDS);
+            detail.classList.add(...info.event.classNames.filter((c) => KINDS.includes(c)));
             detail.querySelector('[data-field=kind]').textContent = props.kind || '';
             detail.querySelector('[data-field=title]').textContent = info.event.title;
             detail.querySelector('[data-field=detail]').textContent = props.detail || '';
@@ -63,6 +73,11 @@ export function mountCalendar() {
                 link.hidden = true;
             }
             detail.showModal();
+        },
+        eventDidMount(info) {
+            // Tooltip mit allen Angaben (gekürzte Titel in kleinen Zellen)
+            const { kind, detail: text } = info.event.extendedProps;
+            info.el.title = [kind, info.event.title, text].filter(Boolean).join(' · ');
         },
     });
 

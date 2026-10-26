@@ -1,7 +1,12 @@
 @extends('layouts.app')
 @section('title', __('Übersicht'))
 
-@php $kiosk = auth()->user()->isKiosk(); @endphp
+@php
+    $kiosk = auth()->user()->isKiosk();
+    $canLoan = auth()->user()->can('loans.create');
+    // Am Kiosk geht die Rückgabe nur per Scan
+    $scanReturn = $kiosk && auth()->user()->can('loans.return');
+@endphp
 
 @section('content')
     <x-page-header :title="$kiosk ? __('Willkommen!') : __('Hallo, :name', ['name' => Str::before(auth()->user()->name, ' ')])">
@@ -13,19 +18,20 @@
 
     {{-- Hauptaktionen: groß und eindeutig, auch für Erstbesucher (am Kiosk mit Vormerken) --}}
     <div @class(['mb-6 grid gap-3 sm:grid-cols-3', 'sm:grid-rows-2' => $kiosk])>
-        <a href="{{ route('devices.index') }}" @class(['group flex items-center gap-4 rounded-xl bg-accent p-5 text-accent-fg shadow-md transition hover:brightness-110 active:brightness-95 sm:col-span-2 sm:p-6', 'sm:row-span-2 sm:p-8' => $kiosk])>
+        {{-- Mit ?ausleihen=1 zeigt die Geräteliste oben den Weg zum Scannen --}}
+        <a href="{{ $canLoan ? route('devices.index', ['ausleihen' => 1]) : route('devices.index') }}" @class(['group flex items-center gap-4 rounded-xl bg-accent p-5 text-accent-fg shadow-md transition hover:brightness-110 active:brightness-95 sm:col-span-2 sm:p-6', 'sm:row-span-2 sm:p-8' => $kiosk])>
             <span class="grid size-14 shrink-0 place-items-center rounded-xl bg-white/20"><x-icon name="devices" class="size-7"/></span>
             <span class="min-w-0 flex-1">
-                <span @class(['block font-semibold', 'text-xl sm:text-2xl' => ! $kiosk, 'text-2xl sm:text-4xl' => $kiosk])>{{ auth()->user()->can('loans.create') ? __('Gerät ausleihen') : __('Geräte ansehen') }}</span>
-                <span class="mt-0.5 block text-sm opacity-90">{{ __('Gerät aussuchen, Zeitraum wählen, fertig.') }}</span>
+                <span @class(['block font-semibold', 'text-xl sm:text-2xl' => ! $kiosk, 'text-2xl sm:text-4xl' => $kiosk])>{{ $canLoan ? __('Gerät ausleihen') : __('Geräte ansehen') }}</span>
+                <span class="mt-0.5 block text-sm opacity-90">{{ $canLoan ? __('Scannen oder Gerät aussuchen, Zeitraum wählen, fertig.') : __('Gerät aussuchen, Zeitraum wählen, fertig.') }}</span>
             </span>
             <x-icon name="chevron-right" class="size-6 shrink-0 transition group-hover:translate-x-1"/>
         </a>
-        <a href="{{ route('loans.index') }}" class="card group flex items-center gap-4 p-5 transition hover:border-accent/40 sm:p-6">
+        <a href="{{ $scanReturn ? route('loans.return-scan') : route('loans.index') }}" class="card group flex items-center gap-4 p-5 transition hover:border-accent/40 sm:p-6">
             <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent"><x-icon name="undo" class="size-6"/></span>
             <span class="min-w-0 flex-1">
                 <span class="block text-lg font-semibold">{{ __('Zurückgeben') }}</span>
-                <span class="block text-sm text-muted">{{ __('Laufende Ausleihen') }}</span>
+                <span class="block text-sm text-muted">{{ $scanReturn ? __('Gerät scannen oder ID eingeben') : __('Laufende Ausleihen') }}</span>
             </span>
         </a>
         @if ($kiosk && auth()->user()->can('reservations.create'))

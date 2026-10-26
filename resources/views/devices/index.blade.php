@@ -17,6 +17,19 @@
         </x-slot:actions>
     </x-page-header>
 
+    {{-- Vom großen Ausleih-Button der Startseite: zuerst der schnelle Weg per Scan --}}
+    @if (request()->boolean('ausleihen') && Gate::allows('loans.create'))
+        <a href="{{ route('loans.checkout') }}" class="group mb-3 flex items-center gap-4 rounded-xl bg-accent p-5 text-accent-fg shadow-md transition hover:brightness-110 active:brightness-95 sm:p-6">
+            <span class="grid size-14 shrink-0 place-items-center rounded-xl bg-white/20"><x-icon name="scan" class="size-7"/></span>
+            <span class="min-w-0 flex-1">
+                <span class="block text-xl font-semibold sm:text-2xl">{{ __('Scannen oder ID eingeben') }}</span>
+                <span class="mt-0.5 block text-sm opacity-90">{{ __('Etikett scannen – auch mehrere Geräte auf einmal, mit einem Namen und Zeitraum.') }}</span>
+            </span>
+            <x-icon name="chevron-right" class="size-6 shrink-0 transition group-hover:translate-x-1"/>
+        </a>
+        <p class="mb-5 text-center text-sm text-muted">{{ __('… oder unten ein Gerät aussuchen.') }}</p>
+    @endif
+
     {{-- Filter --}}
     <div class="card mb-5 flex flex-col gap-3 p-3 md:flex-row md:items-center">
         <div class="relative flex-1">
