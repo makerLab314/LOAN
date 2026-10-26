@@ -45,6 +45,8 @@ class LookupController extends Controller
             return $hit
                 ? response()->json([
                     'found' => true,
+                    'device_id' => $hit['device']->id,
+                    'unit' => $hit['unit'],
                     'title' => $hit['device']->title,
                     'label' => $hit['unit'] ? $hit['device']->unitLabel($hit['unit']) : $hit['device']->inventory_number,
                     'url' => route('devices.show', array_filter(['device' => $hit['device']->id, 'unit' => $hit['unit']])),

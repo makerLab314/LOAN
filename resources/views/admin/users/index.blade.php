@@ -26,6 +26,7 @@
                     <td>
                         <span class="font-medium">{{ $user->name }}</span>
                         @if ($user->is(auth()->user()))<span class="badge badge-muted ml-1">{{ __('du') }}</span>@endif
+                        @if ($user->must_change_password)<span class="badge badge-warn ml-1" title="{{ __('Muss bei der nächsten Anmeldung ein eigenes Passwort festlegen') }}">{{ __('Passwort ausstehend') }}</span>@endif
                         <span class="block text-xs text-muted md:hidden">{{ $user->email }}</span>
                     </td>
                     <td class="hidden text-muted md:table-cell">{{ $user->email }}</td>

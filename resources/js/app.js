@@ -183,7 +183,9 @@ document.addEventListener('change', (event) => {
 
 // Seitenspezifische Module nur bei Bedarf laden
 if (document.querySelector('[data-calendar]')) import('./calendar').then((m) => m.mountCalendar());
-if (document.querySelector('[data-scanner]')) import('./scanner').then((m) => m.mountScanner());
+if (document.querySelector('[data-scanner][data-lookup]')) import('./scanner').then((m) => m.mountScanner());
+if (document.querySelector('[data-checkout]')) import('./checkout').then((m) => m.mountCheckout());
+if (document.querySelector('[data-return]')) import('./returns').then((m) => m.mountReturns());
 if (document.querySelector('[data-label-picker]')) import('./labels').then((m) => m.mountLabelPicker());
 
 // Installierbar als App (PWA); der Service Worker speichert keine Seiten mit Daten

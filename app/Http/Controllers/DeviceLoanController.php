@@ -7,13 +7,17 @@ use App\Models\Device;
 use App\Models\DeviceLoan;
 use App\Models\DeviceReservation;
 use App\Services\LoanService;
+use App\Services\ReturnScans;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DeviceLoanController extends Controller
 {
-    public function __construct(private LoanService $loans) {}
+    public function __construct(
+        private LoanService $loans,
+        private ReturnScans $scans,
+    ) {}
 
     /**
      * Übersicht: aktive Ausleihen, Vormerkungen, offene Rückgabe-Probleme.
@@ -105,15 +109,26 @@ class DeviceLoanController extends Controller
 
         $mode = $data['mode'] ?? 'all';
         $checks = $request->boolean('accessories_present') ? ($data['accessories'] ?? []) : null;
+        $units = $mode === 'units' ? ($data['units'] ?? []) : null;
+
+        // Kiosk: nur zurücknehmen, was vorher gescannt bzw. per ID eingegeben wurde
+        $kiosk = $request->user()->isKiosk();
+        if ($kiosk) {
+            $units = $this->scans->authorize($loan, $units);
+        }
 
         $loan = $this->loans->return(
             $loan,
             $request->user(),
-            $mode === 'quantity' ? (int) ($data['quantity'] ?? 0) : null,
-            $mode === 'units' ? ($data['units'] ?? []) : null,
+            ! $units && $mode === 'quantity' ? (int) ($data['quantity'] ?? 0) : null,
+            $units,
             $checks,
             $data['note'] ?? null,
         );
+
+        if ($kiosk) {
+            $this->scans->consume($loan, $units);
+        }
 
         $message = $loan->isActive()
             ? __('Teilrückgabe gebucht – noch offen: :n.', ['n' => $loan->outstanding_quantity])

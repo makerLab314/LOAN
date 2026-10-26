@@ -256,30 +256,201 @@
     --fc-event-border-color: transparent;
     font-size: 0.8125rem;
 }
+/* Farben je Art – gelten für Termine, Legende und Detail-Dialog */
+:root {
+    --ev-room: #2563eb;
+    --ev-reservation: #7c3aed;
+}
+.dark {
+    --ev-room: #60a5fa;
+    --ev-reservation: #a78bfa;
+}
+.ev-room { --ev: var(--ev-room); }
+.ev-reservation { --ev: var(--ev-reservation); }
+.ev-loan { --ev: var(--accent); }
+.ev-overdue { --ev: var(--danger); }
+
+/* Werkzeugleiste */
+.fc .fc-toolbar.fc-header-toolbar {
+    @apply mb-4 flex-wrap gap-2;
+}
+.fc .fc-toolbar.fc-footer-toolbar {
+    @apply mt-4;
+}
+.fc .fc-toolbar-title {
+    @apply text-lg font-semibold tracking-tight capitalize sm:text-xl;
+}
 .fc .fc-button {
-    @apply rounded-lg text-sm font-medium shadow-sm;
+    @apply rounded-lg px-3 py-1.5 text-sm font-medium capitalize shadow-sm;
+}
+.fc .fc-button:focus,
+.fc .fc-button-primary:not(:disabled):active:focus,
+.fc .fc-button-primary:not(:disabled).fc-button-active:focus {
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 30%, transparent);
 }
 .fc .fc-button-primary:not(:disabled).fc-button-active {
     color: var(--accent-fg);
 }
-.fc .fc-toolbar-title {
-    @apply text-base font-semibold sm:text-lg;
+.fc .fc-button-primary:disabled {
+    @apply opacity-50;
 }
-.fc .ev-room { background: #2563eb; color: #fff; }
-.fc .ev-reservation { background: #7c3aed; color: #fff; }
-.fc .ev-loan { background: var(--accent); color: var(--accent-fg); }
-.fc .ev-overdue { background: var(--danger); color: #fff; }
-/* In der Listenansicht nur der Punkt farbig, nicht die ganze Zeile */
-.fc .fc-list-event.ev-room,
-.fc .fc-list-event.ev-reservation,
-.fc .fc-list-event.ev-loan,
-.fc .fc-list-event.ev-overdue { background: transparent; color: var(--fg); cursor: pointer; }
-.fc .fc-list-event.ev-room .fc-list-event-dot { border-color: #2563eb; }
-.fc .fc-list-event.ev-reservation .fc-list-event-dot { border-color: #7c3aed; }
-.fc .fc-list-event.ev-loan .fc-list-event-dot { border-color: var(--accent); }
-.fc .fc-list-event.ev-overdue .fc-list-event-dot { border-color: var(--danger); }
-.fc .fc-list-event.ev-overdue .fc-list-event-title { color: var(--danger); }
-.fc-theme-standard .fc-list-day-cushion { background: var(--surface-2); }
+.fc .fc-prev-button,
+.fc .fc-next-button {
+    @apply px-2;
+}
+
+/* Raster */
+.fc-theme-standard .fc-scrollgrid {
+    @apply overflow-hidden rounded-xl;
+}
+.fc .fc-col-header-cell {
+    @apply bg-surface-2/60;
+}
+.fc .fc-col-header-cell-cushion {
+    @apply px-1 py-2 text-[11px] font-semibold tracking-wider text-muted uppercase;
+}
+.fc .fc-day-sat:not(.fc-col-header-cell),
+.fc .fc-day-sun:not(.fc-col-header-cell) {
+    background: color-mix(in oklab, var(--surface-2) 45%, transparent);
+}
+.fc .fc-daygrid-day-number {
+    @apply m-1 grid h-7 min-w-7 place-items-center rounded-full px-1.5 py-0 text-xs font-medium text-muted tabular-nums;
+}
+.fc .fc-daygrid-day-number:hover {
+    @apply bg-surface-2 text-fg no-underline;
+}
+.fc .fc-day-today .fc-daygrid-day-number {
+    @apply bg-accent font-semibold text-accent-fg;
+}
+.fc .fc-day-other .fc-daygrid-day-top {
+    @apply opacity-40;
+}
+.fc .fc-daygrid-week-number {
+    @apply m-1 rounded-md bg-transparent text-[10px] font-medium text-muted/70;
+}
+.fc .fc-daygrid-more-link {
+    @apply mx-1 text-xs font-semibold text-accent hover:no-underline;
+}
+.fc .fc-popover {
+    @apply overflow-hidden rounded-xl border border-line bg-surface shadow-xl;
+}
+.fc .fc-popover-header {
+    @apply bg-surface-2 px-3 py-2 text-sm font-semibold;
+}
+
+/* Termine: getönte Fläche mit farbiger Kante statt voller Farbe */
+.fc .fc-h-event,
+.fc .fc-v-event {
+    @apply cursor-pointer rounded-md border-0 text-xs font-medium transition;
+    background: color-mix(in oklab, var(--ev, var(--accent)) 18%, var(--surface));
+    border-left: 3px solid var(--ev, var(--accent));
+    color: var(--fg);
+}
+.fc .fc-h-event:hover,
+.fc .fc-v-event:hover {
+    background: color-mix(in oklab, var(--ev, var(--accent)) 30%, var(--surface));
+}
+.fc .fc-h-event .fc-event-main,
+.fc .fc-v-event .fc-event-main {
+    @apply px-1.5 py-0.5;
+    color: inherit;
+}
+.fc .fc-event-time {
+    @apply font-semibold;
+    color: var(--ev, var(--accent));
+}
+.fc .ev-overdue .fc-event-title {
+    @apply font-semibold text-danger;
+}
+.dark .fc .fc-h-event,
+.dark .fc .fc-v-event {
+    background: color-mix(in oklab, var(--ev, var(--accent)) 26%, var(--surface));
+}
+.dark .fc .fc-h-event:hover,
+.dark .fc .fc-v-event:hover {
+    background: color-mix(in oklab, var(--ev, var(--accent)) 38%, var(--surface));
+}
+/* Mehrtägige Termine: Kante nur am Anfang, Rundung nur an den echten Enden */
+.fc .fc-h-event:not(.fc-event-start) {
+    @apply rounded-l-none;
+    border-left-color: transparent;
+}
+.fc .fc-h-event:not(.fc-event-end) {
+    @apply rounded-r-none;
+}
+.fc .fc-daygrid-event-harness {
+    @apply mb-0.5;
+}
+
+/* Wochen- und Tagesansicht */
+.fc .fc-timegrid-slot {
+    @apply h-10;
+}
+.fc .fc-timegrid-slot-minor {
+    border-top-style: dotted;
+}
+.fc .fc-timegrid-slot-label-cushion,
+.fc .fc-timegrid-axis-cushion {
+    @apply text-[11px] font-medium text-muted tabular-nums;
+}
+.fc .fc-timegrid-now-indicator-line {
+    border-color: var(--danger);
+    border-width: 2px 0 0;
+}
+.fc .fc-timegrid-now-indicator-arrow {
+    border-color: var(--danger);
+    border-bottom-color: transparent;
+    border-top-color: transparent;
+}
+
+/* Listenansicht: nur der Punkt farbig, nicht die ganze Zeile */
+.fc .fc-list {
+    @apply overflow-hidden rounded-xl;
+}
+.fc-theme-standard .fc-list-day-cushion {
+    @apply bg-surface-2 px-4 py-2 text-xs font-semibold tracking-wide uppercase;
+}
+.fc .fc-list-event {
+    @apply cursor-pointer;
+}
+.fc .fc-list-event td {
+    @apply px-4 py-2.5;
+}
+.fc .fc-list-event-dot {
+    border-color: var(--ev, var(--accent));
+    border-width: 5px;
+}
+.fc .fc-list-event-time {
+    @apply text-muted tabular-nums;
+}
+.fc .fc-list-event.ev-overdue .fc-list-event-title {
+    @apply font-medium text-danger;
+}
+.fc .fc-list-empty {
+    @apply bg-surface text-muted;
+}
+
+/* Legende / Filter über dem Kalender */
+.cal-chip {
+    @apply inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-medium
+        text-muted shadow-sm transition select-none hover:bg-surface-2 has-checked:text-fg has-focus-visible:ring-2 has-focus-visible:ring-accent/40;
+}
+.cal-dot {
+    @apply size-2.5 shrink-0 rounded-full transition;
+    box-shadow: inset 0 0 0 2px var(--ev);
+}
+.cal-chip input:checked + .cal-dot,
+.cal-dot-filled {
+    background: var(--ev);
+}
+.cal-bar {
+    background: var(--ev, var(--accent));
+}
+.cal-kind {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-semibold tracking-wide uppercase;
+    background: color-mix(in oklab, var(--ev, var(--accent)) 14%, transparent);
+    color: var(--ev, var(--accent));
+}
 
 /* ---------------------------------------------------------------------------
  * Druck (Etiketten werden separat gestylt)

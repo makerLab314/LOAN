@@ -30,6 +30,7 @@ class CreateAdminCommand extends Command
         $user->name = $user->name ?: (string) $this->option('name');
         $user->password = Hash::make($password);
         $user->role = User::ROLE_ADMIN;
+        $user->must_change_password = true;
         $user->locale = $user->locale ?: 'de';
         $user->deleted_at = null;
         $user->save();
@@ -37,7 +38,7 @@ class CreateAdminCommand extends Command
         Audit::log('user.admin_created_cli', $user);
 
         $this->info("Admin {$email} – Passwort: {$password}");
-        $this->warn('Bitte nach der ersten Anmeldung unter „Profil“ ändern.');
+        $this->warn('Bei der ersten Anmeldung wird ein eigenes Passwort verlangt.');
 
         return self::SUCCESS;
     }

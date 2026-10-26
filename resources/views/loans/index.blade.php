@@ -6,8 +6,14 @@
     <x-page-header :title="__('Ausleihen & Vormerkungen')">
         <x-slot:actions>
             @unless (auth()->user()->isKiosk())
-                <a href="{{ route('loans.history') }}" class="btn btn-secondary"><x-icon name="history"/>{{ __('Abgeschlossene') }}</a>
+                <a href="{{ route('loans.history') }}" class="btn btn-secondary"><x-icon name="history"/><span class="hidden sm:inline">{{ __('Abgeschlossene') }}</span></a>
             @endunless
+            @can('loans.return')
+                <a href="{{ route('loans.return-scan') }}" class="btn btn-secondary"><x-icon name="undo"/>{{ __('Zurückgeben') }}</a>
+            @endcan
+            @can('loans.create')
+                <a href="{{ route('loans.checkout') }}" class="btn btn-primary"><x-icon name="scan"/>{{ __('Ausleihen') }}</a>
+            @endcan
         </x-slot:actions>
     </x-page-header>
 

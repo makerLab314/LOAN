@@ -17,6 +17,7 @@ use Illuminate\Support\Carbon;
  * @property string $role
  * @property string $locale
  * @property string $theme
+ * @property bool $must_change_password
  * @property Carbon|null $deleted_at
  */
 class User extends Authenticatable
@@ -36,7 +37,7 @@ class User extends Authenticatable
     public const THEMES = ['system', 'light', 'dark'];
 
     /**
-     * "role" ist bewusst NICHT mass-assignable – Rollen werden nur explizit gesetzt.
+     * "role" und "must_change_password" sind bewusst NICHT mass-assignable – nur explizit gesetzt.
      */
     protected $fillable = [
         'name',
@@ -56,6 +57,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'must_change_password' => 'boolean',
         ];
     }
 

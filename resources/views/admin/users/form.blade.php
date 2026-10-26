@@ -41,6 +41,24 @@
                 <x-field :label="__('Passwort wiederholen')" name="password_confirmation">
                     <input type="password" name="password_confirmation" class="input" @required(! $user->exists) autocomplete="new-password">
                 </x-field>
+                @unless ($user->is(auth()->user()))
+                    <div class="sm:col-span-2">
+                        <label class="flex items-start gap-3 rounded-lg border border-line p-3 text-sm has-checked:border-accent has-checked:bg-accent-soft">
+                            <input type="hidden" name="must_change_password" value="0">
+                            <input type="checkbox" name="must_change_password" value="1" class="checkbox mt-0.5" @checked(old('must_change_password', '1'))>
+                            <span>
+                                {{ $user->exists ? __('Beim nächsten Anmelden ein eigenes Passwort verlangen') : __('Bei der ersten Anmeldung ein eigenes Passwort verlangen') }}
+                                <span class="block text-xs text-muted">
+                                    {{ $user->exists ? __('Gilt nur, wenn oben ein neues Passwort gesetzt wird.') : __('Empfohlen – dann kennt nur die Person selbst ihr Passwort.') }}
+                                    {{ __('Für Kiosk-Konten nicht nötig.') }}
+                                </span>
+                            </span>
+                        </label>
+                        @if ($user->exists && $user->must_change_password)
+                            <p class="hint">{{ __('Diese Person hat ihr Passwort noch nicht geändert.') }}</p>
+                        @endif
+                    </div>
+                @endunless
             </div>
             <div class="flex justify-end gap-2 border-t border-line px-4 py-3 sm:px-5">
                 <a href="{{ route('admin.users.index') }}" class="btn btn-secondary">{{ __('Abbrechen') }}</a>

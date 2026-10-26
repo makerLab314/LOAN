@@ -5,6 +5,8 @@
     $form = old('_form');
     $canLoan = Gate::allows('loans.create');
     $canReturn = Gate::allows('loans.return');
+    // Kiosk: Rückgabe nur über „Zurückgeben“ per Scan, nicht direkt hier
+    $returnHere = $canReturn && ! auth()->user()->isKiosk();
     $canExtend = Gate::allows('loans.extend');
     $accessoryItems = $device->accessories->map(fn ($a) => ['key' => $a->id, 'name' => $a->name, 'quantity' => $a->quantity])->all();
     $defaultDays = (int) $settings->get('loans.default_days');
@@ -44,8 +46,10 @@
                 @endisset
             </p>
             @isset($loanedUnits[$preselectUnit])
-                @if ($canReturn)
+                @if ($returnHere)
                     <button type="button" class="btn btn-primary btn-sm" data-dialog="return-dialog-{{ $loanedUnits[$preselectUnit]->id }}">{{ __('Zurücknehmen') }}</button>
+                @elseif ($canReturn)
+                    <a href="{{ route('loans.return-scan') }}" class="btn btn-primary btn-sm">{{ __('Zurückgeben') }}</a>
                 @endif
             @else
                 @if ($canLoan && $device->available_quantity > 0)
@@ -188,7 +192,11 @@
                                     </div>
                                     @if ($canReturn)
                                         <div class="flex shrink-0 gap-2">
-                                            <button type="button" class="btn btn-primary btn-sm" data-dialog="return-dialog-{{ $loan->id }}"><x-icon name="undo"/>{{ __('Rückgabe') }}</button>
+                                            @if ($returnHere)
+                                                <button type="button" class="btn btn-primary btn-sm" data-dialog="return-dialog-{{ $loan->id }}"><x-icon name="undo"/>{{ __('Rückgabe') }}</button>
+                                            @else
+                                                <a href="{{ route('loans.return-scan') }}" class="btn btn-primary btn-sm"><x-icon name="undo"/>{{ __('Rückgabe') }}</a>
+                                            @endif
                                             @if ($canExtend)
                                                 <button type="button" class="btn btn-secondary btn-sm" data-dialog="extend-dialog-{{ $loan->id }}"><x-icon name="calendar-plus"/>{{ __('Verlängern') }}</button>
                                             @endif
@@ -330,7 +338,7 @@
         </datalist>
     @endif
 
-    @if ($canReturn)
+    @if ($returnHere)
         @foreach ($activeLoans as $loan)
             @php $outstandingUnits = $loan->outstandingUnitNumbers(); @endphp
             <x-modal :id="'return-dialog-'.$loan->id" :title="__('Rückgabe: :name', ['name' => $loan->borrower_name])" :open-on-load="$form === 'return-'.$loan->id">
