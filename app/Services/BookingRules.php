@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Support\Audit;
 use App\Support\Settings;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -42,7 +43,10 @@ class BookingRules
         return [$start->seconds(0), $end->seconds(0)];
     }
 
-    public function bookRoom(Room $room, Carbon $start, Carbon $end, ?string $purpose, User $actor, ?RoomBooking $existing = null, ?string $bookedFor = null): RoomBooking
+    /**
+     * Beginn und Höchstdauer prüfen – ohne Blick auf andere Buchungen.
+     */
+    public function assertRoomPeriod(Carbon $start, Carbon $end, ?RoomBooking $existing = null): void
     {
         $this->assertNotPast($start, $existing?->start_at);
 
@@ -50,29 +54,59 @@ class BookingRules
         if ($maxHours > 0 && $start->diffInMinutes($end) > $maxHours * 60) {
             throw ValidationException::withMessages(['end_time' => __('Maximale Buchungsdauer: :n Stunden.', ['n' => $maxHours])]);
         }
+    }
+
+    /**
+     * Buchungen des Raums, die sich mit dem Zeitraum überschneiden.
+     *
+     * @return Collection<int, RoomBooking>
+     */
+    public function roomConflicts(Room $room, Carbon $start, Carbon $end, ?int $ignoreId = null): Collection
+    {
+        return RoomBooking::query()
+            ->with('user')
+            ->where('room_id', $room->id)
+            ->overlapping($start, $end)
+            ->when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+            ->orderBy('start_at')
+            ->get();
+    }
+
+    /**
+     * @param  Collection<int, RoomBooking>  $conflicts
+     */
+    public function conflictMessage(Collection $conflicts): string
+    {
+        $describe = fn (RoomBooking $b) => $b->start_at->format('d.m.').' '.$b->timeRange()
+            .' ('.collect([$b->purpose, $b->displayName()])->filter()->implode(', ').')';
+
+        if ($conflicts->count() === 1) {
+            return __('Der Raum ist in diesem Zeitraum bereits gebucht: :booking.', ['booking' => $describe($conflicts->first())]);
+        }
+
+        $list = $conflicts->take(5)->map($describe)->implode('; ').($conflicts->count() > 5 ? '; …' : '');
+
+        return __('Der Raum ist in diesem Zeitraum :count-mal belegt: :list.', ['count' => $conflicts->count(), 'list' => $list]);
+    }
+
+    public function bookRoom(Room $room, Carbon $start, Carbon $end, ?string $purpose, User $actor, ?RoomBooking $existing = null, ?string $bookedFor = null): RoomBooking
+    {
+        $this->assertRoomPeriod($start, $end, $existing);
 
         return DB::transaction(function () use ($room, $start, $end, $purpose, $actor, $existing, $bookedFor) {
             Room::query()->whereKey($room->id)->lockForUpdate()->first();
 
-            $conflict = RoomBooking::query()
-                ->with('user')
-                ->where('room_id', $room->id)
-                ->overlapping($start, $end)
-                ->when($existing, fn ($q) => $q->where('id', '!=', $existing->id))
-                ->orderBy('start_at')
-                ->first();
-
-            if ($conflict) {
-                throw ValidationException::withMessages(['start_date' => __('Der Raum ist in diesem Zeitraum bereits gebucht (:from – :to, :name).', [
-                    'from' => $conflict->start_at->format('d.m.Y H:i'),
-                    'to' => $conflict->end_at->format('d.m.Y H:i'),
-                    'name' => $conflict->displayName(),
-                ])]);
+            $conflicts = $this->roomConflicts($room, $start, $end, $existing?->id);
+            if ($conflicts->isNotEmpty()) {
+                throw ValidationException::withMessages(['start_date' => $this->conflictMessage($conflicts)]);
             }
 
             if ($existing) {
                 $before = ['start' => $existing->start_at->format('d.m.Y H:i'), 'end' => $existing->end_at->format('d.m.Y H:i')];
-                $existing->update(['room_id' => $room->id, 'start_at' => $start, 'end_at' => $end, 'purpose' => $purpose]);
+                $existing->update([
+                    'room_id' => $room->id, 'start_at' => $start, 'end_at' => $end,
+                    'purpose' => $purpose, 'booked_by_name' => $bookedFor,
+                ]);
                 Audit::log('room_booking.updated', $existing, ['before' => $before, 'after' => [
                     'start' => $start->format('d.m.Y H:i'), 'end' => $end->format('d.m.Y H:i'),
                 ]], $actor);
@@ -88,9 +122,10 @@ class BookingRules
                 'end_at' => $end,
                 'purpose' => $purpose,
             ]);
-            Audit::log('room_booking.created', $booking->setRelation('room', $room), [
+            Audit::log('room_booking.created', $booking->setRelation('room', $room), array_filter([
+                'for' => $bookedFor,
                 'start' => $start->format('d.m.Y H:i'), 'end' => $end->format('d.m.Y H:i'),
-            ], $actor);
+            ]), $actor);
 
             return $booking;
         });
@@ -148,6 +183,11 @@ class BookingRules
 
         // Beim Bearbeiten einer bereits laufenden Buchung den bisherigen Beginn erlauben
         if ($previousStart && $start->equalTo($previousStart)) {
+            return;
+        }
+
+        // Ganztägig ab heute 00:00 ist kein Nachtragen, sondern der heutige Tag
+        if ($start->isToday() && $start->isStartOfDay()) {
             return;
         }
 

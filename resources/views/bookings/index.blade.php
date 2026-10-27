@@ -34,9 +34,12 @@
                             <p class="font-semibold">{{ $b->start_at->format('d.m.y') }}</p>
                         </div>
                         <div class="min-w-0 flex-1">
-                            <p class="font-medium">{{ $b->room?->name }} <span class="font-normal text-muted">· {{ $b->start_at->format('H:i') }} – {{ $b->end_at->format($b->end_at->isSameDay($b->start_at) ? 'H:i' : 'd.m. H:i') }}</span></p>
+                            <p class="font-medium">{{ $b->room?->name }} <span class="font-normal text-muted">· {{ $b->timeRange() }}</span></p>
                             <p class="text-sm text-muted">{{ $b->purpose }}</p>
-                            <p class="text-xs text-muted">{{ $b->displayName() }}</p>
+                            <p class="text-xs text-muted">
+                                {{ $b->displayName() }}
+                                @if ($by = $b->enteredBy()) · {{ __('eingetragen von :name', ['name' => $by]) }}@endif
+                            </p>
                         </div>
                         @can('update', $b)
                             <div class="flex gap-2">

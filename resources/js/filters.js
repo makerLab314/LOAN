@@ -14,7 +14,11 @@ export function deviceFilter() {
         total: 0,
 
         init() {
-            this.category = this.$root.dataset.category || '';
+            // Filter stehen in der URL – so landet „Zurück“ wieder bei denselben Ergebnissen
+            const params = new URLSearchParams(window.location.search);
+            this.q = params.get('q') || '';
+            this.category = params.get('category') || this.$root.dataset.category || '';
+            this.status = params.get('status') || '';
             try { this.view = localStorage.getItem('devices.view') || 'grid'; } catch (e) { /* privat */ }
             this.$watch('q', () => this.apply());
             this.$watch('category', () => this.apply());
@@ -39,6 +43,19 @@ export function deviceFilter() {
             });
             this.shown = shown;
             this.total = total;
+            this.remember();
+        },
+
+        remember() {
+            const params = new URLSearchParams(window.location.search);
+            const set = (key, value) => (value ? params.set(key, value) : params.delete(key));
+            set('q', this.q.trim());
+            set('category', this.category);
+            set('status', this.status);
+            const query = params.toString();
+            const url = window.location.pathname + (query ? `?${query}` : '');
+            window.history.replaceState(window.history.state, '', url);
+            try { sessionStorage.setItem('list.devices', url); } catch (e) { /* privat */ }
         },
 
         setView(event) { this.view = event.currentTarget.dataset.view; },

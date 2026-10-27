@@ -44,15 +44,19 @@ class CalendarController extends Controller
                 ->when($data['room'] ?? null, fn ($q, $room) => $q->where('room_id', $room))
                 ->get()
                 ->each(function (RoomBooking $b) use (&$events, $request) {
+                    $allDay = $b->isAllDay();
+                    $by = $b->enteredBy();
                     $events[] = [
                         'id' => 'b'.$b->id,
                         'title' => ($b->room?->name ?? '—').' · '.($b->purpose ?? ''),
-                        'start' => $b->start_at->toIso8601String(),
-                        'end' => $b->end_at->toIso8601String(),
+                        'start' => $allDay ? $b->start_at->toDateString() : $b->start_at->toIso8601String(),
+                        'end' => $allDay ? $b->end_at->copy()->addDay()->toDateString() : $b->end_at->toIso8601String(),
+                        'allDay' => $allDay,
                         'classNames' => ['ev-room'],
                         'extendedProps' => [
                             'kind' => __('Raumbuchung'),
-                            'detail' => __('Gebucht von :name', ['name' => $b->displayName()]),
+                            'detail' => __('Ansprechperson: :name', ['name' => $b->displayName()])
+                                .($by ? ' · '.__('eingetragen von :name', ['name' => $by]) : ''),
                             'url' => $request->user()->can('update', $b) ? route('bookings.edit', $b) : null,
                         ],
                     ];

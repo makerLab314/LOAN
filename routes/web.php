@@ -115,6 +115,7 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     });
     Route::get('/bookings', [RoomBookingController::class, 'index'])->name('bookings.index');
     Route::get('/bookings/archive', [RoomBookingController::class, 'archived'])->middleware('not-kiosk')->name('bookings.archived');
+    Route::get('/bookings/availability', [RoomBookingController::class, 'availability'])->middleware('throttle:120,1')->name('bookings.availability');
     Route::get('/bookings/{booking}/edit', [RoomBookingController::class, 'edit'])->name('bookings.edit');
     Route::put('/bookings/{booking}', [RoomBookingController::class, 'update'])->name('bookings.update');
     Route::delete('/bookings/{booking}', [RoomBookingController::class, 'destroy'])->name('bookings.destroy');

@@ -14,7 +14,7 @@
 @endphp
 
 @section('content')
-    <x-page-header :title="$device->title" :back="route('devices.index')">
+    <x-page-header :title="$device->title" :back="route('devices.index')" back-list="devices">
         <x-slot:subtitle>
             <span class="flex flex-wrap items-center gap-2">
                 <span class="id-chip">{{ $device->inventory_number }}</span>

@@ -6,7 +6,7 @@
 import Alpine from '@alpinejs/csp';
 import { postJson } from './http';
 import { searchPalette } from './search';
-import { loanForm, returnForm, accessoryEditor, unitPicker } from './forms';
+import { loanForm, returnForm, accessoryEditor, unitPicker, bookingForm } from './forms';
 import { deviceFilter } from './filters';
 
 window.Alpine = Alpine;
@@ -84,6 +84,7 @@ Alpine.data('loanForm', loanForm);
 Alpine.data('returnForm', returnForm);
 Alpine.data('accessoryEditor', accessoryEditor);
 Alpine.data('unitPicker', unitPicker);
+Alpine.data('bookingForm', bookingForm);
 Alpine.data('deviceFilter', deviceFilter);
 
 Alpine.data('tabs', () => ({
@@ -205,6 +206,14 @@ if (kioskIdle > 0) {
     ['pointerdown', 'keydown', 'input', 'scroll'].forEach((type) => window.addEventListener(type, reset, { capture: true, passive: true }));
     reset();
 }
+
+// „Zurück“ zur Liste mit den zuletzt gesetzten Filtern (filters.js merkt sie sich)
+document.querySelectorAll('a[data-back-list]').forEach((link) => {
+    try {
+        const url = sessionStorage.getItem(`list.${link.dataset.backList}`);
+        if (url && url.startsWith('/') && !url.startsWith('//')) link.href = url;
+    } catch (e) { /* privat */ }
+});
 
 // Dialoge mit Validierungsfehlern nach dem Neuladen wieder öffnen
 document.querySelectorAll('dialog[data-open-on-load]').forEach((d) => d.showModal());

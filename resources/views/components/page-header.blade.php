@@ -1,8 +1,9 @@
-@props(['title', 'back' => null])
+@props(['title', 'back' => null, 'backList' => null])
 <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
     <div class="min-w-0">
         @if ($back)
-            <a href="{{ $back }}" class="mb-2 inline-flex items-center gap-1 text-sm text-muted hover:text-fg">
+            {{-- backList: zurück zur Liste mit den zuletzt gesetzten Filtern (siehe filters.js) --}}
+            <a href="{{ $back }}" @if ($backList) data-back-list="{{ $backList }}" @endif class="mb-2 inline-flex items-center gap-1 text-sm text-muted hover:text-fg">
                 <x-icon name="chevron-left"/>{{ __('Zurück') }}
             </a>
         @endif

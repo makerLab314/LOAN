@@ -167,7 +167,7 @@
                                 <p class="text-sm font-medium">{{ $b->room?->name }}</p>
                                 <p class="text-xs text-muted">
                                     {{ $b->start_at->isToday() ? __('Heute') : $b->start_at->translatedFormat('D d.m.') }},
-                                    {{ $b->start_at->format('H:i') }}–{{ $b->end_at->format($b->end_at->isSameDay($b->start_at) ? 'H:i' : 'd.m. H:i') }}
+                                    {{ $b->timeRange() }}
                                     · {{ $b->displayName() }}
                                 </p>
                                 @if ($b->purpose)<p class="mt-0.5 truncate text-xs text-muted">{{ $b->purpose }}</p>@endif

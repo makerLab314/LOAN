@@ -52,10 +52,38 @@ class RoomBooking extends Model
         return $this->belongsTo(User::class)->withTrashed();
     }
 
-    /** Am Kiosk gebucht: eingetragener Name, sonst das Konto */
+    /** Ansprechperson (am Kiosk: eingetragener Name), sonst das Konto */
     public function displayName(): string
     {
         return $this->booked_by_name ?: ($this->user?->name ?? '—');
+    }
+
+    /** Wer die Buchung eingetragen hat, wenn das nicht die Ansprechperson ist (nicht am Kiosk) */
+    public function enteredBy(): ?string
+    {
+        if (! $this->booked_by_name || ! $this->user || $this->user->isKiosk() || $this->user->name === $this->booked_by_name) {
+            return null;
+        }
+
+        return $this->user->name;
+    }
+
+    /** 00:00 bis 23:59 – auch über mehrere Tage */
+    public function isAllDay(): bool
+    {
+        return $this->start_at->format('H:i') === '00:00' && $this->end_at->format('H:i') === '23:59';
+    }
+
+    /** „10:00 – 11:30“, „ganztägig“ oder bei mehreren Tagen „14:00 – 12.03. 10:00“ */
+    public function timeRange(): string
+    {
+        $sameDay = $this->end_at->isSameDay($this->start_at);
+
+        if ($this->isAllDay()) {
+            return $sameDay ? __('ganztägig') : __('ganztägig bis :date', ['date' => $this->end_at->format('d.m.')]);
+        }
+
+        return $this->start_at->format('H:i').' – '.$this->end_at->format($sameDay ? 'H:i' : 'd.m. H:i');
     }
 
     public function scopeOverlapping(Builder $query, Carbon $from, Carbon $to): Builder
