@@ -1,13 +1,15 @@
 @php
-    $main = [
+    // Raumplanung: Geräte, Ausleihen und Scanner gar nicht erst zeigen
+    $devices = Gate::allows('devices.view');
+    $main = array_filter([
         ['route' => 'home', 'match' => 'home', 'icon' => 'home', 'label' => __('Übersicht')],
-        ['route' => 'devices.index', 'match' => 'devices.*', 'icon' => 'devices', 'label' => __('Geräte')],
-        ['route' => 'loans.index', 'match' => 'loans.*', 'icon' => 'loans', 'label' => __('Ausleihen')],
+        $devices ? ['route' => 'devices.index', 'match' => 'devices.*', 'icon' => 'devices', 'label' => __('Geräte')] : null,
+        $devices ? ['route' => 'loans.index', 'match' => 'loans.*', 'icon' => 'loans', 'label' => __('Ausleihen')] : null,
         ['route' => 'calendar', 'match' => 'calendar', 'icon' => 'calendar', 'label' => __('Kalender')],
         ['route' => 'rooms.index', 'match' => 'rooms.*', 'icon' => 'door', 'label' => __('Räume')],
         ['route' => 'bookings.index', 'match' => 'bookings.*', 'icon' => 'bookmark', 'label' => __('Raumbuchungen')],
-        ['route' => 'scan', 'match' => 'scan', 'icon' => 'scan', 'label' => __('Scannen / ID')],
-    ];
+        $devices ? ['route' => 'scan', 'match' => 'scan', 'icon' => 'scan', 'label' => __('Scannen / ID')] : null,
+    ]);
     $admin = array_filter([
         Gate::allows('categories.manage') ? ['route' => 'categories.index', 'match' => 'categories.*', 'icon' => 'tag', 'label' => __('Kategorien')] : null,
         Gate::allows('labels.print') ? ['route' => 'labels.index', 'match' => 'labels.*', 'icon' => 'qr', 'label' => __('Etiketten')] : null,

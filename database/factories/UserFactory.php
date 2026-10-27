@@ -42,4 +42,9 @@ class UserFactory extends Factory
     {
         return $this->afterMaking(fn (User $user) => $user->role = User::ROLE_KIOSK);
     }
+
+    public function roomPlanner(): static
+    {
+        return $this->afterMaking(fn (User $user) => $user->role = User::ROLE_ROOMS);
+    }
 }

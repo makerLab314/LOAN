@@ -50,55 +50,58 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::get('/kiosk/exit', [KioskController::class, 'show'])->name('kiosk.exit');
     Route::post('/kiosk/exit', [KioskController::class, 'logout'])->middleware('throttle:6,1');
 
-    // Inventar-ID / Scanner
-    Route::get('/scan', [LookupController::class, 'scan'])->name('scan');
-    Route::post('/lookup', [LookupController::class, 'lookup'])->middleware('throttle:search')->name('lookup');
-    Route::get('/d/{code}', [LookupController::class, 'show'])->where('code', '[^/]{1,64}')->name('lookup.show');
+    // Geräte, Ausleihen, Vormerkungen, Scanner – nicht für die Raumplanung (siehe Gate devices.view)
+    Route::middleware('can:devices.view')->group(function () {
+        // Inventar-ID / Scanner
+        Route::get('/scan', [LookupController::class, 'scan'])->name('scan');
+        Route::post('/lookup', [LookupController::class, 'lookup'])->middleware('throttle:search')->name('lookup');
+        Route::get('/d/{code}', [LookupController::class, 'show'])->where('code', '[^/]{1,64}')->name('lookup.show');
 
-    // Geräte
-    Route::middleware('can:devices.manage')->group(function () {
-        Route::get('/devices/create', [DeviceController::class, 'create'])->name('devices.create');
-        Route::post('/devices', [DeviceController::class, 'store'])->name('devices.store');
-        Route::get('/devices/{device}/edit', [DeviceController::class, 'edit'])->name('devices.edit');
-        Route::put('/devices/{device}', [DeviceController::class, 'update'])->name('devices.update');
-        Route::delete('/devices/{device}', [DeviceController::class, 'destroy'])->name('devices.destroy');
+        // Geräte
+        Route::middleware('can:devices.manage')->group(function () {
+            Route::get('/devices/create', [DeviceController::class, 'create'])->name('devices.create');
+            Route::post('/devices', [DeviceController::class, 'store'])->name('devices.store');
+            Route::get('/devices/{device}/edit', [DeviceController::class, 'edit'])->name('devices.edit');
+            Route::put('/devices/{device}', [DeviceController::class, 'update'])->name('devices.update');
+            Route::delete('/devices/{device}', [DeviceController::class, 'destroy'])->name('devices.destroy');
+        });
+        Route::get('/devices', [DeviceController::class, 'index'])->name('devices.index');
+        Route::get('/devices/{device}', [DeviceController::class, 'show'])->name('devices.show');
+        Route::get('/devices/{device}/qr/{unit?}', [LabelController::class, 'qr'])->whereNumber('unit')->name('devices.qr');
+
+        // Ausleihen
+        Route::get('/loans', [DeviceLoanController::class, 'index'])->name('loans.index');
+
+        // Ausleihe per Scan – auch mehrere Geräte/Exemplare mit einer Eingabe
+        Route::middleware('can:loans.create')->group(function () {
+            Route::get('/loans/checkout', [LoanCheckoutController::class, 'create'])->name('loans.checkout');
+            Route::post('/loans/checkout', [LoanCheckoutController::class, 'store'])->name('loans.checkout.store');
+        });
+
+        // Rückgabe per Scan (am Kiosk der einzige Weg, siehe ReturnScans)
+        Route::middleware('can:loans.return')->group(function () {
+            Route::get('/loans/return', [LoanReturnController::class, 'create'])->name('loans.return-scan');
+            Route::post('/loans/return', [LoanReturnController::class, 'store'])->name('loans.return-scan.store');
+            Route::post('/loans/return/scan', [LoanReturnController::class, 'scan'])->middleware('throttle:search')->name('loans.return-scan.lookup');
+        });
+
+        Route::get('/loans/history', [DeviceLoanController::class, 'history'])->middleware('not-kiosk')->name('loans.history');
+        Route::post('/devices/{device}/loans', [DeviceLoanController::class, 'store'])->middleware('can:loans.create')->name('loans.store');
+        Route::post('/loans/{loan}/return', [DeviceLoanController::class, 'return'])->middleware('can:loans.return')->name('loans.return');
+        Route::post('/loans/{loan}/extend', [DeviceLoanController::class, 'extend'])->middleware('can:loans.extend')->name('loans.extend');
+        Route::post('/loans/{loan}/resolve', [DeviceLoanController::class, 'resolveIssues'])->middleware('can:loans.resolve')->name('loans.resolve');
+
+        // Vormerkungen
+        Route::middleware('can:reservations.create')->group(function () {
+            Route::get('/devices/{device}/reserve', [DeviceReservationController::class, 'create'])->name('reservations.create');
+            Route::post('/devices/{device}/reserve', [DeviceReservationController::class, 'store'])->name('reservations.store');
+        });
+        Route::delete('/reservations/{reservation}', [DeviceReservationController::class, 'destroy'])->name('reservations.destroy');
+        Route::post('/reservations/{reservation}/convert', [DeviceReservationController::class, 'convert'])->name('reservations.convert');
+
+        // Kategorien
+        Route::resource('categories', CategoryController::class)->except(['show'])->middleware('can:categories.manage');
     });
-    Route::get('/devices', [DeviceController::class, 'index'])->name('devices.index');
-    Route::get('/devices/{device}', [DeviceController::class, 'show'])->name('devices.show');
-    Route::get('/devices/{device}/qr/{unit?}', [LabelController::class, 'qr'])->whereNumber('unit')->name('devices.qr');
-
-    // Ausleihen
-    Route::get('/loans', [DeviceLoanController::class, 'index'])->name('loans.index');
-
-    // Ausleihe per Scan – auch mehrere Geräte/Exemplare mit einer Eingabe
-    Route::middleware('can:loans.create')->group(function () {
-        Route::get('/loans/checkout', [LoanCheckoutController::class, 'create'])->name('loans.checkout');
-        Route::post('/loans/checkout', [LoanCheckoutController::class, 'store'])->name('loans.checkout.store');
-    });
-
-    // Rückgabe per Scan (am Kiosk der einzige Weg, siehe ReturnScans)
-    Route::middleware('can:loans.return')->group(function () {
-        Route::get('/loans/return', [LoanReturnController::class, 'create'])->name('loans.return-scan');
-        Route::post('/loans/return', [LoanReturnController::class, 'store'])->name('loans.return-scan.store');
-        Route::post('/loans/return/scan', [LoanReturnController::class, 'scan'])->middleware('throttle:search')->name('loans.return-scan.lookup');
-    });
-
-    Route::get('/loans/history', [DeviceLoanController::class, 'history'])->middleware('not-kiosk')->name('loans.history');
-    Route::post('/devices/{device}/loans', [DeviceLoanController::class, 'store'])->middleware('can:loans.create')->name('loans.store');
-    Route::post('/loans/{loan}/return', [DeviceLoanController::class, 'return'])->middleware('can:loans.return')->name('loans.return');
-    Route::post('/loans/{loan}/extend', [DeviceLoanController::class, 'extend'])->middleware('can:loans.extend')->name('loans.extend');
-    Route::post('/loans/{loan}/resolve', [DeviceLoanController::class, 'resolveIssues'])->middleware('can:loans.resolve')->name('loans.resolve');
-
-    // Vormerkungen
-    Route::middleware('can:reservations.create')->group(function () {
-        Route::get('/devices/{device}/reserve', [DeviceReservationController::class, 'create'])->name('reservations.create');
-        Route::post('/devices/{device}/reserve', [DeviceReservationController::class, 'store'])->name('reservations.store');
-    });
-    Route::delete('/reservations/{reservation}', [DeviceReservationController::class, 'destroy'])->name('reservations.destroy');
-    Route::post('/reservations/{reservation}/convert', [DeviceReservationController::class, 'convert'])->name('reservations.convert');
-
-    // Kategorien
-    Route::resource('categories', CategoryController::class)->except(['show'])->middleware('can:categories.manage');
 
     // Räume & Raumbuchungen
     Route::get('/rooms', [RoomController::class, 'index'])->name('rooms.index');
@@ -110,6 +113,8 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         Route::delete('/rooms/{room}', [RoomController::class, 'destroy'])->name('rooms.destroy');
     });
     Route::middleware('can:rooms.book')->group(function () {
+        // „Neue Buchung“ ohne vorher einen Raum zu wählen (im Formular wechselbar)
+        Route::get('/bookings/new', [RoomBookingController::class, 'start'])->name('bookings.new');
         Route::get('/rooms/{room}/book', [RoomBookingController::class, 'create'])->name('bookings.create');
         Route::post('/rooms/{room}/book', [RoomBookingController::class, 'store'])->name('bookings.store');
     });

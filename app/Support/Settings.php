@@ -98,7 +98,7 @@ class Settings
 
     /**
      * Darf das Recht dieser Rolle überhaupt gegeben werden? Admin-Rechte nie,
-     * der Kiosk-Rolle nur ausdrücklich freigegebene.
+     * der Kiosk-Rolle nur ausdrücklich freigegebene, der Raumplanung keine Geräterechte.
      */
     public static function assignable(string $role, mixed $permission): bool
     {
@@ -106,6 +106,7 @@ class Settings
 
         return $entry !== null
             && empty($entry['admin_only'])
-            && ($role !== 'kiosk' || ! empty($entry['kiosk']));
+            && ($role !== 'kiosk' || ! empty($entry['kiosk']))
+            && ($role !== 'raumplanung' || empty($entry['devices']));
     }
 }

@@ -100,6 +100,9 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
+        // Geräte, Ausleihen, Scanner & Co. – für die Raumplanung komplett ausgeblendet
+        Gate::define('devices.view', fn (User $user) => $user->usesDevices());
+
         // Verlängern und Zubehör-Probleme abschließen gehören zur Rücknahme –
         // aber nicht am gemeinsamen Kiosk-Tablet.
         Gate::define('loans.extend', fn (User $user) => ! $user->isKiosk() && $user->can('loans.return'));

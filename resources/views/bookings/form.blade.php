@@ -23,7 +23,7 @@
                     @foreach ($rooms as $r)
                         <label class="flex cursor-pointer flex-col rounded-xl border border-line bg-surface px-3 py-2.5 transition has-checked:border-accent has-checked:bg-accent-soft has-focus-visible:ring-2 has-focus-visible:ring-accent">
                             <input type="radio" name="room_id" value="{{ $r->id }}" class="sr-only" data-name="{{ $r->name }}" @checked($roomId === $r->id) @change="check">
-                            <span class="font-medium">{{ $r->name }}</span>
+                            <span class="flex items-center gap-2 font-medium"><span class="cal-dot cal-dot-filled {{ $r->colorClass() }}" aria-hidden="true"></span>{{ $r->name }}</span>
                             <span class="text-xs text-muted">{{ $r->location }}</span>
                         </label>
                     @endforeach
@@ -104,7 +104,7 @@
 
             <div class="flex justify-end gap-2 pt-2">
                 <a href="{{ route('bookings.index') }}" class="btn btn-secondary">{{ __('Abbrechen') }}</a>
-                <button class="btn btn-primary" :disabled="hasConflict"><x-icon name="check"/>{{ $booking->exists ? __('Speichern') : __('Buchen') }}</button>
+                <button class="btn btn-primary" :disabled="blocked"><x-icon name="check"/>{{ $booking->exists ? __('Speichern') : __('Buchen') }}</button>
             </div>
         </form>
 
@@ -120,21 +120,21 @@
                     </template>
                 </div>
                 <template x-for="row in rows" :key="row.id">
-                    <div>
+                    <div :class="row.color">
                         <div class="flex items-center gap-2">
                             <p class="w-18 shrink-0 truncate text-sm" :class="row.selected ? 'font-semibold' : 'text-muted'" x-text="row.name"></p>
                             <div class="relative h-7 flex-1 overflow-hidden rounded-md bg-surface-2">
                                 <template x-for="(bar, index) in row.bars" :key="index">
-                                    <div class="absolute inset-y-0 rounded-sm bg-blue-600/70" :style="bar.style" :title="bar.title"></div>
+                                    <div class="room-bar absolute inset-y-0 rounded-sm" :style="bar.style" :title="bar.title"></div>
                                 </template>
-                                <div x-show="row.selected && hasSelection" class="absolute inset-y-0 rounded-sm border-2" :class="hasConflict ? 'border-danger bg-danger/30' : 'border-accent bg-accent/25'" :style="selectionStyle"></div>
+                                <div class="absolute inset-y-0 rounded-sm border-2" :class="row.selectionClass" :style="selectionStyle" data-selection></div>
                             </div>
                         </div>
                         <ul class="mt-1 ml-20 space-y-0.5 text-xs text-muted">
                             <template x-for="(bar, index) in row.bars" :key="index">
                                 <li><span class="tabular-nums" x-text="bar.time"></span> · <span x-text="bar.label"></span></li>
                             </template>
-                            <li x-show="row.bars.length === 0">{{ __('frei') }}</li>
+                            <li :class="row.freeClass">{{ __('frei') }}</li>
                         </ul>
                     </div>
                 </template>

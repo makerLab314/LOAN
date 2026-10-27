@@ -17,18 +17,19 @@ return [
      * Rechtekatalog. "admin_only" = nicht an andere Rollen vergebbar
      * (verhindert, dass man sich aussperrt). "kiosk" = darf der Kiosk-Rolle
      * gegeben werden (gemeinsames Tablet ohne persönliche Anmeldung).
+     * "devices" = gehört zur Geräteverwaltung – nie für die Raumplanung.
      */
     'permissions' => [
-        'loans.create' => ['group' => 'Ausleihe', 'label' => 'Geräte ausleihen & Vormerkungen umwandeln', 'kiosk' => true],
-        'loans.return' => ['group' => 'Ausleihe', 'label' => 'Rücknahme, Teilrückgabe & Verlängerung', 'kiosk' => true],
-        'reservations.create' => ['group' => 'Ausleihe', 'label' => 'Geräte vormerken', 'kiosk' => true],
-        'reservations.manage_others' => ['group' => 'Ausleihe', 'label' => 'Vormerkungen anderer widerrufen'],
+        'loans.create' => ['group' => 'Ausleihe', 'label' => 'Geräte ausleihen & Vormerkungen umwandeln', 'kiosk' => true, 'devices' => true],
+        'loans.return' => ['group' => 'Ausleihe', 'label' => 'Rücknahme, Teilrückgabe & Verlängerung', 'kiosk' => true, 'devices' => true],
+        'reservations.create' => ['group' => 'Ausleihe', 'label' => 'Geräte vormerken', 'kiosk' => true, 'devices' => true],
+        'reservations.manage_others' => ['group' => 'Ausleihe', 'label' => 'Vormerkungen anderer widerrufen', 'devices' => true],
         'rooms.book' => ['group' => 'Räume', 'label' => 'Räume buchen', 'kiosk' => true],
         'room_bookings.manage_others' => ['group' => 'Räume', 'label' => 'Raumbuchungen anderer bearbeiten & löschen'],
-        'devices.manage' => ['group' => 'Stammdaten', 'label' => 'Geräte anlegen, bearbeiten & löschen'],
-        'categories.manage' => ['group' => 'Stammdaten', 'label' => 'Kategorien verwalten'],
+        'devices.manage' => ['group' => 'Stammdaten', 'label' => 'Geräte anlegen, bearbeiten & löschen', 'devices' => true],
+        'categories.manage' => ['group' => 'Stammdaten', 'label' => 'Kategorien verwalten', 'devices' => true],
         'rooms.manage' => ['group' => 'Stammdaten', 'label' => 'Räume verwalten'],
-        'labels.print' => ['group' => 'Stammdaten', 'label' => 'Etiketten drucken'],
+        'labels.print' => ['group' => 'Stammdaten', 'label' => 'Etiketten drucken', 'devices' => true],
         'audit.view' => ['group' => 'Verwaltung', 'label' => 'Protokoll einsehen'],
         'users.manage' => ['group' => 'Verwaltung', 'label' => 'Nutzer verwalten', 'admin_only' => true],
         'settings.manage' => ['group' => 'Verwaltung', 'label' => 'Einstellungen ändern', 'admin_only' => true],
@@ -37,6 +38,8 @@ return [
     'roles' => [
         'administration' => 'Administration',
         'moderation' => 'Moderation',
+        // Nur Räume, Buchungen und Kalender – Geräte und Ausleihe sind ausgeblendet
+        'raumplanung' => 'Raumplanung',
         'kiosk' => 'Kiosk',
     ],
 
@@ -91,6 +94,11 @@ return [
             'reservations.create',
             'rooms.book',
             'labels.print',
+        ],
+        // Raumplanung: Rechte mit "devices" => true sind nicht vergebbar
+        'permissions.raumplanung' => [
+            'rooms.book',
+            'room_bookings.manage_others',
         ],
         // Kiosk: nur Rechte mit "kiosk" => true sind überhaupt vergebbar
         'permissions.kiosk' => [

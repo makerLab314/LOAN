@@ -589,5 +589,21 @@
     "Kein anderer Saal ist in diesem Zeitraum frei.": "No other room is free during this time.",
     "Wird geladen …": "Loading …",
     "Der Raum ist in diesem Zeitraum bereits gebucht: :booking.": "The room is already booked during this time: :booking.",
-    "Der Raum ist in diesem Zeitraum :count-mal belegt: :list.": "The room is booked :count times during this time: :list."
+    "Der Raum ist in diesem Zeitraum :count-mal belegt: :list.": "The room is booked :count times during this time: :list.",
+    "Neue Buchung": "New booking",
+    "Saal wählen, Zeitraum festlegen, fertig.": "Pick a room, set the time, done.",
+    "Alle Buchungen im Überblick": "All bookings at a glance",
+    "Heute ist nichts gebucht": "Nothing booked today",
+    "Die nächsten 7 Tage": "Next 7 days",
+    "Meine Buchungen": "My bookings",
+    "Noch keine eigenen Buchungen": "No bookings of your own yet",
+    "Alle Buchungen": "All bookings",
+    "Es gibt noch keine Räume.": "There are no rooms yet.",
+    "Raum, Anlass oder Person…": "Room, occasion or person…",
+    "Tippe einen Raum, einen Anlass oder eine Ansprechperson.": "Type a room, an occasion or a contact person.",
+    "Suchen…": "Search…",
+    "Alle Raumbuchungen auf einen Blick.": "All room bookings at a glance.",
+    "Administration und Moderation: alles – Geräte, Ausleihe und Räume (Rechte je Rolle unter Einstellungen).": "Administration and moderation: everything – devices, loans and rooms (permissions per role under Settings).",
+    "Raumplanung: nur Räume, Buchungen und Kalender. Geräte, Ausleihe und Scanner sind ausgeblendet.": "Room planning: only rooms, bookings and the calendar. Devices, loans and the scanner are hidden.",
+    "Raumplanung sieht nur Räume, Buchungen und Kalender – Geräterechte lassen sich dieser Rolle nicht geben.": "Room planning only sees rooms, bookings and the calendar – device permissions cannot be given to this role."
 }

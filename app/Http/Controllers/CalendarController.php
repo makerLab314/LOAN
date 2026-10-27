@@ -28,7 +28,8 @@ class CalendarController extends Controller
             'end' => ['required', 'date', 'after:start'],
             'types' => ['nullable', 'array'],
             'types.*' => ['in:rooms,reservations,loans'],
-            'room' => ['nullable', 'integer'],
+            'rooms' => ['nullable', 'array'],
+            'rooms.*' => ['integer'],
         ]);
 
         $from = Carbon::parse($data['start']);
@@ -36,12 +37,16 @@ class CalendarController extends Controller
         abort_if($from->diffInDays($to) > 120, 422);
 
         $types = $data['types'] ?? ['rooms', 'reservations', 'loans'];
+        // Raumplanung sieht nur Raumbuchungen
+        if (! $request->user()->usesDevices()) {
+            $types = array_values(array_intersect($types, ['rooms']));
+        }
         $events = [];
 
         if (in_array('rooms', $types, true)) {
             RoomBooking::query()->with(['room', 'user'])
                 ->overlapping($from, $to)
-                ->when($data['room'] ?? null, fn ($q, $room) => $q->where('room_id', $room))
+                ->when($data['rooms'] ?? null, fn ($q, $rooms) => $q->whereIn('room_id', $rooms))
                 ->get()
                 ->each(function (RoomBooking $b) use (&$events, $request) {
                     $allDay = $b->isAllDay();
@@ -52,8 +57,12 @@ class CalendarController extends Controller
                         'start' => $allDay ? $b->start_at->toDateString() : $b->start_at->toIso8601String(),
                         'end' => $allDay ? $b->end_at->copy()->addDay()->toDateString() : $b->end_at->toIso8601String(),
                         'allDay' => $allDay,
-                        'classNames' => ['ev-room'],
+                        'classNames' => ['ev-room', $b->room?->colorClass() ?? 'room-c0'],
                         'extendedProps' => [
+                            // Für die eigene Darstellung im Kalender: Saal, Anlass, Ansprechperson getrennt
+                            'room' => $b->room?->name,
+                            'headline' => $b->purpose,
+                            'contact' => $b->displayName(),
                             'kind' => __('Raumbuchung'),
                             'detail' => __('Ansprechperson: :name', ['name' => $b->displayName()])
                                 .($by ? ' · '.__('eingetragen von :name', ['name' => $by]) : ''),

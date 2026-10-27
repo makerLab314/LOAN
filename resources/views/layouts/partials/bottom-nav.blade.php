@@ -1,9 +1,16 @@
 @php
-    $items = [
+    $items = Gate::allows('devices.view') ? [
         ['route' => 'home', 'match' => 'home', 'icon' => 'home', 'label' => __('Start')],
         ['route' => 'devices.index', 'match' => 'devices.*', 'icon' => 'devices', 'label' => __('Geräte')],
         ['route' => 'scan', 'match' => 'scan', 'icon' => 'scan', 'label' => __('Scannen'), 'primary' => true],
         ['route' => 'loans.index', 'match' => 'loans.*', 'icon' => 'loans', 'label' => __('Ausleihen')],
+        ['route' => 'calendar', 'match' => 'calendar', 'icon' => 'calendar', 'label' => __('Kalender')],
+    ] : [
+        // Raumplanung: Buchen statt Scannen in der Mitte
+        ['route' => 'home', 'match' => 'home', 'icon' => 'home', 'label' => __('Start')],
+        ['route' => 'rooms.index', 'match' => 'rooms.*', 'icon' => 'door', 'label' => __('Räume')],
+        ['route' => 'bookings.new', 'match' => 'bookings.create', 'icon' => 'calendar-plus', 'label' => __('Buchen'), 'primary' => true],
+        ['route' => 'bookings.index', 'match' => ['bookings.index', 'bookings.archived', 'bookings.edit'], 'icon' => 'bookmark', 'label' => __('Buchungen')],
         ['route' => 'calendar', 'match' => 'calendar', 'icon' => 'calendar', 'label' => __('Kalender')],
     ];
 @endphp

@@ -245,7 +245,7 @@
     --fc-page-bg-color: var(--surface);
     --fc-neutral-bg-color: var(--surface-2);
     --fc-list-event-hover-bg-color: var(--surface-2);
-    --fc-today-bg-color: color-mix(in oklab, var(--accent) 8%, transparent);
+    --fc-today-bg-color: color-mix(in oklab, var(--accent) 4%, transparent);
     --fc-button-bg-color: var(--surface);
     --fc-button-border-color: var(--border);
     --fc-button-text-color: var(--fg);
@@ -269,6 +269,30 @@
 .ev-reservation { --ev: var(--ev-reservation); }
 .ev-loan { --ev: var(--accent); }
 .ev-overdue { --ev: var(--danger); }
+
+/* Eine Farbe je Saal (Room::colorClass) – nach .ev-room, damit sie gewinnt */
+:root {
+    --room-0: #2563eb;
+    --room-1: #0d9488;
+    --room-2: #db2777;
+    --room-3: #ea580c;
+    --room-4: #0891b2;
+    --room-5: #4f46e5;
+}
+.dark {
+    --room-0: #60a5fa;
+    --room-1: #2dd4bf;
+    --room-2: #f472b6;
+    --room-3: #fb923c;
+    --room-4: #22d3ee;
+    --room-5: #818cf8;
+}
+.room-c0 { --ev: var(--room-0); }
+.room-c1 { --ev: var(--room-1); }
+.room-c2 { --ev: var(--room-2); }
+.room-c3 { --ev: var(--room-3); }
+.room-c4 { --ev: var(--room-4); }
+.room-c5 { --ev: var(--room-5); }
 
 /* Werkzeugleiste */
 .fc .fc-toolbar.fc-header-toolbar {
@@ -359,8 +383,50 @@
     @apply font-semibold;
     color: var(--ev, var(--accent));
 }
-.fc .ev-overdue .fc-event-title {
+.fc .ev-overdue .fc-event-title,
+.fc .ev-overdue .ev-title {
     @apply font-semibold text-danger;
+}
+.fc .fc-v-event {
+    @apply overflow-hidden rounded-lg;
+    /* Trennlinie zwischen nebeneinanderliegenden Terminen */
+    box-shadow: 0 0 0 1px var(--surface);
+}
+.fc .fc-v-event .fc-event-main {
+    @apply px-2 py-1;
+}
+
+/* Eigener Termininhalt (calendar.js → eventContent) */
+.fc .ev-line {
+    @apply flex min-w-0 items-baseline gap-1.5 overflow-hidden;
+}
+.fc .ev-time {
+    @apply shrink-0 font-semibold tabular-nums;
+    color: var(--ev, var(--accent));
+}
+.fc .ev-line .ev-title {
+    @apply min-w-0 truncate;
+}
+.fc .ev-meta {
+    @apply truncate text-[11px] font-semibold tabular-nums;
+    color: var(--ev, var(--accent));
+}
+.fc .fc-v-event .ev-title {
+    @apply line-clamp-2 leading-snug font-semibold;
+}
+.fc .ev-sub {
+    @apply mt-0.5 truncate text-[11px] text-muted;
+}
+/* Je nach Höhe des Termins weniger Zeilen: erst die Ansprechperson, dann der zweite Titelzeile weg */
+.fc .fc-v-event .fc-event-main {
+    container-type: size;
+}
+@container (max-height: 58px) {
+    .fc .ev-sub { display: none; }
+    .fc .fc-v-event .ev-title { -webkit-line-clamp: 1; }
+}
+@container (max-height: 34px) {
+    .fc .ev-meta { display: none; }
 }
 .dark .fc .fc-h-event,
 .dark .fc .fc-v-event {
@@ -384,7 +450,39 @@
 
 /* Wochen- und Tagesansicht */
 .fc .fc-timegrid-slot {
-    @apply h-10;
+    @apply h-8;
+}
+.fc .fc-timegrid-slot-label {
+    @apply align-top;
+}
+.fc .fc-timegrid-slot-label-cushion {
+    @apply -mt-2 bg-surface px-2;
+}
+.fc .fc-timegrid-slot-label.fc-timegrid-slot-minor .fc-timegrid-slot-label-cushion {
+    @apply hidden;
+}
+.fc .fc-timegrid-axis-cushion {
+    @apply px-1 text-[10px] whitespace-normal;
+}
+
+/* Kopfzeile Woche/Tag: Wochentag klein, Datum groß, heute hervorgehoben */
+.fc .cal-head {
+    @apply flex flex-col items-center gap-0.5 py-1 normal-case;
+}
+.fc .cal-head-day {
+    @apply text-[11px] font-semibold tracking-wider text-muted uppercase;
+}
+.fc .cal-head-date {
+    @apply grid size-8 place-items-center rounded-full text-lg font-semibold tracking-normal text-fg tabular-nums;
+}
+.fc .cal-head.is-today .cal-head-day {
+    @apply text-accent;
+}
+.fc .cal-head.is-today .cal-head-date {
+    @apply bg-accent text-accent-fg;
+}
+.fc .fc-timegrid-col.fc-day-today {
+    background: color-mix(in oklab, var(--accent) 3%, transparent);
 }
 .fc .fc-timegrid-slot-minor {
     border-top-style: dotted;
@@ -445,6 +543,14 @@
 }
 .cal-bar {
     background: var(--ev, var(--accent));
+}
+/* Saal-Filter ist wirkungslos, solange Raumbuchungen ausgeblendet sind */
+[data-calendar-filters]:has(input[value='rooms']:not(:checked)) [data-room-filter] {
+    @apply pointer-events-none opacity-40;
+}
+/* Belegungsleiste im Buchungsformular in der Farbe des Saals */
+.room-bar {
+    background: color-mix(in oklab, var(--ev, var(--accent)) 75%, transparent);
 }
 .cal-kind {
     @apply inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-semibold tracking-wide uppercase;

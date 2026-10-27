@@ -119,6 +119,8 @@ export function bookingForm() {
         },
         get hasConflict() { return this.conflicts.length > 0; },
         get isFree() { return this.checked && !this.problem && !this.hasConflict; },
+        /** Konflikt oder Hinweis (Vergangenheit, Höchstdauer): der Server würde ablehnen */
+        get blocked() { return this.hasConflict || Boolean(this.problem); },
         isPreset(value) { return this.activePreset === value; },
 
         form() { return this.$root.querySelector('form'); },
@@ -170,9 +172,13 @@ export function bookingForm() {
                 end.setHours(23, 59, 0, 0);
                 this.write('end', end);
             } else {
-                // Von „ganztägig“ zurück auf eine Dauer: nicht um Mitternacht beginnen
+                // Von „ganztägig“ zurück auf eine Dauer: nicht um Mitternacht beginnen,
+                // sondern um 8 Uhr – heute frühestens zur nächsten vollen Stunde
                 if (this.activePreset === 'day') {
                     start.setHours(8, 0, 0, 0);
+                    const next = new Date();
+                    next.setHours(next.getHours() + 1, 0, 0, 0);
+                    if (start < next && start.toDateString() === new Date().toDateString()) start.setTime(next.getTime());
                     this.write('start', start);
                 }
                 this.write('end', new Date(start.getTime() + Number(value) * 60000));
@@ -240,10 +246,18 @@ export function bookingForm() {
                 this.ticks.push({ label: pad(Math.min(m / 60, 24)), style: `left:${((m - from) / span) * 100}%` });
             }
 
+            this.hasSelection = Boolean(selection && selection.to > selection.from);
+            this.selectionStyle = this.hasSelection ? place(selection.from, selection.to) : '';
+            // Sichtbarkeit als fertige Klasse statt x-show: In wiederverwendeten x-for-Zeilen
+            // blendet x-show einmal Gezeigtes nicht zuverlässig wieder aus
+            const selectionClass = this.hasConflict ? 'border-danger bg-danger/30' : 'border-accent bg-accent/25';
             this.rows = data.day.rooms.map((r) => ({
                 id: r.id,
                 name: r.name,
+                color: r.color,
                 selected: r.id === roomId,
+                selectionClass: r.id === roomId && this.hasSelection ? selectionClass : 'hidden',
+                freeClass: r.bookings.length === 0 ? '' : 'hidden',
                 bars: r.bookings.map((b) => ({
                     style: place(b.from, b.to),
                     time: b.time,
@@ -251,8 +265,6 @@ export function bookingForm() {
                     title: `${b.time} · ${b.title}`,
                 })),
             }));
-            this.hasSelection = Boolean(selection && selection.to > selection.from);
-            this.selectionStyle = this.hasSelection ? place(selection.from, selection.to) : '';
         },
     };
 }

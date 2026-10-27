@@ -29,10 +29,13 @@ class User extends Authenticatable
 
     public const ROLE_MODERATOR = 'moderation';
 
+    /** Nur Räume, Buchungen und Kalender – für Leute, die mit der Technik nichts zu tun haben */
+    public const ROLE_ROOMS = 'raumplanung';
+
     /** Gemeinsames Konto für ein fest montiertes Tablet: dauerhaft angemeldet, stark eingeschränkt */
     public const ROLE_KIOSK = 'kiosk';
 
-    public const ROLES = [self::ROLE_ADMIN, self::ROLE_MODERATOR, self::ROLE_KIOSK];
+    public const ROLES = [self::ROLE_ADMIN, self::ROLE_MODERATOR, self::ROLE_ROOMS, self::ROLE_KIOSK];
 
     public const THEMES = ['system', 'light', 'dark'];
 
@@ -69,6 +72,12 @@ class User extends Authenticatable
     public function isKiosk(): bool
     {
         return $this->role === self::ROLE_KIOSK;
+    }
+
+    /** Sieht Geräte, Ausleihen und Scanner? (alle außer der Raumplanung) */
+    public function usesDevices(): bool
+    {
+        return $this->role !== self::ROLE_ROOMS;
     }
 
     /** @return HasMany<RoomBooking, $this> */

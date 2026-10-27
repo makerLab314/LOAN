@@ -25,7 +25,11 @@
                         <input type="hidden" name="role" value="{{ $user->role }}">
                         <p class="hint">{{ __('Die eigene Rolle kann nicht geändert werden.') }}</p>
                     @else
-                        <p class="hint">{{ __('Kiosk: für ein fest montiertes Tablet. Bleibt dauerhaft angemeldet, Abmelden nur mit Passwort. Ein Admin kann es hier mit „Alle abmelden“ oder einem neuen Passwort abmelden.') }}</p>
+                        <ul class="hint list-disc space-y-0.5 pl-4">
+                            <li>{{ __('Administration und Moderation: alles – Geräte, Ausleihe und Räume (Rechte je Rolle unter Einstellungen).') }}</li>
+                            <li>{{ __('Raumplanung: nur Räume, Buchungen und Kalender. Geräte, Ausleihe und Scanner sind ausgeblendet.') }}</li>
+                            <li>{{ __('Kiosk: für ein fest montiertes Tablet. Bleibt dauerhaft angemeldet, Abmelden nur mit Passwort. Ein Admin kann es hier mit „Alle abmelden“ oder einem neuen Passwort abmelden.') }}</li>
+                        </ul>
                     @endif
                 </x-field>
                 <x-field :label="__('Sprache')" name="locale">

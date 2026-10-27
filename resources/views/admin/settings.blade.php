@@ -117,6 +117,7 @@
 
                 @if ($section === 'permissions')
                     <p class="text-sm text-muted">{{ __('Administration hat immer alle Rechte. Nutzerverwaltung und Einstellungen bleiben Admins vorbehalten.') }}</p>
+                    <p class="text-sm text-muted">{{ __('Raumplanung sieht nur Räume, Buchungen und Kalender – Geräterechte lassen sich dieser Rolle nicht geben.') }}</p>
                     <p class="text-sm text-muted">{{ __('Kiosk ist für ein gemeinsames Tablet gedacht: Es bleibt angemeldet und kann höchstens ausleihen, zurückgeben, vormerken und Räume buchen – nie löschen, bearbeiten oder Vormerkungen und Buchungen widerrufen.') }}</p>
                     <div class="overflow-x-auto">
                         <table class="table">

@@ -2,6 +2,8 @@
 @section('title', __('Kalender'))
 
 @php
+    // Raumplanung: nur Raumbuchungen, deshalb ohne Auswahl der Arten
+    $devices = Gate::allows('devices.view');
     $types = [
         ['value' => 'rooms', 'class' => 'ev-room', 'label' => __('Raumbuchungen')],
         ['value' => 'reservations', 'class' => 'ev-reservation', 'label' => __('Vormerkungen')],
@@ -11,27 +13,39 @@
 
 @section('content')
     <x-page-header :title="__('Kalender')">
-        <x-slot:subtitle>{{ __('Räume, Vormerkungen und Ausleihen auf einen Blick.') }}</x-slot:subtitle>
+        <x-slot:subtitle>{{ $devices ? __('Räume, Vormerkungen und Ausleihen auf einen Blick.') : __('Alle Raumbuchungen auf einen Blick.') }}</x-slot:subtitle>
+        @can('rooms.book')
+            <x-slot:actions>
+                <a href="{{ route('bookings.new') }}" class="btn btn-primary"><x-icon name="calendar-plus"/>{{ __('Neue Buchung') }}</a>
+            </x-slot:actions>
+        @endcan
     </x-page-header>
 
-    <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center" data-calendar-filters>
-        <div class="flex flex-wrap gap-2" role="group" aria-label="{{ __('Anzeigen') }}">
-            @foreach ($types as $type)
-                <label class="cal-chip {{ $type['class'] }}">
-                    <input type="checkbox" name="types[]" value="{{ $type['value'] }}" class="sr-only" checked>
-                    <span class="cal-dot" aria-hidden="true"></span>{{ $type['label'] }}
-                </label>
-            @endforeach
-            <span class="cal-chip ev-overdue pointer-events-none border-dashed" title="{{ __('Teil der Ausleihen') }}">
-                <span class="cal-dot cal-dot-filled" aria-hidden="true"></span>{{ __('Überfällig') }}
-            </span>
-        </div>
-        <select name="room" class="input sm:ml-auto sm:w-56" aria-label="{{ __('Raum') }}">
-            <option value="">{{ __('Alle Räume') }}</option>
-            @foreach ($rooms as $room)
-                <option value="{{ $room->id }}">{{ $room->name }}</option>
-            @endforeach
-        </select>
+    <div class="mb-4 flex flex-col gap-3 lg:flex-row lg:items-center" data-calendar-filters>
+        @if ($devices)
+            <div class="flex flex-wrap gap-2" role="group" aria-label="{{ __('Anzeigen') }}">
+                @foreach ($types as $type)
+                    <label class="cal-chip {{ $type['class'] }}">
+                        <input type="checkbox" name="types[]" value="{{ $type['value'] }}" class="sr-only" checked>
+                        <span class="cal-dot" aria-hidden="true"></span>{{ $type['label'] }}
+                    </label>
+                @endforeach
+                <span class="cal-chip ev-overdue pointer-events-none border-dashed" title="{{ __('Teil der Ausleihen') }}">
+                    <span class="cal-dot cal-dot-filled" aria-hidden="true"></span>{{ __('Überfällig') }}
+                </span>
+            </div>
+        @endif
+        @if ($rooms->count() > 1)
+            {{-- Säle in ihrer Kalenderfarbe; alle an = kein Filter --}}
+            <div @class(['flex flex-wrap items-center gap-2', 'lg:ml-auto lg:border-l lg:border-line lg:pl-4' => $devices]) role="group" aria-label="{{ __('Räume') }}" data-room-filter>
+                @foreach ($rooms as $room)
+                    <label class="cal-chip {{ $room->colorClass() }}">
+                        <input type="checkbox" name="rooms[]" value="{{ $room->id }}" class="sr-only" checked>
+                        <span class="cal-dot" aria-hidden="true"></span>{{ $room->name }}
+                    </label>
+                @endforeach
+            </div>
+        @endif
     </div>
 
     <div class="card p-3 sm:p-5">

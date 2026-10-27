@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Device;
 use App\Models\DeviceLoan;
 use App\Models\DeviceReservation;
+use App\Models\Room;
 use App\Models\RoomBooking;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -13,6 +14,10 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request): View
     {
+        if (! $request->user()->usesDevices()) {
+            return $this->rooms($request);
+        }
+
         $activeLoans = DeviceLoan::query()->active()->with('device')->orderBy('loan_end_date')->get();
 
         $overdue = $activeLoans->filter->isOverdue()->values();
@@ -54,5 +59,35 @@ class DashboardController extends Controller
         return view('dashboard', compact(
             'overdue', 'dueToday', 'dueSoon', 'issues', 'reservations', 'bookings', 'stats', 'myReservations',
         ));
+    }
+
+    /**
+     * Startseite der Raumplanung: Buchen und Kalender, dazu die Belegung – keine Geräte.
+     */
+    private function rooms(Request $request): View
+    {
+        $rooms = Room::query()
+            ->with(['bookings' => fn ($q) => $q->where('start_at', '<=', now())->where('end_at', '>', now())->with('user')])
+            ->orderBy('name')
+            ->get();
+
+        $today = RoomBooking::query()->with(['room', 'user'])
+            ->overlapping(today(), today()->addDay())
+            ->orderBy('start_at')
+            ->get();
+
+        $upcoming = RoomBooking::query()->with(['room', 'user'])
+            ->where('start_at', '>=', today()->addDay())
+            ->where('start_at', '<', today()->addDays(8))
+            ->orderBy('start_at')
+            ->limit(20)
+            ->get()
+            ->groupBy(fn (RoomBooking $b) => $b->start_at->toDateString());
+
+        $mine = RoomBooking::query()->upcoming()->with('room')
+            ->where('user_id', $request->user()->id)
+            ->orderBy('start_at')->limit(5)->get();
+
+        return view('dashboard-rooms', compact('rooms', 'today', 'upcoming', 'mine'));
     }
 }

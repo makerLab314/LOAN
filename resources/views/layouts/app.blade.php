@@ -45,7 +45,7 @@
                     <button type="button" data-search-open
                             class="ml-auto flex h-9 items-center gap-2 rounded-lg border border-line bg-surface-2/60 px-3 text-sm text-muted transition hover:border-accent/50 lg:ml-0 lg:w-80">
                         <x-icon name="search"/>
-                        <span class="hidden sm:inline">{{ __('Suchen oder ID eingeben…') }}</span>
+                        <span class="hidden sm:inline">{{ Gate::allows('devices.view') ? __('Suchen oder ID eingeben…') : __('Suchen…') }}</span>
                         <span class="kbd ml-auto hidden lg:inline">Strg K</span>
                     </button>
                 @endunless

@@ -43,6 +43,19 @@ class RoomBookingController extends Controller
         return view('bookings.index', compact('rooms', 'bookings', 'roomId', 'archived'));
     }
 
+    /**
+     * „Neue Buchung“: direkt ins Formular mit dem ersten Raum – der Raum lässt sich dort wechseln.
+     */
+    public function start(Request $request): RedirectResponse
+    {
+        $room = Room::orderBy('name')->first();
+        if (! $room) {
+            return redirect()->route('rooms.index')->with('error', __('Es gibt noch keine Räume.'));
+        }
+
+        return redirect()->route('bookings.create', array_filter(['room' => $room->id, 'date' => $request->query('date')]));
+    }
+
     public function create(Request $request, Room $room): View
     {
         return view('bookings.form', [
@@ -162,6 +175,7 @@ class RoomBookingController extends Controller
                 'rooms' => $rooms->map(fn (Room $r) => [
                     'id' => $r->id,
                     'name' => $r->name,
+                    'color' => $r->colorClass(),
                     'bookings' => $dayBookings->get($r->id, collect())->map(fn (RoomBooking $b) => [
                         'from' => $minutes($b->start_at),
                         'to' => $minutes($b->end_at),
