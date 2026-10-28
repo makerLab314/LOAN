@@ -99,6 +99,30 @@ class InventoryTest extends TestCase
         $this->assertSame(400, $tw);
     }
 
+    public function test_uploaded_photos_are_rotated_by_exif_orientation(): void
+    {
+        $this->assertTrue(function_exists('exif_read_data'), 'PHP-Extension exif fehlt');
+        Storage::fake('public');
+        $category = Category::factory()->create();
+
+        // Handyfoto: Pixel quer gespeichert, EXIF-Orientation 6 (= 90° im Uhrzeigersinn drehen)
+        $gd = imagecreatetruecolor(300, 200);
+        ob_start();
+        imagejpeg($gd);
+        $jpeg = ob_get_clean();
+        $tiff = "MM\x00\x2A\x00\x00\x00\x08"."\x00\x01"."\x01\x12\x00\x03\x00\x00\x00\x01\x00\x06\x00\x00"."\x00\x00\x00\x00";
+        $app1 = "\xFF\xE1".pack('n', strlen($tiff) + 8)."Exif\x00\x00".$tiff;
+        $photo = substr($jpeg, 0, 2).$app1.substr($jpeg, 2);
+
+        $this->actingAs($this->admin())->post(route('devices.store'), [
+            'title' => 'Box', 'category_id' => $category->id, 'total_quantity' => 1,
+            'image' => UploadedFile::fake()->createWithContent('foto.jpg', $photo),
+        ])->assertSessionHasNoErrors();
+
+        [$w, $h] = getimagesize(Storage::disk('public')->path(Device::first()->image));
+        $this->assertSame([200, 300], [$w, $h]);
+    }
+
     public function test_non_images_are_rejected(): void
     {
         $category = Category::factory()->create();

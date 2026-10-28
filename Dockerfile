@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libzip-dev libpng-dev libjpeg62-turbo-dev libwebp-dev libfreetype6-dev \
         libicu-dev unzip mariadb-client \
     && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install -j"$(nproc)" pdo_mysql gd zip intl opcache bcmath \
+    # exif: ohne die Extension ignoriert Intervention Image die Ausrichtung von Handyfotos
+    && docker-php-ext-install -j"$(nproc)" pdo_mysql gd exif zip intl opcache bcmath \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY docker/php.ini /usr/local/etc/php/conf.d/zz-loan.ini
