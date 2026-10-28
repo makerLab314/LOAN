@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Device;
+use App\Support\Branding;
 use App\Support\Codes;
 use App\Support\Settings;
 use Illuminate\Http\Request;
@@ -38,20 +39,40 @@ class LabelController extends Controller
         ]);
     }
 
-    public function print(Request $request, Settings $settings): View
+    public function print(Request $request, Settings $settings, Branding $branding): View
     {
         $data = $request->validate([
             'devices' => ['required', 'array', 'min:1', 'max:500'],
             'devices.*' => ['integer'],
             'mode' => ['required', Rule::in(['device', 'units', 'both'])],
-            'format' => ['required', Rule::in(array_keys(config('loan.label_formats')))],
+            'format' => ['required', Rule::in([...array_keys(config('loan.label_formats')), 'custom'])],
             'code_type' => ['required', Rule::in(['qr', 'barcode', 'both', 'text'])],
             'show_title' => ['nullable', 'boolean'],
             'skip' => ['nullable', 'integer', 'min:0', 'max:100'],
             'copies' => ['nullable', 'integer', 'min:1', 'max:10'],
             'note' => ['nullable', 'string', 'max:40'],
+            // Gestaltung
+            'layout' => ['nullable', Rule::in(['row', 'row-reverse', 'column'])],
+            'text_size' => ['nullable', Rule::in(['s', 'm', 'l'])],
+            'code_size' => ['nullable', Rule::in(['s', 'm', 'l'])],
+            'align' => ['nullable', Rule::in(['left', 'center'])],
+            'cut_lines' => ['nullable', 'boolean'],
+            'show_logo' => ['nullable', 'boolean'],
+            'offset_x' => ['nullable', 'numeric', 'between:-10,10'],
+            'offset_y' => ['nullable', 'numeric', 'between:-10,10'],
+            // Eigenes Format
+            'custom_sheet' => ['nullable', 'boolean'],
+            'custom_w' => ['exclude_unless:format,custom', 'required', 'numeric', 'between:10,200'],
+            'custom_h' => ['exclude_unless:format,custom', 'required', 'numeric', 'between:5,280'],
+            'custom_cols' => ['exclude_unless:format,custom', 'nullable', 'integer', 'between:1,10'],
+            'custom_rows' => ['exclude_unless:format,custom', 'nullable', 'integer', 'between:1,40'],
+            'custom_margin_top' => ['exclude_unless:format,custom', 'nullable', 'numeric', 'between:0,60'],
+            'custom_margin_left' => ['exclude_unless:format,custom', 'nullable', 'numeric', 'between:0,60'],
+            'custom_gap_x' => ['exclude_unless:format,custom', 'nullable', 'numeric', 'between:0,20'],
+            'custom_gap_y' => ['exclude_unless:format,custom', 'nullable', 'numeric', 'between:0,20'],
         ]);
         $copies = (int) ($data['copies'] ?? 1);
+        $format = $data['format'] === 'custom' ? $this->customFormat($request, $data) : config('loan.label_formats')[$data['format']];
 
         $devices = Device::whereIn('id', $data['devices'])->orderBy('inventory_number')->get();
 
@@ -92,13 +113,56 @@ class LabelController extends Controller
 
         return view('labels.print', [
             'labels' => $labels,
-            'format' => config('loan.label_formats')[$data['format']],
+            'format' => $format + ['gap_x' => 0, 'gap_y' => 0],
             'codeType' => $data['code_type'],
             'showTitle' => $request->boolean('show_title'),
             'skip' => (int) ($data['skip'] ?? 0),
             'note' => trim((string) ($data['note'] ?? '')),
             'appName' => $settings->get('labels.show_app_name') ? $settings->get('general.app_name') : null,
+            'logo' => $request->boolean('show_logo') ? $branding->logoUrl() : null,
+            'style' => [
+                'layout' => $data['layout'] ?? 'row',
+                'text' => ['s' => 0.85, 'm' => 1.0, 'l' => 1.2][$data['text_size'] ?? 'm'],
+                'code' => ['s' => 0.8, 'm' => 1.0, 'l' => 1.2][$data['code_size'] ?? 'm'],
+                'align' => $data['align'] ?? 'left',
+                'cut_lines' => $request->boolean('cut_lines'),
+                'offset_x' => (float) ($data['offset_x'] ?? 0),
+                'offset_y' => (float) ($data['offset_y'] ?? 0),
+            ],
         ]);
+    }
+
+    /**
+     * Eigenes Format aus dem Formular. Als Bogen (A4) muss es auf die Seite passen.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function customFormat(Request $request, array $data): array
+    {
+        $w = (float) $data['custom_w'];
+        $h = (float) $data['custom_h'];
+
+        if (! $request->boolean('custom_sheet')) {
+            return ['label' => __('Eigenes Format :w × :h mm (Rolle)', ['w' => $w, 'h' => $h]), 'page' => "{$w}mm {$h}mm",
+                'cols' => 1, 'rows' => 1, 'w' => $w, 'h' => $h, 'margin_top' => 0, 'margin_left' => 0];
+        }
+
+        $format = [
+            'label' => __('Eigenes Format :w × :h mm (A4)', ['w' => $w, 'h' => $h]), 'page' => 'A4', 'w' => $w, 'h' => $h,
+            'cols' => (int) ($data['custom_cols'] ?? 1), 'rows' => (int) ($data['custom_rows'] ?? 1),
+            'margin_top' => (float) ($data['custom_margin_top'] ?? 0), 'margin_left' => (float) ($data['custom_margin_left'] ?? 0),
+            'gap_x' => (float) ($data['custom_gap_x'] ?? 0), 'gap_y' => (float) ($data['custom_gap_y'] ?? 0),
+        ];
+        $width = $format['margin_left'] + $format['cols'] * $w + ($format['cols'] - 1) * $format['gap_x'];
+        $height = $format['margin_top'] + $format['rows'] * $h + ($format['rows'] - 1) * $format['gap_y'];
+        if ($width > 210.5 || $height > 297.5) {
+            throw ValidationException::withMessages(['custom_w' => __('Das Format passt nicht auf A4 (:w × :h mm belegt).', [
+                'w' => round($width, 1), 'h' => round($height, 1),
+            ])]);
+        }
+
+        return $format;
     }
 
     /**

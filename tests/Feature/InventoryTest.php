@@ -78,6 +78,32 @@ class InventoryTest extends TestCase
         $this->assertSame(3, substr_count($html, 'Eigentum &lt;b&gt;MakerLab&lt;/b&gt;'));
     }
 
+    public function test_labels_support_gaps_layout_and_custom_formats(): void
+    {
+        $device = Device::factory()->quantity(2)->create(['inventory_number' => 'KAB-0009']);
+        $this->actingAs($this->moderator());
+        $params = ['devices' => [$device->id], 'mode' => 'units', 'code_type' => 'qr'];
+
+        $html = $this->get(route('labels.print', $params + [
+            'format' => 'a4_5x13', 'layout' => 'column', 'text_size' => 'l', 'cut_lines' => 1, 'offset_x' => -1.5,
+        ]))->assertOk()->getContent();
+        $this->assertStringContainsString('column-gap: 2.5mm', $html);
+        $this->assertStringContainsString('flex-direction: column', $html);
+        $this->assertStringContainsString('<body class="cut">', $html);
+        $this->assertStringContainsString('padding: 10.7mm 0 0 3.25mm', $html); // Rand links 4,75 − 1,5
+
+        $html = $this->get(route('labels.print', $params + [
+            'format' => 'custom', 'custom_w' => 40, 'custom_h' => 12,
+        ]))->assertOk()->getContent();
+        $this->assertStringContainsString('size: 40mm 12mm', $html);
+        $this->assertSame(2, substr_count($html, '<div class="qr">'));
+
+        $this->get(route('labels.print', $params + [
+            'format' => 'custom', 'custom_sheet' => 1, 'custom_w' => 80, 'custom_h' => 30, 'custom_cols' => 3, 'custom_rows' => 5,
+        ]))->assertSessionHasErrors('custom_w');
+        $this->get(route('labels.print', $params + ['format' => 'custom']))->assertSessionHasErrors(['custom_w', 'custom_h']);
+    }
+
     public function test_uploaded_images_are_reencoded_without_metadata(): void
     {
         Storage::fake('public');
