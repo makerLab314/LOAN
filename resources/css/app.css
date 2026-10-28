@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+/* Inter selbst gehostet (über Vite gebündelt, CSP font-src 'self') */
+@import '@fontsource-variable/inter';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -15,11 +17,11 @@
     --accent: #d97706;
     --accent-fg: #ffffff;
 
-    --bg: #f6f6f4;
+    --bg: #f3f3f0;
     --surface: #ffffff;
-    --surface-2: #f1f1ef;
-    --border: #e4e4e0;
-    --fg: #1c1c1a;
+    --surface-2: #f0f0ed;
+    --border: #e2e2dd;
+    --fg: #1a1a18;
     --muted: #6b6b66;
 
     --ok: #15803d;
@@ -27,15 +29,25 @@
     --danger: #dc2626;
     --info: #2563eb;
 
+    /* Glas: halbtransparente Flächen mit Lichtkante. Weichzeichnen (backdrop-filter)
+       nur bei wenigen festen Leisten/Dialogen – Karten bleiben ohne Blur, das spart GPU. */
+    --glass: color-mix(in oklab, var(--surface) 78%, transparent);
+    --glass-strong: color-mix(in oklab, var(--surface) 90%, transparent);
+    --glass-border: color-mix(in oklab, var(--fg) 9%, transparent);
+    --glass-edge: rgb(255 255 255 / 0.85);
+    --glass-blur: blur(18px) saturate(1.6);
+    --shadow-card: 0 1px 2px rgb(20 20 15 / 0.04), 0 8px 24px -12px rgb(20 20 15 / 0.12);
+    --shadow-pop: 0 2px 6px rgb(20 20 15 / 0.06), 0 24px 48px -16px rgb(20 20 15 / 0.25);
+
     color-scheme: light;
 }
 
 .dark {
-    --bg: #111110;
-    --surface: #1a1a19;
-    --surface-2: #232321;
-    --border: #2f2f2c;
-    --fg: #ecece8;
+    --bg: #0d0d0c;
+    --surface: #1a1a18;
+    --surface-2: #242421;
+    --border: #2e2e2a;
+    --fg: #eeeeea;
     --muted: #9b9b94;
 
     --ok: #4ade80;
@@ -43,7 +55,28 @@
     --danger: #f87171;
     --info: #60a5fa;
 
+    --glass: color-mix(in oklab, var(--surface) 70%, transparent);
+    --glass-strong: color-mix(in oklab, var(--surface) 82%, transparent);
+    --glass-border: rgb(255 255 255 / 0.08);
+    --glass-edge: rgb(255 255 255 / 0.07);
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px -16px rgb(0 0 0 / 0.6);
+    --shadow-pop: 0 2px 8px rgb(0 0 0 / 0.4), 0 32px 64px -20px rgb(0 0 0 / 0.75);
+
     color-scheme: dark;
+}
+
+/* Kiosk/schwache Geräte und "Transparenz reduzieren": keine Weichzeichner, deckende Flächen */
+.lite {
+    --glass: var(--surface);
+    --glass-strong: var(--surface);
+    --glass-blur: none;
+}
+@media (prefers-reduced-transparency: reduce) {
+    :root {
+        --glass: var(--surface);
+        --glass-strong: var(--surface);
+        --glass-blur: none;
+    }
 }
 
 @theme inline {
@@ -61,7 +94,7 @@
     --color-danger: var(--danger);
     --color-info: var(--info);
 
-    --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     --font-mono: ui-monospace, 'SFMono-Regular', 'Cascadia Mono', Menlo, monospace;
 }
 
@@ -72,7 +105,11 @@
 
     body {
         @apply bg-bg text-fg antialiased;
-        font-feature-settings: 'cv11', 'ss01';
+        font-feature-settings: 'cv11', 'ss01', 'ss03';
+    }
+
+    h1, h2, h3 {
+        text-wrap: balance;
     }
 
     ::selection {
@@ -84,30 +121,63 @@
         outline-offset: 2px;
     }
 
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: color-mix(in oklab, var(--fg) 18%, transparent) transparent;
+    }
+
     [x-cloak] {
         display: none !important;
     }
 
     dialog::backdrop {
-        background: rgb(0 0 0 / 0.45);
-        backdrop-filter: blur(2px);
+        background: rgb(10 10 8 / 0.4);
+        backdrop-filter: blur(6px);
+    }
+    .lite dialog::backdrop {
+        background: rgb(10 10 8 / 0.6);
+        backdrop-filter: none;
+    }
+}
+
+/* Seiteninhalt blendet weich ein (nur Deckkraft/Verschiebung, läuft auf der GPU) */
+@keyframes page-in {
+    from { opacity: 0; transform: translateY(6px); }
+}
+@keyframes pop-in {
+    from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+}
+@media (prefers-reduced-motion: no-preference) {
+    html:not(.lite) main {
+        animation: page-in 0.32s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+    html:not(.lite) dialog[open] {
+        animation: pop-in 0.18s ease-out both;
     }
 }
 
 @layer components {
     /* Buttons */
     .btn {
-        @apply inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium whitespace-nowrap
-            transition select-none disabled:opacity-50 disabled:pointer-events-none;
+        @apply inline-flex items-center justify-center gap-2 rounded-[0.625rem] px-3.5 py-2 text-sm font-medium whitespace-nowrap
+            transition select-none active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none;
     }
     .btn svg {
         @apply size-4 shrink-0;
     }
     .btn-primary {
-        @apply bg-accent text-accent-fg shadow-sm hover:brightness-110 active:brightness-95;
+        @apply text-accent-fg hover:brightness-110 active:brightness-95;
+        background: linear-gradient(180deg, color-mix(in oklab, var(--accent), white 14%), var(--accent));
+        box-shadow:
+            inset 0 1px 0 rgb(255 255 255 / 0.28),
+            0 1px 2px rgb(0 0 0 / 0.18),
+            0 6px 18px -8px color-mix(in oklab, var(--accent) 80%, transparent);
     }
     .btn-secondary {
-        @apply border border-line bg-surface text-fg shadow-sm hover:bg-surface-2;
+        @apply border text-fg hover:bg-surface-2;
+        border-color: var(--glass-border);
+        background: var(--glass-strong);
+        box-shadow: inset 0 1px 0 var(--glass-edge), 0 1px 2px rgb(0 0 0 / 0.06);
     }
     .btn-ghost {
         @apply text-muted hover:bg-surface-2 hover:text-fg;
@@ -133,10 +203,12 @@
         @apply mt-1 text-xs text-muted;
     }
     .input {
-        @apply block w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-fg shadow-sm
+        @apply block w-full rounded-[0.625rem] border border-line px-3 py-2 text-sm text-fg
             placeholder:text-muted/70 transition
-            focus:border-accent focus:ring-2 focus:ring-accent/25 focus:outline-none
+            focus:border-accent focus:ring-[3px] focus:ring-accent/20 focus:outline-none
             disabled:bg-surface-2 disabled:text-muted;
+        background-color: var(--glass-strong);
+        box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.04);
     }
     select.input {
         @apply pr-8;
@@ -153,10 +225,115 @@
 
     /* Flächen */
     .card {
-        @apply rounded-xl border border-line bg-surface shadow-sm;
+        @apply rounded-2xl border;
+        border-color: var(--glass-border);
+        background: linear-gradient(180deg, var(--glass-strong), var(--glass));
+        box-shadow: inset 0 1px 0 var(--glass-edge), var(--shadow-card);
     }
     .card-header {
         @apply flex items-center justify-between gap-3 border-b border-line px-4 py-3 sm:px-5;
+    }
+
+    /* Feste Leisten, Menüs, Dialoge: echtes Glas mit Weichzeichner */
+    .glass {
+        background: var(--glass);
+        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: var(--glass-blur);
+    }
+    .glass-pop {
+        @apply rounded-xl border;
+        border-color: var(--glass-border);
+        background: var(--glass-strong);
+        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: var(--glass-blur);
+        box-shadow: inset 0 1px 0 var(--glass-edge), var(--shadow-pop);
+    }
+
+    /* Seitenleiste überlappt keinen Inhalt – Transparenz reicht, kein Weichzeichner nötig */
+    .sidebar {
+        border-color: var(--glass-border);
+        background: linear-gradient(180deg, var(--glass), color-mix(in oklab, var(--surface) 55%, transparent));
+    }
+    .lite .sidebar {
+        background: var(--surface);
+    }
+    .search-trigger {
+        border-color: var(--glass-border);
+        background: color-mix(in oklab, var(--surface-2) 55%, transparent);
+        box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.04);
+    }
+
+    /* Hauptaktion auf der Startseite: Akzentfläche mit Lichtkante */
+    .hero-tile {
+        @apply relative overflow-hidden text-accent-fg;
+        background:
+            radial-gradient(28rem 14rem at 100% 0%, rgb(255 255 255 / 0.22), transparent 60%),
+            linear-gradient(135deg, color-mix(in oklab, var(--accent), white 10%), color-mix(in oklab, var(--accent), black 18%));
+        box-shadow:
+            inset 0 1px 0 rgb(255 255 255 / 0.3),
+            0 1px 2px rgb(0 0 0 / 0.2),
+            0 18px 40px -18px color-mix(in oklab, var(--accent) 85%, transparent);
+    }
+
+    /* Symbol in getönter Kachel (Startseite, Leerzustände) */
+    .icon-tile {
+        @apply grid shrink-0 place-items-center rounded-xl text-accent;
+        background: linear-gradient(180deg, color-mix(in oklab, var(--accent) 20%, transparent), color-mix(in oklab, var(--accent) 9%, transparent));
+        box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 22%, transparent);
+    }
+
+    /* Umschalter aus Radio-Buttons (Etiketten-Gestaltung) */
+    .segmented {
+        @apply flex rounded-[0.625rem] border border-line p-0.5;
+        background: color-mix(in oklab, var(--surface-2) 70%, transparent);
+    }
+    .segmented label {
+        @apply flex-1 cursor-pointer;
+    }
+    .segmented input {
+        @apply sr-only;
+    }
+    .segmented span {
+        @apply block rounded-lg px-2 py-1.5 text-center text-xs font-medium whitespace-nowrap text-muted transition hover:text-fg;
+    }
+    .segmented input:checked + span {
+        @apply bg-surface text-fg;
+        box-shadow: inset 0 1px 0 var(--glass-edge), 0 1px 3px rgb(0 0 0 / 0.12);
+    }
+    .segmented input:focus-visible + span {
+        outline: 2px solid var(--accent);
+        outline-offset: 1px;
+    }
+
+    /* Pagination */
+    .pager {
+        @apply flex items-center justify-between gap-3;
+    }
+    .pager-group {
+        @apply flex items-center gap-1 rounded-xl border p-1;
+        border-color: var(--glass-border);
+        background: var(--glass-strong);
+        box-shadow: inset 0 1px 0 var(--glass-edge), var(--shadow-card);
+    }
+    .pager-item {
+        @apply grid h-8 min-w-8 place-items-center rounded-lg px-2 text-sm font-medium text-muted tabular-nums transition;
+    }
+    a.pager-item:hover {
+        @apply bg-surface-2 text-fg;
+    }
+    .pager-item[aria-disabled] {
+        @apply opacity-35;
+    }
+    .pager-item.active {
+        @apply text-accent-fg;
+        background: linear-gradient(180deg, color-mix(in oklab, var(--accent), white 14%), var(--accent));
+        box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25), 0 4px 12px -6px var(--accent);
+    }
+    .pager-item svg {
+        @apply size-4;
+    }
+    .pager-gap {
+        @apply min-w-5 px-0;
     }
     .card-title {
         @apply text-sm font-semibold;
@@ -168,6 +345,7 @@
     /* Badges */
     .badge {
         @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap;
+        box-shadow: inset 0 0 0 1px color-mix(in oklab, currentColor 16%, transparent);
     }
     .badge-ok {
         @apply bg-ok/12 text-ok;
@@ -193,7 +371,7 @@
         @apply w-full text-left text-sm;
     }
     .table th {
-        @apply border-b border-line px-4 py-2.5 text-xs font-medium tracking-wide text-muted uppercase;
+        @apply border-b border-line bg-surface-2/40 px-4 py-2.5 text-[11px] font-semibold tracking-wider text-muted uppercase;
     }
     .table td {
         @apply border-b border-line px-4 py-3 align-middle;
@@ -213,7 +391,14 @@
         @apply size-[18px] shrink-0;
     }
     .nav-link.active {
-        @apply bg-accent-soft text-accent;
+        @apply relative text-accent;
+        background: linear-gradient(90deg, color-mix(in oklab, var(--accent) 17%, transparent), color-mix(in oklab, var(--accent) 5%, transparent));
+        box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--accent) 18%, transparent);
+    }
+    .nav-link.active::before {
+        content: '';
+        @apply absolute top-1/2 -left-3 h-5 w-1 -translate-y-1/2 rounded-r-full bg-accent;
+        box-shadow: 0 0 12px var(--accent);
     }
 
     .kbd {
@@ -225,7 +410,16 @@
     }
 
     .modal {
-        @apply m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl border border-line bg-surface p-0 text-fg shadow-2xl;
+        @apply m-auto w-[calc(100%-2rem)] max-w-lg rounded-2xl border p-0 text-fg;
+        border-color: var(--glass-border);
+        background: var(--glass-strong);
+        -webkit-backdrop-filter: var(--glass-blur);
+        backdrop-filter: var(--glass-blur);
+        box-shadow: inset 0 1px 0 var(--glass-edge), var(--shadow-pop);
+    }
+    /* Dialog über weichgezeichnetem Hintergrund: Fläche fast deckend, damit Text ruhig bleibt */
+    .dark .modal {
+        background: color-mix(in oklab, var(--surface) 92%, transparent);
     }
 
     .prose-legal h1 { @apply mt-6 mb-3 text-2xl font-semibold; }

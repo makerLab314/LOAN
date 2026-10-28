@@ -6,14 +6,14 @@
 
 @section('content')
     <x-page-header :title="__('Hallo, :name', ['name' => Str::before(auth()->user()->name, ' ')])">
-        <x-slot:subtitle>{{ now()->translatedFormat('l, j. F Y') }}</x-slot:subtitle>
+        <x-slot:subtitle>{{ now()->translatedFormat(__('l, j. F Y')) }}</x-slot:subtitle>
     </x-page-header>
 
     {{-- Hauptaktionen: groß und eindeutig --}}
     <div class="mb-6 grid gap-3 sm:grid-cols-3">
         @if ($canBook)
-            <a href="{{ route('bookings.new') }}" class="group flex items-center gap-4 rounded-xl bg-accent p-5 text-accent-fg shadow-md transition hover:brightness-110 active:brightness-95 sm:col-span-2 sm:p-6">
-                <span class="grid size-14 shrink-0 place-items-center rounded-xl bg-white/20"><x-icon name="calendar-plus" class="size-7"/></span>
+            <a href="{{ route('bookings.new') }}" class="group flex items-center gap-4 hero-tile rounded-2xl p-5 transition hover:brightness-110 active:brightness-95 sm:col-span-2 sm:p-6">
+                <span class="grid size-14 shrink-0 place-items-center rounded-xl bg-white/20 ring-1 ring-white/25 ring-inset"><x-icon name="calendar-plus" class="size-7"/></span>
                 <span class="min-w-0 flex-1">
                     <span class="block text-xl font-semibold sm:text-2xl">{{ __('Neue Buchung') }}</span>
                     <span class="mt-0.5 block text-sm opacity-90">{{ __('Saal wählen, Zeitraum festlegen, fertig.') }}</span>
@@ -22,7 +22,7 @@
             </a>
         @endif
         <a href="{{ route('calendar') }}" @class(['card group flex items-center gap-4 p-5 transition hover:border-accent/40 sm:p-6', 'sm:col-span-3' => ! $canBook])>
-            <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent"><x-icon name="calendar" class="size-6"/></span>
+            <span class="icon-tile size-12"><x-icon name="calendar" class="size-6"/></span>
             <span class="min-w-0 flex-1">
                 <span class="block text-lg font-semibold">{{ __('Kalender') }}</span>
                 <span class="block text-sm text-muted">{{ __('Alle Buchungen im Überblick') }}</span>

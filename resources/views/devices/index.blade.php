@@ -19,8 +19,8 @@
 
     {{-- Vom großen Ausleih-Button der Startseite: zuerst der schnelle Weg per Scan --}}
     @if (request()->boolean('ausleihen') && Gate::allows('loans.create'))
-        <a href="{{ route('loans.checkout') }}" class="group mb-3 flex items-center gap-4 rounded-xl bg-accent p-5 text-accent-fg shadow-md transition hover:brightness-110 active:brightness-95 sm:p-6">
-            <span class="grid size-14 shrink-0 place-items-center rounded-xl bg-white/20"><x-icon name="scan" class="size-7"/></span>
+        <a href="{{ route('loans.checkout') }}" class="group mb-3 flex items-center gap-4 hero-tile rounded-2xl p-5 transition hover:brightness-110 active:brightness-95 sm:p-6">
+            <span class="grid size-14 shrink-0 place-items-center rounded-xl bg-white/20 ring-1 ring-white/25 ring-inset"><x-icon name="scan" class="size-7"/></span>
             <span class="min-w-0 flex-1">
                 <span class="block text-xl font-semibold sm:text-2xl">{{ __('Scannen oder ID eingeben') }}</span>
                 <span class="mt-0.5 block text-sm opacity-90">{{ __('Etikett scannen – auch mehrere Geräte auf einmal, mit einem Namen und Zeitraum.') }}</span>

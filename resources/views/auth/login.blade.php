@@ -12,7 +12,7 @@
             @csrf
             <x-field :label="__('E-Mail')" name="email">
                 <input id="email" type="email" name="email" value="{{ old('email') }}" class="input @error('email') input-error @enderror"
-                       required autofocus autocomplete="username" inputmode="email">
+                       required autofocus autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false">
             </x-field>
             <x-field :label="__('Passwort')" name="password">
                 <x-password id="password" name="password" required autocomplete="current-password"/>

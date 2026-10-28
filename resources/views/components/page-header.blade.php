@@ -7,7 +7,7 @@
                 <x-icon name="chevron-left"/>{{ __('Zurück') }}
             </a>
         @endif
-        <h1 class="truncate text-2xl font-semibold tracking-tight">{{ $title }}</h1>
+        <h1 class="truncate text-2xl font-semibold tracking-[-0.025em] sm:text-[1.875rem] sm:leading-9">{{ $title }}</h1>
         @isset($subtitle)
             <div class="mt-1 text-sm text-muted">{{ $subtitle }}</div>
         @endisset

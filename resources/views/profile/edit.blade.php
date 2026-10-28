@@ -43,14 +43,16 @@
                 </div>
             </div>
             <div class="card-body grid gap-4 sm:grid-cols-3">
-                <x-field :label="__('Aktuelles Passwort')" name="current_password" bag="password">
-                    <input type="password" name="current_password" class="input" required autocomplete="current-password">
+                {{-- Für Passwortmanager (Bitwarden & Co.): zu welchem Konto das neue Passwort gehört --}}
+                <input type="text" name="username" value="{{ $user->email }}" autocomplete="username" class="sr-only" tabindex="-1" aria-hidden="true" readonly>
+                <x-field :label="__('Aktuelles Passwort')" name="current_password" bag="password" for="pw_current">
+                    <x-password id="pw_current" name="current_password" required autocomplete="current-password"/>
                 </x-field>
-                <x-field :label="__('Neues Passwort')" name="password" bag="password" :hint="__('Mind. :n Zeichen, Buchstaben und Zahlen.', ['n' => max(8, (int) $settings->get('security.password_min'))])">
-                    <input type="password" name="password" class="input" required autocomplete="new-password" minlength="8">
+                <x-field :label="__('Neues Passwort')" name="password" bag="password" for="pw_new" :hint="__('Mind. :n Zeichen, Buchstaben und Zahlen.', ['n' => max(8, (int) $settings->get('security.password_min'))])">
+                    <x-password id="pw_new" name="password" required autocomplete="new-password" minlength="8"/>
                 </x-field>
-                <x-field :label="__('Wiederholen')" name="password_confirmation" bag="password">
-                    <input type="password" name="password_confirmation" class="input" required autocomplete="new-password">
+                <x-field :label="__('Wiederholen')" name="password_confirmation" bag="password" for="pw_confirm">
+                    <x-password id="pw_confirm" name="password_confirmation" required autocomplete="new-password"/>
                 </x-field>
             </div>
             <div class="flex justify-end border-t border-line px-4 py-3 sm:px-5">

@@ -14,7 +14,7 @@
     <div class="no-print pointer-events-none fixed inset-x-0 top-16 z-50 flex flex-col items-center gap-2 px-4 sm:items-end sm:px-6" aria-live="polite">
         @foreach ($flashes as $type => $message)
             <div x-data="toast" x-show="visible" x-transition.opacity
-                 class="pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-xl border bg-surface p-3.5 shadow-lg {{ $styles[$type]['class'] }}"
+                 class="glass-pop pointer-events-auto flex w-full max-w-sm items-start gap-3 p-3.5 {{ $styles[$type]['class'] }}"
                  role="{{ $type === 'error' ? 'alert' : 'status' }}" data-timeout="{{ $type === 'error' ? 9000 : 5000 }}">
                 <x-icon :name="$styles[$type]['icon']" class="mt-0.5 size-5 shrink-0"/>
                 <p class="flex-1 text-sm text-fg">{{ $message }}</p>

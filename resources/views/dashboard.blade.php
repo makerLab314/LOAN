@@ -10,7 +10,7 @@
 
 @section('content')
     <x-page-header :title="$kiosk ? __('Willkommen!') : __('Hallo, :name', ['name' => Str::before(auth()->user()->name, ' ')])">
-        <x-slot:subtitle>{{ now()->translatedFormat('l, j. F Y') }}</x-slot:subtitle>
+        <x-slot:subtitle>{{ now()->translatedFormat(__('l, j. F Y')) }}</x-slot:subtitle>
         <x-slot:actions>
             <a href="{{ route('calendar') }}" class="btn btn-secondary"><x-icon name="calendar"/>{{ __('Kalender') }}</a>
         </x-slot:actions>
@@ -19,8 +19,8 @@
     {{-- Hauptaktionen: groß und eindeutig, auch für Erstbesucher (am Kiosk mit Vormerken) --}}
     <div @class(['mb-6 grid gap-3 sm:grid-cols-3', 'sm:grid-rows-2' => $kiosk])>
         {{-- Mit ?ausleihen=1 zeigt die Geräteliste oben den Weg zum Scannen --}}
-        <a href="{{ $canLoan ? route('devices.index', ['ausleihen' => 1]) : route('devices.index') }}" @class(['group flex items-center gap-4 rounded-xl bg-accent p-5 text-accent-fg shadow-md transition hover:brightness-110 active:brightness-95 sm:col-span-2 sm:p-6', 'sm:row-span-2 sm:p-8' => $kiosk])>
-            <span class="grid size-14 shrink-0 place-items-center rounded-xl bg-white/20"><x-icon name="devices" class="size-7"/></span>
+        <a href="{{ $canLoan ? route('devices.index', ['ausleihen' => 1]) : route('devices.index') }}" @class(['group flex items-center gap-4 hero-tile rounded-2xl p-5 transition hover:brightness-110 active:brightness-95 sm:col-span-2 sm:p-6', 'sm:row-span-2 sm:p-8' => $kiosk])>
+            <span class="grid size-14 shrink-0 place-items-center rounded-xl bg-white/20 ring-1 ring-white/25 ring-inset"><x-icon name="devices" class="size-7"/></span>
             <span class="min-w-0 flex-1">
                 <span @class(['block font-semibold', 'text-xl sm:text-2xl' => ! $kiosk, 'text-2xl sm:text-4xl' => $kiosk])>{{ $canLoan ? __('Gerät ausleihen') : __('Geräte ansehen') }}</span>
                 <span class="mt-0.5 block text-sm opacity-90">{{ $canLoan ? __('Scannen oder Gerät aussuchen, Zeitraum wählen, fertig.') : __('Gerät aussuchen, Zeitraum wählen, fertig.') }}</span>
@@ -28,7 +28,7 @@
             <x-icon name="chevron-right" class="size-6 shrink-0 transition group-hover:translate-x-1"/>
         </a>
         <a href="{{ $scanReturn ? route('loans.return-scan') : route('loans.index') }}" class="card group flex items-center gap-4 p-5 transition hover:border-accent/40 sm:p-6">
-            <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent"><x-icon name="undo" class="size-6"/></span>
+            <span class="icon-tile size-12"><x-icon name="undo" class="size-6"/></span>
             <span class="min-w-0 flex-1">
                 <span class="block text-lg font-semibold">{{ __('Zurückgeben') }}</span>
                 <span class="block text-sm text-muted">{{ $scanReturn ? __('Gerät scannen oder ID eingeben') : __('Laufende Ausleihen') }}</span>
@@ -36,7 +36,7 @@
         </a>
         @if ($kiosk && auth()->user()->can('reservations.create'))
             <a href="{{ route('devices.index') }}" class="card group flex items-center gap-4 p-5 transition hover:border-accent/40 sm:p-6">
-                <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent"><x-icon name="bookmark" class="size-6"/></span>
+                <span class="icon-tile size-12"><x-icon name="bookmark" class="size-6"/></span>
                 <span class="min-w-0 flex-1">
                     <span class="block text-lg font-semibold">{{ __('Vormerken') }}</span>
                     <span class="block text-sm text-muted">{{ __('Gerät für später reservieren') }}</span>
@@ -49,7 +49,7 @@
     <form method="POST" action="{{ route('lookup') }}" class="card mb-6 flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
         @csrf
         <div class="flex items-center gap-3 sm:flex-1">
-            <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-accent-soft text-accent"><x-icon name="qr" class="size-5"/></span>
+            <span class="icon-tile size-10 rounded-lg"><x-icon name="qr" class="size-5"/></span>
             <div class="flex-1">
                 <label for="quick-code" class="text-sm font-medium">{{ __('Inventar-ID eingeben') }}</label>
                 <input id="quick-code" name="code" class="input mt-1 font-mono uppercase" placeholder="KAB-0042-3" autocomplete="off" autocapitalize="characters" required>

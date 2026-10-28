@@ -125,7 +125,7 @@
                             <tr>
                                 <th>{{ __('Recht') }}</th>
                                 @foreach ($roles as $role => $roleLabel)
-                                    <th class="text-center">{{ $roleLabel }}</th>
+                                    <th class="text-center">{{ __($roleLabel) }}</th>
                                 @endforeach
                             </tr>
                             </thead>
@@ -144,7 +144,7 @@
                                                 @else
                                                     <input type="checkbox" name="permissions[{{ $role }}][]" value="{{ $key }}" class="checkbox"
                                                            @checked(in_array($key, (array) ($values['permissions.'.$role] ?? []), true))
-                                                           aria-label="{{ $roleLabel }}: {{ __($permission['label']) }}">
+                                                           aria-label="{{ __($roleLabel) }}: {{ __($permission['label']) }}">
                                                 @endif
                                             </td>
                                         @endforeach

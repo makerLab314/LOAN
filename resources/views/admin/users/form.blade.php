@@ -9,16 +9,17 @@
             @csrf
             @if ($user->exists) @method('PUT') @endif
             <div class="card-body grid gap-4 sm:grid-cols-2">
+                {{-- Fremdes Konto: Passwortmanager sollen hier nicht die eigenen Zugangsdaten eintragen --}}
                 <x-field :label="__('Name')" name="name">
-                    <input name="name" class="input" value="{{ old('name', $user->name) }}" required maxlength="255" autocomplete="off">
+                    <input id="name" name="name" class="input" value="{{ old('name', $user->name) }}" required maxlength="255" autocomplete="off" data-bwignore data-1p-ignore data-lpignore="true">
                 </x-field>
                 <x-field :label="__('E-Mail')" name="email">
-                    <input type="email" name="email" class="input" value="{{ old('email', $user->email) }}" required autocomplete="off">
+                    <input id="email" type="email" name="email" class="input" value="{{ old('email', $user->email) }}" required autocomplete="off" data-bwignore data-1p-ignore data-lpignore="true">
                 </x-field>
                 <x-field :label="__('Rolle')" name="role">
                     <select name="role" class="input" @disabled($user->is(auth()->user()))>
                         @foreach (config('loan.roles') as $value => $label)
-                            <option value="{{ $value }}" @selected(old('role', $user->role) === $value)>{{ $label }}</option>
+                            <option value="{{ $value }}" @selected(old('role', $user->role) === $value)>{{ __($label) }}</option>
                         @endforeach
                     </select>
                     @if ($user->is(auth()->user()))
@@ -40,10 +41,10 @@
                 </x-field>
                 <x-field :label="$user->exists ? __('Neues Passwort (optional)') : __('Passwort')" name="password"
                          :hint="__('Mind. :n Zeichen, Buchstaben und Zahlen.', ['n' => max(8, (int) $settings->get('security.password_min'))])">
-                    <input type="password" name="password" class="input" @required(! $user->exists) autocomplete="new-password">
+                    <x-password id="password" name="password" :required="! $user->exists" autocomplete="new-password"/>
                 </x-field>
                 <x-field :label="__('Passwort wiederholen')" name="password_confirmation">
-                    <input type="password" name="password_confirmation" class="input" @required(! $user->exists) autocomplete="new-password">
+                    <x-password id="password_confirmation" name="password_confirmation" :required="! $user->exists" autocomplete="new-password"/>
                 </x-field>
                 @unless ($user->is(auth()->user()))
                     <div class="sm:col-span-2">

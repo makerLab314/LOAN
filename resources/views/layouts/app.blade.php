@@ -1,6 +1,6 @@
 @php $kiosk = (bool) auth()->user()?->isKiosk(); @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full"
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['h-full', 'lite' => $kiosk])
       data-theme="{{ auth()->user()?->theme ?? 'system' }}"
       style="--accent: {{ $branding->accent() }}; --accent-fg: {{ $branding->accentForeground() }};">
 <head>
@@ -18,7 +18,7 @@
 <div x-data="shell" class="min-h-full" @keydown.window="onKey">
 
     {{-- Sidebar (Desktop) --}}
-    <aside class="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-line bg-surface lg:flex">
+    <aside class="sidebar fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r lg:flex">
         @include('layouts.partials.nav')
     </aside>
 
@@ -32,7 +32,7 @@
 
     <div class="lg:pl-64">
         {{-- Topbar --}}
-        <header class="sticky top-0 z-20 border-b border-line bg-surface/85 backdrop-blur supports-[backdrop-filter]:bg-surface/70">
+        <header class="glass sticky top-0 z-20 border-b border-[var(--glass-border)]">
             <div class="flex h-14 items-center gap-2 px-3 sm:px-6 lg:px-8">
                 <button type="button" class="btn btn-ghost btn-icon lg:hidden" @click="openDrawer" aria-label="{{ __('Menü') }}">
                     <x-icon name="menu" class="size-5"/>
@@ -43,10 +43,10 @@
 
                 @unless ($kiosk)
                     <button type="button" data-search-open
-                            class="ml-auto flex h-9 items-center gap-2 rounded-lg border border-line bg-surface-2/60 px-3 text-sm text-muted transition hover:border-accent/50 lg:ml-0 lg:w-80">
+                            class="search-trigger ml-auto flex h-9 items-center gap-2 rounded-[0.625rem] border px-3 text-sm text-muted transition hover:border-accent/50 hover:text-fg lg:ml-0 lg:w-80">
                         <x-icon name="search"/>
                         <span class="hidden sm:inline">{{ Gate::allows('devices.view') ? __('Suchen oder ID eingeben…') : __('Suchen…') }}</span>
-                        <span class="kbd ml-auto hidden lg:inline">Strg K</span>
+                        <span class="kbd ml-auto hidden lg:inline">{{ __('Strg') }} K</span>
                     </button>
                 @endunless
 

@@ -30,7 +30,7 @@
                         <span class="block text-xs text-muted md:hidden">{{ $user->email }}</span>
                     </td>
                     <td class="hidden text-muted md:table-cell">{{ $user->email }}</td>
-                    <td><span class="badge {{ $user->isAdmin() ? 'badge-accent' : 'badge-muted' }}">{{ config('loan.roles.'.$user->role, $user->role) }}</span></td>
+                    <td><span class="badge {{ $user->isAdmin() ? 'badge-accent' : 'badge-muted' }}">{{ __(config('loan.roles.'.$user->role, $user->role)) }}</span></td>
                     <td class="hidden text-muted lg:table-cell">
                         {{ isset($lastSeen[$user->id]) ? \Illuminate\Support\Carbon::createFromTimestamp($lastSeen[$user->id])->diffForHumans() : '—' }}
                     </td>

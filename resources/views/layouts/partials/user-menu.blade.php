@@ -8,11 +8,11 @@
         <x-icon name="chevron-down" class="hidden size-4 text-muted md:block"/>
     </button>
     <div x-cloak x-show="open" @click.outside="close"
-         class="absolute right-0 z-40 mt-1 w-60 rounded-xl border border-line bg-surface p-1 shadow-lg">
+         class="glass-pop absolute right-0 z-40 mt-1 w-60 p-1">
         <div class="border-b border-line px-3 py-2">
             <p class="truncate text-sm font-medium">{{ auth()->user()->name }}</p>
             <p class="truncate text-xs text-muted">{{ auth()->user()->email }}</p>
-            <p class="mt-1"><span class="badge badge-accent">{{ config('loan.roles.'.auth()->user()->role, auth()->user()->role) }}</span></p>
+            <p class="mt-1"><span class="badge badge-accent">{{ __(config('loan.roles.'.auth()->user()->role, auth()->user()->role)) }}</span></p>
         </div>
         <a href="{{ route('profile.edit') }}" class="nav-link mt-1"><x-icon name="user"/>{{ __('Profil') }}</a>
         <a href="{{ route('sessions.index') }}" class="nav-link"><x-icon name="smartphone"/>{{ __('Sitzungen') }}</a>
