@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@use('App\Support\Names')
 @section('title', __('Übersicht'))
 
 @php
@@ -103,7 +104,7 @@
                                         <p class="truncate text-sm font-medium">{{ $loan->device?->title }}
                                             @if ($loan->outstanding_quantity > 1)<span class="text-muted">· {{ $loan->outstanding_quantity }}×</span>@endif
                                         </p>
-                                        <p class="truncate text-xs text-muted">{{ $loan->borrower_name }}</p>
+                                        <p class="truncate text-xs text-muted">{{ Names::shown($loan->borrower_name) }}</p>
                                     </div>
                                     @if ($loan->isOverdue())
                                         <span class="badge badge-danger">{{ __('seit :date', ['date' => $loan->loan_end_date->format('d.m.')]) }}</span>
@@ -138,7 +139,7 @@
                                     </div>
                                     <div class="min-w-0 flex-1">
                                         <p class="truncate text-sm font-medium">{{ $r->quantity }}× {{ $r->device?->title }}</p>
-                                        <p class="truncate text-xs text-muted">{{ $r->displayName() }} · {{ $r->start_at->format('H:i') }} – {{ $r->end_at->format('d.m. H:i') }}</p>
+                                        <p class="truncate text-xs text-muted">{{ Names::shown($r->displayName()) }} · {{ $r->start_at->format('H:i') }} – {{ $r->end_at->format('d.m. H:i') }}</p>
                                     </div>
                                     @if ($r->start_at->isPast())
                                         <span class="badge badge-warn">{{ __('abholbereit') }}</span>
@@ -187,7 +188,7 @@
                         @foreach ($issues as $loan)
                             <li>
                                 <a href="{{ route('devices.show', $loan->device_id) }}" class="block px-4 py-3 hover:bg-surface-2/60 sm:px-5">
-                                    <p class="text-sm font-medium">{{ $loan->device?->title }} · {{ $loan->borrower_name }}</p>
+                                    <p class="text-sm font-medium">{{ $loan->device?->title }} · {{ Names::shown($loan->borrower_name) }}</p>
                                     <p class="text-xs text-muted">{{ collect($loan->return_issues)->map(fn ($i) => $i['missing'].'× '.$i['name'])->join(', ') }}</p>
                                 </a>
                             </li>

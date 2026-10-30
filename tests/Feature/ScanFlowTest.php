@@ -43,6 +43,14 @@ class ScanFlowTest extends TestCase
         return DeviceLoan::latest('id')->firstOrFail();
     }
 
+    /** Wie am Kiosk: erst scannen (bzw. ID eingeben), dann ausleihen */
+    private function lendScanned(Device $device, array $data = []): DeviceLoan
+    {
+        $this->postJson(route('lookup'), ['code' => $device->inventory_number])->assertOk();
+
+        return $this->lend($device, $data);
+    }
+
     /* ------------------------------------------------------------------ *
      * Einstiege
      * ------------------------------------------------------------------ */
@@ -190,7 +198,7 @@ class ScanFlowTest extends TestCase
     {
         $device = Device::factory()->create();
         $this->actingAs($this->kiosk());
-        $loan = $this->lend($device);
+        $loan = $this->lendScanned($device);
 
         $this->post(route('loans.return', $loan))->assertSessionHasErrors('code');
         $this->post(route('loans.return-scan.store'), ['returns' => [['loan_id' => $loan->id]]])->assertSessionHasErrors('returns');
@@ -202,11 +210,24 @@ class ScanFlowTest extends TestCase
             ->assertSee(route('loans.return-scan'), false);
     }
 
+    public function test_kiosk_returns_loans_lent_without_scan_without_scanning(): void
+    {
+        // Etikett abgefallen oder großer Lautsprecher: ohne Scan ausgeliehen
+        $device = Device::factory()->create();
+        $this->actingAs($this->kiosk());
+        $loan = $this->lend($device);
+        $this->assertFalse($loan->checkout_scanned);
+
+        $this->get(route('devices.show', $device))->assertSee('return-dialog-'.$loan->id);
+        $this->post(route('loans.return', $loan))->assertSessionHasNoErrors();
+        $this->assertFalse($loan->fresh()->isActive());
+    }
+
     public function test_kiosk_returns_after_scanning_and_scan_is_used_up(): void
     {
         $device = Device::factory()->create(['inventory_number' => 'BEA-0001']);
         $this->actingAs($this->kiosk());
-        $loan = $this->lend($device);
+        $loan = $this->lendScanned($device);
 
         $this->postJson(route('loans.return-scan.lookup'), ['code' => 'bea-0001'])
             ->assertOk()
@@ -218,7 +239,7 @@ class ScanFlowTest extends TestCase
         $this->assertFalse($loan->fresh()->isActive());
 
         // Der Scan gilt nur für eine Rückgabe
-        $second = $this->lend($device);
+        $second = $this->lendScanned($device);
         $this->post(route('loans.return', $second))->assertSessionHasErrors('code');
         $this->assertTrue($second->fresh()->isActive());
     }
@@ -227,7 +248,7 @@ class ScanFlowTest extends TestCase
     {
         $device = Device::factory()->quantity(4)->create(['inventory_number' => 'TAB-0001']);
         $this->actingAs($this->kiosk());
-        $loan = $this->lend($device, ['units' => [1, 2, 3]]);
+        $loan = $this->lendScanned($device, ['units' => [1, 2, 3]]);
 
         $this->postJson(route('loans.return-scan.lookup'), ['code' => 'TAB-0001-2'])->assertOk();
 
@@ -250,13 +271,34 @@ class ScanFlowTest extends TestCase
     {
         $device = Device::factory()->create(['inventory_number' => 'BEA-0001']);
         $this->actingAs($this->kiosk());
-        $loan = $this->lend($device);
+        $loan = $this->lendScanned($device);
 
         $this->postJson(route('loans.return-scan.lookup'), ['code' => 'BEA-0001'])->assertOk();
         $this->travel(ReturnScans::TTL + 60)->seconds();
 
         $this->post(route('loans.return', $loan))->assertSessionHasErrors('code');
         $this->assertTrue($loan->fresh()->isActive());
+    }
+
+    public function test_one_kiosk_scan_covers_one_return_even_in_a_batch(): void
+    {
+        $device = Device::factory()->quantity(5)->create(['inventory_number' => 'BEA-0001']);
+        $this->actingAs($this->kiosk());
+        $first = $this->lendScanned($device, ['quantity' => 2]);
+        $second = $this->lendScanned($device, ['quantity' => 3]);
+        $this->postJson(route('loans.return-scan.lookup'), ['code' => 'BEA-0001'])->assertOk();
+
+        $this->post(route('loans.return-scan.store'), ['returns' => [
+            ['loan_id' => $first->id],
+            ['loan_id' => $second->id],
+        ]])->assertSessionHasErrors('returns');
+        $this->assertTrue($first->fresh()->isActive());
+        $this->assertTrue($second->fresh()->isActive());
+
+        // Nichts gebucht – der Scan gilt weiter, aber nur für eine Rückgabe
+        $this->post(route('loans.return-scan.store'), ['returns' => [['loan_id' => $first->id]]])->assertSessionHasNoErrors();
+        $this->assertFalse($first->fresh()->isActive());
+        $this->assertTrue($second->fresh()->isActive());
     }
 
     public function test_staff_can_still_return_directly_and_in_batches(): void

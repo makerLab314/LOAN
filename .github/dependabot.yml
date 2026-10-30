@@ -1,0 +1,7 @@
+# Hält die auf Commit-SHAs gepinnten GitHub Actions aktuell (ein PR pro Monat und Action)
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

@@ -13,9 +13,9 @@ jobs:
   php:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
-      - uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         with:
           php-version: '8.4'
           extensions: gd, exif, intl, pdo_sqlite, zip, bcmath
@@ -42,8 +42,8 @@ jobs:
   frontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
         with:
           node-version: 22
           cache: npm
@@ -55,6 +55,13 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - name: Image bauen
         run: docker build --target production -t loan:ci .
+      # Abgeschaltet – der Server scannt das Image bei jedem Update selbst. Zum Einschalten
+      # die Zeilen wieder einkommentieren: Bricht ab bei kritischen Lücken im fertigen Image
+      # (Debian-Pakete, PHP-Erweiterungen, Composer), für die es schon einen Fix gibt.
+      # - name: Sicherheitslücken im Image
+      #   run: >
+      #     docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:0.58.1
+      #     image --exit-code 1 --severity CRITICAL --ignore-unfixed --no-progress loan:ci

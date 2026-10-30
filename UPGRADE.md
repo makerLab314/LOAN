@@ -54,7 +54,7 @@ cp .env.example .env
 | `DB_USERNAME` / `DB_PASSWORD` | bisher `loan` / `loan` (siehe 6.) |
 | `DB_ROOT_PASSWORD` | bisher `rootpassword` |
 | `SESSION_SECURE_COOKIE` | `true` bei HTTPS, sonst `false` |
-| `TRUSTED_PROXIES` | IP-Bereich des Reverse Proxys (Vorgabe: private Docker-Netze), leer ohne Proxy – nicht `*` |
+| `TRUSTED_PROXIES` | genau die Adresse des Reverse Proxys (Proxy auf demselben Host: `172.30.10.1`), leer ohne Proxy – keine ganzen Netze, nicht `*` |
 | `MAIL_*` | SMTP-Zugang für „Passwort vergessen“ |
 | `APP_PORT` | Host-Port für nginx (Standard 8080) |
 | `APP_BIND` | `127.0.0.1` (Standard, nur für einen Proxy auf demselben Host) oder `0.0.0.0` (direkt im Netz erreichbar) |
@@ -82,6 +82,19 @@ Das Skript erledigt Folgendes:
    Migrationen laufen automatisch. Die Version steht danach als `LOAN_VERSION` in der `.env`.
 
 Wer das Image lieber selbst baut (oder falls noch kein Release existiert): `./deploy.sh --build`.
+
+**Empfohlen: Signatur prüfen.** Releases sind signierte Commits. Hinterlegst du den öffentlichen
+Schlüssel, bricht `deploy.sh` ab, wenn ein Release-Stand nicht von dir signiert ist:
+
+```bash
+echo "deine@mail.de sk-ssh-ed25519@openssh.com AAAA… (öffentlicher Schlüssel)" > ~/.config/loan-allowed-signers
+git config gpg.ssh.allowedSignersFile ~/.config/loan-allowed-signers
+```
+
+**Nach dem Update auf diese Version:** In der `.env` `TRUSTED_PROXIES=172.30.10.1` setzen (statt ganzer
+privater Netze) und im Reverse Proxy `proxy_set_header X-Forwarded-For $remote_addr;` verwenden. Das
+Compose-Netz bekommt dafür feste Adressen. Meldet `deploy.sh` am Ende, das Netz müsse neu angelegt
+werden: einmalig `docker compose down && docker compose up -d`.
 
 Danach erreichst du LOAN wie gewohnt. Zum Prüfen:
 

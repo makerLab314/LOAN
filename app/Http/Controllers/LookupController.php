@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\CheckoutScans;
 use App\Services\InventoryNumbers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -15,7 +16,10 @@ use Illuminate\View\View;
  */
 class LookupController extends Controller
 {
-    public function __construct(private InventoryNumbers $numbers) {}
+    public function __construct(
+        private InventoryNumbers $numbers,
+        private CheckoutScans $scans,
+    ) {}
 
     public function scan(): View
     {
@@ -30,6 +34,8 @@ class LookupController extends Controller
             return redirect()->route('scan')->with('error', __('Keine Inventar-ID „:code“ gefunden.', ['code' => mb_substr($code, 0, 40)]));
         }
 
+        $this->scans->record($hit['device']);
+
         return redirect()->route('devices.show', array_filter([
             'device' => $hit['device']->id,
             'unit' => $hit['unit'],
@@ -42,6 +48,10 @@ class LookupController extends Controller
         $hit = $this->numbers->resolve($code);
 
         if ($request->expectsJson()) {
+            if ($hit) {
+                $this->scans->record($hit['device']);
+            }
+
             return $hit
                 ? response()->json([
                     'found' => true,

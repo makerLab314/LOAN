@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Models\DeviceLoan;
+use App\Models\User;
 use App\Services\InventoryNumbers;
 use App\Services\LoanService;
 use App\Services\ReturnScans;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Throwable;
 
 /**
  * Rückgabe per Scan: Etiketten scannen (oder IDs eintippen), die passenden
@@ -97,8 +100,34 @@ class LoanReturnController extends Controller
         $user = $request->user();
         $lines = collect($data['returns'])->sortBy('loan_id')->values();
         $kiosk = $user->isKiosk();
+        $scans = $this->scans->snapshot();
 
-        $done = DB::transaction(function () use ($lines, $user, $kiosk, $data) {
+        try {
+            $done = $this->returnAll($lines, $user, $kiosk, $data);
+        } catch (Throwable $e) {
+            // Nichts gebucht – also gelten auch die Scans weiter
+            $this->scans->restore($scans);
+            throw $e;
+        }
+
+        $issues = collect($done)->contains(fn ($d) => $d[0]->hasOpenIssues());
+        $count = count($done);
+
+        return redirect()->route('loans.return-scan')->with($issues ? 'warning' : 'success', $issues
+            ? __('Rückgabe gebucht – Zubehör fehlt, wurde vermerkt.')
+            : trans_choice(':count Rückgabe gebucht.|:count Rückgaben gebucht.', $count, ['count' => $count]));
+    }
+
+    /**
+     * Alles oder nichts in einer Transaktion.
+     *
+     * @param  Collection<int, array<string, mixed>>  $lines
+     * @param  array<string, mixed>  $data
+     * @return list<array{0: DeviceLoan, 1: list<int>|null}>
+     */
+    private function returnAll(Collection $lines, User $user, bool $kiosk, array $data): array
+    {
+        return DB::transaction(function () use ($lines, $user, $kiosk, $data) {
             $done = [];
             foreach ($lines as $line) {
                 $loan = DeviceLoan::query()->with(['device', 'units'])->findOrFail((int) $line['loan_id']);
@@ -123,21 +152,13 @@ class LoanReturnController extends Controller
                 }
 
                 $done[] = [$loan, $units];
+                // Sofort verbrauchen: Ein Scan deckt genau eine Rückgabe – auch innerhalb
+                // einer Anfrage (sonst schließt ein Scan alle Ausleihen desselben Geräts)
+                $this->scans->consume($loan, $units);
             }
 
             return $done;
         });
-
-        foreach ($done as [$loan, $units]) {
-            $this->scans->consume($loan, $units);
-        }
-
-        $issues = collect($done)->contains(fn ($d) => $d[0]->hasOpenIssues());
-        $count = count($done);
-
-        return redirect()->route('loans.return-scan')->with($issues ? 'warning' : 'success', $issues
-            ? __('Rückgabe gebucht – Zubehör fehlt, wurde vermerkt.')
-            : trans_choice(':count Rückgabe gebucht.|:count Rückgaben gebucht.', $count, ['count' => $count]));
     }
 
     /**

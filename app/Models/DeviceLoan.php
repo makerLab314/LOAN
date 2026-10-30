@@ -21,6 +21,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $notes
  * @property array<int, array{name: string, quantity: int, checked: bool}>|null $accessories
  * @property array<int, array{name: string, missing: int}>|null $return_issues
+ * @property bool $checkout_scanned Beim Ausleihen gescannt → Rückgabe am Kiosk nur per Scan
  * @property Carbon|null $returned_at
  * @property Carbon|null $issues_resolved_at
  * @property-read int $outstanding_quantity
@@ -41,6 +42,7 @@ class DeviceLoan extends Model
         'accessories',
         'return_issues',
         'loaned_by',
+        'checkout_scanned',
         'returned_at',
         'returned_by',
         'device_reservation_id',
@@ -58,6 +60,7 @@ class DeviceLoan extends Model
         'return_issues' => 'array',
         'quantity' => 'integer',
         'returned_quantity' => 'integer',
+        'checkout_scanned' => 'boolean',
     ];
 
     /** @return BelongsTo<Device, $this> */

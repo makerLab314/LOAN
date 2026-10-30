@@ -91,6 +91,47 @@ class UserController extends Controller
             'must_change_password' => ['nullable', 'boolean'],
         ], [], $this->attributeNames());
 
+        $roleChanged = DB::transaction(fn () => $this->saveUser($request, $user, $data));
+
+        // Eigenes Konto: den angemeldeten Nutzer aktualisieren, damit AuthenticateSession
+        // den neuen Passwort-Hash speichert und die aktuelle Sitzung nicht beendet
+        if ($user->is($request->user())) {
+            Auth::guard('web')->setUser($user);
+        }
+
+        Audit::log('user.updated', $user, array_filter([
+            'role' => $roleChanged ? $user->role : null,
+            'password_reset' => ! empty($data['password']) ?: null,
+            'must_change_password' => ! empty($data['password']) && $user->must_change_password ?: null,
+        ]));
+
+        return redirect()->route('admin.users.index')->with('success', __('Nutzer gespeichert.'));
+    }
+
+    public function destroy(User $user): RedirectResponse
+    {
+        DB::transaction(function () use ($user) {
+            $this->lockAdmins();
+            $this->authorize('delete', $user->refresh());
+
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+            $user->delete();
+        });
+        Audit::log('user.deleted', $user);
+
+        return redirect()->route('admin.users.index')->with('success', __('Nutzer gelöscht.'));
+    }
+
+    /**
+     * Speichern unter Sperre der Admin-Zeilen (siehe lockAdmins).
+     *
+     * @param  array<string, mixed>  $data
+     * @return bool Rolle geändert?
+     */
+    private function saveUser(Request $request, User $user, array $data): bool
+    {
+        $this->lockAdmins();
+        $user->refresh();
         $this->authorize('changeRole', [$user, $data['role']]);
 
         $roleChanged = $user->role !== $data['role'];
@@ -119,30 +160,16 @@ class UserController extends Controller
 
         $user->save();
 
-        // Eigenes Konto: den angemeldeten Nutzer aktualisieren, damit AuthenticateSession
-        // den neuen Passwort-Hash speichert und die aktuelle Sitzung nicht beendet
-        if ($user->is($request->user())) {
-            Auth::guard('web')->setUser($user);
-        }
-
-        Audit::log('user.updated', $user, array_filter([
-            'role' => $roleChanged ? $user->role : null,
-            'password_reset' => ! empty($data['password']) ?: null,
-            'must_change_password' => ! empty($data['password']) && $user->must_change_password ?: null,
-        ]));
-
-        return redirect()->route('admin.users.index')->with('success', __('Nutzer gespeichert.'));
+        return $roleChanged;
     }
 
-    public function destroy(User $user): RedirectResponse
+    /**
+     * Zwei Admins, die sich gleichzeitig herabstufen oder löschen, dürfen nicht beide
+     * "es gibt noch einen anderen Admin" sehen (UserPolicy) – sonst bleibt keiner übrig.
+     */
+    private function lockAdmins(): void
     {
-        $this->authorize('delete', $user);
-
-        DB::table('sessions')->where('user_id', $user->id)->delete();
-        $user->delete();
-        Audit::log('user.deleted', $user);
-
-        return redirect()->route('admin.users.index')->with('success', __('Nutzer gelöscht.'));
+        User::query()->where('role', User::ROLE_ADMIN)->lockForUpdate()->pluck('id');
     }
 
     /**

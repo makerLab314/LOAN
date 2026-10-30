@@ -15,6 +15,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class DeviceController extends Controller
@@ -125,13 +126,16 @@ class DeviceController extends Controller
     {
         $data = $this->validated($request, $device);
 
-        if ($error = $this->quantityConflict($device, (int) $data['total_quantity'])) {
-            return back()->withInput()->withErrors(['total_quantity' => $error]);
-        }
-
         $before = $device->only(['inventory_number', 'title', 'category_id', 'total_quantity']);
 
         DB::transaction(function () use ($request, $data, $device) {
+            // Unter derselben Sperre wie Ausleihen/Vormerkungen prüfen – sonst passt eine
+            // gleichzeitig gebuchte Ausleihe nicht mehr in die neue Gesamtmenge
+            Device::query()->whereKey($device->id)->lockForUpdate()->first();
+            if ($error = $this->quantityConflict($device->refresh(), (int) $data['total_quantity'])) {
+                throw ValidationException::withMessages(['total_quantity' => $error]);
+            }
+
             $payload = [
                 'inventory_number' => ($data['inventory_number'] ?? null) ?: ($device->inventory_number ?: $this->numbers->next(Category::find($data['category_id']))),
                 'title' => $data['title'],

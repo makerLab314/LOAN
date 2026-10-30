@@ -10,6 +10,7 @@ use App\Policies\RoomBookingPolicy;
 use App\Policies\UserPolicy;
 use App\Support\Audit;
 use App\Support\Branding;
+use App\Support\ClientIp;
 use App\Support\Settings;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
@@ -112,8 +113,8 @@ class AppServiceProvider extends ServiceProvider
     private function registerRateLimiters(): void
     {
         // Zusätzlich zur Sperre pro E-Mail+IP (LoginRequest): max. 20 Versuche/Minute je IP
-        RateLimiter::for('login', fn (Request $request) => Limit::perMinute(20)->by('login|'.$request->ip()));
-        RateLimiter::for('password-reset', fn (Request $request) => Limit::perMinute(5)->by('pw|'.$request->ip()));
+        RateLimiter::for('login', fn (Request $request) => Limit::perMinute(20)->by('login|'.ClientIp::bucket($request->ip())));
+        RateLimiter::for('password-reset', fn (Request $request) => Limit::perMinute(5)->by('pw|'.ClientIp::bucket($request->ip())));
         RateLimiter::for('search', fn (Request $request) => Limit::perMinute(120)->by('search|'.($request->user()?->id ?: $request->ip())));
     }
 

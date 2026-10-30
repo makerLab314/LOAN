@@ -81,13 +81,14 @@ Route::middleware(['auth', 'auth.session'])->group(function () {
         // Rückgabe per Scan (am Kiosk der einzige Weg, siehe ReturnScans)
         Route::middleware('can:loans.return')->group(function () {
             Route::get('/loans/return', [LoanReturnController::class, 'create'])->name('loans.return-scan');
-            Route::post('/loans/return', [LoanReturnController::class, 'store'])->name('loans.return-scan.store');
+            // block(): gleichzeitige Rückgaben derselben Sitzung nacheinander (Scans liegen in der Sitzung)
+            Route::post('/loans/return', [LoanReturnController::class, 'store'])->block(5, 5)->name('loans.return-scan.store');
             Route::post('/loans/return/scan', [LoanReturnController::class, 'scan'])->middleware('throttle:search')->name('loans.return-scan.lookup');
         });
 
         Route::get('/loans/history', [DeviceLoanController::class, 'history'])->middleware('not-kiosk')->name('loans.history');
         Route::post('/devices/{device}/loans', [DeviceLoanController::class, 'store'])->middleware('can:loans.create')->name('loans.store');
-        Route::post('/loans/{loan}/return', [DeviceLoanController::class, 'return'])->middleware('can:loans.return')->name('loans.return');
+        Route::post('/loans/{loan}/return', [DeviceLoanController::class, 'return'])->middleware('can:loans.return')->block(5, 5)->name('loans.return');
         Route::post('/loans/{loan}/extend', [DeviceLoanController::class, 'extend'])->middleware('can:loans.extend')->name('loans.extend');
         Route::post('/loans/{loan}/resolve', [DeviceLoanController::class, 'resolveIssues'])->middleware('can:loans.resolve')->name('loans.resolve');
 

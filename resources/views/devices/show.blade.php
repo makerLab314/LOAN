@@ -1,12 +1,14 @@
 @extends('layouts.app')
+@use('App\Support\Names')
 @section('title', $device->title)
 
 @php
     $form = old('_form');
     $canLoan = Gate::allows('loans.create');
     $canReturn = Gate::allows('loans.return');
-    // Kiosk: Rückgabe nur über „Zurückgeben“ per Scan, nicht direkt hier
-    $returnHere = $canReturn && ! auth()->user()->isKiosk();
+    // Kiosk: Was per Scan ausgeliehen wurde, geht nur per Scan zurück („Zurückgeben“) –
+    // der Rest (abgefallenes Etikett, großer Lautsprecher) direkt hier
+    $returnHere = fn ($loan) => $canReturn && (! auth()->user()->isKiosk() || ! $loan->checkout_scanned);
     $canExtend = Gate::allows('loans.extend');
     $accessoryItems = $device->accessories->map(fn ($a) => ['key' => $a->id, 'name' => $a->name, 'quantity' => $a->quantity])->all();
     $defaultDays = (int) $settings->get('loans.default_days');
@@ -42,11 +44,11 @@
             <p class="flex-1 text-sm">
                 {{ __('Gescannt:') }} <span class="id-chip">{{ $device->unitLabel($preselectUnit) }}</span>
                 @isset($loanedUnits[$preselectUnit])
-                    – {{ __('verliehen an :name', ['name' => $loanedUnits[$preselectUnit]->borrower_name]) }}
+                    – {{ __('verliehen an :name', ['name' => Names::shown($loanedUnits[$preselectUnit]->borrower_name)]) }}
                 @endisset
             </p>
             @isset($loanedUnits[$preselectUnit])
-                @if ($returnHere)
+                @if ($returnHere($loanedUnits[$preselectUnit]))
                     <button type="button" class="btn btn-primary btn-sm" data-dialog="return-dialog-{{ $loanedUnits[$preselectUnit]->id }}">{{ __('Zurücknehmen') }}</button>
                 @elseif ($canReturn)
                     <a href="{{ route('loans.return-scan') }}" class="btn btn-primary btn-sm">{{ __('Zurückgeben') }}</a>
@@ -100,7 +102,7 @@
                             <li @class(['flex items-center justify-between gap-2 px-4 py-2 sm:px-5', 'bg-accent-soft' => $preselectUnit === $n])>
                                 <span class="id-chip">{{ $device->unitLabel($n) }}</span>
                                 @isset($loanedUnits[$n])
-                                    <span class="truncate text-xs text-muted">{{ $loanedUnits[$n]->borrower_name }}</span>
+                                    <span class="truncate text-xs text-muted">{{ Names::shown($loanedUnits[$n]->borrower_name) }}</span>
                                 @else
                                     <span class="text-xs text-muted">—</span>
                                 @endisset
@@ -121,7 +123,7 @@
                         @foreach ($openIssues as $loan)
                             <li class="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:px-5">
                                 <div class="flex-1 text-sm">
-                                    <p class="font-medium">{{ $loan->borrower_name }} <span class="font-normal text-muted">· {{ __('Rückgabe am :date', ['date' => $loan->returned_at?->format('d.m.Y')]) }}</span></p>
+                                    <p class="font-medium">{{ Names::shown($loan->borrower_name) }} <span class="font-normal text-muted">· {{ __('Rückgabe am :date', ['date' => $loan->returned_at?->format('d.m.Y')]) }}</span></p>
                                     <p class="text-muted">{{ collect($loan->return_issues)->map(fn ($i) => $i['missing'].'× '.$i['name'])->join(', ') }}</p>
                                 </div>
                                 @can('loans.resolve')
@@ -156,7 +158,7 @@
                                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start">
                                     <div class="min-w-0 flex-1">
                                         <p class="font-medium">
-                                            {{ $loan->borrower_name }}
+                                            {{ Names::shown($loan->borrower_name) }}
                                             <span class="font-normal text-muted">· {{ $loan->outstanding_quantity }}×</span>
                                             @if ($loan->returned_quantity > 0)
                                                 <span class="badge badge-muted">{{ __(':n zurück', ['n' => $loan->returned_quantity]) }}</span>
@@ -192,7 +194,7 @@
                                     </div>
                                     @if ($canReturn)
                                         <div class="flex shrink-0 gap-2">
-                                            @if ($returnHere)
+                                            @if ($returnHere($loan))
                                                 <button type="button" class="btn btn-primary btn-sm" data-dialog="return-dialog-{{ $loan->id }}"><x-icon name="undo"/>{{ __('Rückgabe') }}</button>
                                             @else
                                                 <a href="{{ route('loans.return-scan') }}" class="btn btn-primary btn-sm"><x-icon name="undo"/>{{ __('Rückgabe') }}</a>
@@ -223,7 +225,7 @@
                         @foreach ($reservations as $r)
                             <li class="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:px-5">
                                 <div class="min-w-0 flex-1 text-sm">
-                                    <p class="font-medium">{{ $r->quantity }}× · {{ $r->displayName() }}</p>
+                                    <p class="font-medium">{{ $r->quantity }}× · {{ Names::shown($r->displayName()) }}</p>
                                     <p class="text-muted">{{ $r->start_at->format('d.m.Y H:i') }} – {{ $r->end_at->format('d.m.Y H:i') }}
                                         @if ($r->end_at->isPast())<span class="badge badge-warn ml-1">{{ __('abgelaufen') }}</span>@endif
                                     </p>
@@ -338,10 +340,11 @@
         </datalist>
     @endif
 
-    @if ($returnHere)
+    @if ($canReturn)
         @foreach ($activeLoans as $loan)
+            @continue(! $returnHere($loan))
             @php $outstandingUnits = $loan->outstandingUnitNumbers(); @endphp
-            <x-modal :id="'return-dialog-'.$loan->id" :title="__('Rückgabe: :name', ['name' => $loan->borrower_name])" :open-on-load="$form === 'return-'.$loan->id">
+            <x-modal :id="'return-dialog-'.$loan->id" :title="__('Rückgabe: :name', ['name' => Names::shown($loan->borrower_name)])" :open-on-load="$form === 'return-'.$loan->id">
                 <form method="POST" action="{{ route('loans.return', $loan) }}" class="space-y-4" x-data="returnForm" @change="count" @input="count"
                       data-mode="{{ $form === 'return-'.$loan->id ? old('mode', 'all') : 'all' }}" data-outstanding="{{ $loan->outstanding_quantity }}">
                     @csrf
@@ -414,7 +417,7 @@
                 </form>
             </x-modal>
 
-            <x-modal :id="'extend-dialog-'.$loan->id" :title="__('Verlängern: :name', ['name' => $loan->borrower_name])" :open-on-load="$form === 'extend-'.$loan->id">
+            <x-modal :id="'extend-dialog-'.$loan->id" :title="__('Verlängern: :name', ['name' => Names::shown($loan->borrower_name)])" :open-on-load="$form === 'extend-'.$loan->id">
                 <form method="POST" action="{{ route('loans.extend', $loan) }}" class="space-y-4">
                     @csrf
                     <input type="hidden" name="_form" value="extend-{{ $loan->id }}">

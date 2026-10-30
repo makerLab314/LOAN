@@ -80,7 +80,7 @@ class LegacyMigrationTest extends TestCase
         $this->assertFalse(Schema::hasTable('device_histories'));
 
         // Rückwärts migrieren funktioniert
-        Artisan::call('migrate:rollback', ['--step' => 4, '--force' => true]);
+        Artisan::call('migrate:rollback', ['--step' => 5, '--force' => true]);
         $this->assertTrue(Schema::hasColumn('reservations', 'start_date'));
     }
 }

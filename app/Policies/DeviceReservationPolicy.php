@@ -21,6 +21,10 @@ class DeviceReservationPolicy
 
     public function convert(User $user, DeviceReservation $reservation): bool
     {
+        // Am Kiosk gehören alle Vormerkungen demselben Konto – dort kann also jeder die
+        // Vormerkung eines anderen abholen. Bewusst erlaubt, solange der Kiosk in einem
+        // abgeschlossenen Raum steht. Sonst stattdessen diese Zeile verwenden:
+        // if (! $reservation->isActive() || $user->isKiosk() || ! $user->can('loans.create')) {
         if (! $reservation->isActive() || ! $user->can('loans.create')) {
             return false;
         }

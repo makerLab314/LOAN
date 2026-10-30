@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use App\Models\User;
+use App\Support\ClientIp;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -13,6 +14,12 @@ use Illuminate\Validation\ValidationException;
 
 class LoginRequest extends FormRequest
 {
+    /** Fehlversuche je Konto – egal von welcher IP –, bevor es kurz gesperrt wird */
+    private const ACCOUNT_MAX_ATTEMPTS = 20;
+
+    /** Sekunden */
+    private const ACCOUNT_DECAY = 900;
+
     /**
      * Determine if the user is authorized to make this request.
      */
@@ -48,6 +55,7 @@ class LoginRequest extends FormRequest
 
         if (! Auth::attempt($this->only('email', 'password'), $kiosk || $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
+            RateLimiter::hit($this->accountThrottleKey(), self::ACCOUNT_DECAY);
 
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
@@ -55,6 +63,7 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+        RateLimiter::clear($this->accountThrottleKey());
     }
 
     /**
@@ -64,13 +73,20 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
+        // Pro E-Mail+IP (5) und pro Konto über alle IPs hinweg (bremst verteiltes Raten)
+        $key = match (true) {
+            RateLimiter::tooManyAttempts($this->throttleKey(), 5) => $this->throttleKey(),
+            RateLimiter::tooManyAttempts($this->accountThrottleKey(), self::ACCOUNT_MAX_ATTEMPTS) => $this->accountThrottleKey(),
+            default => null,
+        };
+
+        if ($key === null) {
             return;
         }
 
         event(new Lockout($this));
 
-        $seconds = RateLimiter::availableIn($this->throttleKey());
+        $seconds = RateLimiter::availableIn($key);
 
         throw ValidationException::withMessages([
             'email' => trans('auth.throttle', [
@@ -85,6 +101,11 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->input('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->input('email')).'|'.ClientIp::bucket($this->ip()));
+    }
+
+    private function accountThrottleKey(): string
+    {
+        return 'login-account|'.Str::transliterate(Str::lower((string) $this->input('email')));
     }
 }

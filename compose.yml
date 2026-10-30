@@ -91,3 +91,11 @@ services:
 
 volumes:
   public_assets:
+
+networks:
+  default:
+    ipam:
+      config:
+        # Feste Adressen: Ein Reverse Proxy auf dem Host kommt bei nginx als 172.30.10.1
+        # (Gateway) an – genau diese Adresse steht in TRUSTED_PROXIES und conf/default.conf
+        - subnet: 172.30.10.0/24

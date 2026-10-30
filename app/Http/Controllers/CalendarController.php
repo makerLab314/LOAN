@@ -6,6 +6,7 @@ use App\Models\DeviceLoan;
 use App\Models\DeviceReservation;
 use App\Models\Room;
 use App\Models\RoomBooking;
+use App\Support\Names;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -85,7 +86,7 @@ class CalendarController extends Controller
                         'classNames' => ['ev-reservation'],
                         'extendedProps' => [
                             'kind' => __('Vormerkung'),
-                            'detail' => __('Für :name', ['name' => $r->displayName()]).($r->purpose ? ' · '.$r->purpose : ''),
+                            'detail' => __('Für :name', ['name' => Names::shown($r->displayName())]).($r->purpose ? ' · '.$r->purpose : ''),
                             'url' => route('devices.show', $r->device_id),
                         ],
                     ];
@@ -100,7 +101,7 @@ class CalendarController extends Controller
                 ->each(function (DeviceLoan $l) use (&$events) {
                     $events[] = [
                         'id' => 'l'.$l->id,
-                        'title' => $l->outstanding_quantity.'× '.($l->device?->title ?? '—').' → '.$l->borrower_name,
+                        'title' => $l->outstanding_quantity.'× '.($l->device?->title ?? '—').' → '.Names::shown($l->borrower_name),
                         'start' => $l->loan_start_date->toDateString(),
                         'end' => $l->loan_end_date->copy()->addDay()->toDateString(),
                         'allDay' => true,

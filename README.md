@@ -146,13 +146,14 @@ server {
     location / {
         proxy_pass http://127.0.0.1:8080;
         proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        # Overwrite, don't append: the client must not be able to add its own entries
+        proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 }
 ```
 
-`TRUSTED_PROXIES` already covers the usual Docker and private networks. To run **without a proxy** (plain HTTP in a local network), set `APP_BIND=0.0.0.0`, `TRUSTED_PROXIES=` (empty), `SESSION_SECURE_COOKIE=false` and `APP_URL=http://your-server:8080`.
+`TRUSTED_PROXIES=172.30.10.1` trusts exactly this proxy (it reaches nginx through the gateway of the Compose network). Never trust whole private ranges: clients in the school network live there too and could fake their IP. To run **without a proxy** (plain HTTP in a local network), set `APP_BIND=0.0.0.0`, `TRUSTED_PROXIES=` (empty), `SESSION_SECURE_COOKIE=false` and `APP_URL=http://your-server:8080`.
 
 ### 5. Set it up
 
@@ -296,7 +297,7 @@ git tag v2.5.0
 git push origin v2.5.0
 ```
 
-The [release workflow](.github/workflows/release.yml) runs the CI, builds the image for amd64, publishes it as `ghcr.io/makerlab314/loan:2.5.0`, `:2.5`, `:2` and `:latest`, and creates a GitHub release with the changes. Tags with a hyphen (`v2.5.0-rc.1`) become pre-releases: they do not get `latest`, and `./deploy.sh` without a version skips them.
+The [release workflow](.github/workflows/release.yml) runs the CI, builds the image for amd64, publishes it as `ghcr.io/makerlab314/loan:2.5.0`, `:2.5`, `:2` and `:latest`, and creates a GitHub release with the changes. The section `## v2.5.0` from [CHANGELOG.md](CHANGELOG.md) goes on top of the generated notes, so add it before tagging. Tags with a hyphen (`v2.5.0-rc.1`) become pre-releases: they do not get `latest`, and `./deploy.sh` without a version skips them.
 
 ## Credits and license
 

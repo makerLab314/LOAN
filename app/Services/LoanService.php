@@ -23,6 +23,7 @@ class LoanService
     public function __construct(
         private Availability $availability,
         private Settings $settings,
+        private CheckoutScans $checkoutScans,
     ) {}
 
     /**
@@ -94,6 +95,8 @@ class LoanService
                 'notes' => $data['notes'] ?? null,
                 'accessories' => $this->accessorySnapshot($device, $quantity, $data['accessories'] ?? null),
                 'loaned_by' => $actor->id,
+                // Vorher gescannt? Dann geht es am Kiosk auch nur per Scan zurück
+                'checkout_scanned' => $this->checkoutScans->scanned($device),
                 'device_reservation_id' => $fromReservation?->id,
             ]);
 

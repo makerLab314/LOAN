@@ -50,6 +50,7 @@ main() {
             echo "Version $target gibt es nicht. Vorhanden: $(git tag -l 'v*' --sort=-v:refname | head -n5 | tr '\n' ' ')" >&2
             exit 1
         fi
+        verify_signature "$target"
         echo "==> Update auf $target"
     fi
 
@@ -117,6 +118,21 @@ main() {
     echo "==> Status"
     docker compose ps
     echo "Fertig ($version). Logs: docker compose logs -f loan"
+}
+
+# Releases sind signierte Commits. Mit hinterlegten Schlüsseln wird das geprüft – dann läuft
+# kein Update auf einen Stand, den jemand mit fremdem Zugang zum Repository untergeschoben hat.
+# Einrichten: git config gpg.ssh.allowedSignersFile /pfad/allowed_signers
+verify_signature() {
+    if [ -z "$(git config --get gpg.ssh.allowedSignersFile || true)" ]; then
+        echo "HINWEIS: Signatur von $1 nicht geprüft (gpg.ssh.allowedSignersFile ist nicht gesetzt, siehe UPGRADE.md)"
+        return
+    fi
+    if ! git verify-commit "$1^{commit}" >/dev/null 2>&1; then
+        echo "Signatur von $1 ist ungültig oder fehlt – Abbruch." >&2
+        exit 1
+    fi
+    echo "==> Signatur von $1 geprüft"
 }
 
 set_env() {

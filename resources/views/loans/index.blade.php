@@ -1,4 +1,5 @@
 @extends('layouts.app')
+@use('App\Support\Names')
 @section('title', __('Ausleihen'))
 
 @section('content')
@@ -62,7 +63,7 @@
                                 </p>
                             </td>
                             <td>
-                                {{ $loan->borrower_name }}
+                                {{ Names::shown($loan->borrower_name) }}
                                 @if ($loan->loan_purpose)<p class="max-w-56 truncate text-xs text-muted">{{ $loan->loan_purpose }}</p>@endif
                             </td>
                             <td class="hidden text-muted md:table-cell">{{ $loan->loan_start_date->format('d.m.') }} – {{ $loan->loan_end_date->format('d.m.Y') }}</td>
@@ -93,7 +94,7 @@
                     <li class="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:px-5">
                         <div class="min-w-0 flex-1">
                             <a href="{{ route('devices.show', $r->device_id) }}" class="font-medium hover:text-accent">{{ $r->quantity }}× {{ $r->device?->title }}</a>
-                            <p class="text-sm text-muted">{{ $r->displayName() }} · {{ $r->start_at->format('d.m.Y H:i') }} – {{ $r->end_at->format('d.m.Y H:i') }}</p>
+                            <p class="text-sm text-muted">{{ Names::shown($r->displayName()) }} · {{ $r->start_at->format('d.m.Y H:i') }} – {{ $r->end_at->format('d.m.Y H:i') }}</p>
                             @if ($r->purpose)<p class="text-xs text-muted">{{ $r->purpose }}</p>@endif
                         </div>
                         <div class="flex items-center gap-2">
@@ -126,7 +127,7 @@
                     <li class="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:px-5">
                         <div class="min-w-0 flex-1 text-sm">
                             <a href="{{ route('devices.show', $loan->device_id) }}" class="font-medium hover:text-accent">{{ $loan->device?->title }}</a>
-                            · {{ $loan->borrower_name }}
+                            · {{ Names::shown($loan->borrower_name) }}
                             <p class="text-muted">{{ collect($loan->return_issues)->map(fn ($i) => $i['missing'].'× '.$i['name'])->join(', ') }}</p>
                         </div>
                         @can('loans.resolve')

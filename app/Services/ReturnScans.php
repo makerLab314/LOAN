@@ -8,8 +8,9 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * Merkt sich in der Sitzung, welche Geräte/Exemplare gerade gescannt (oder per
- * ID eingegeben) wurden. Am Kiosk darf nur zurückgegeben werden, was vorher so
- * erfasst wurde – das macht "Rückgaben" ohne das Gerät in der Hand mühsam.
+ * ID eingegeben) wurden. Was mit Scan ausgeliehen wurde (CheckoutScans), darf am
+ * Kiosk nur so zurückgegeben werden – das macht "Rückgaben" ohne das Gerät in der
+ * Hand mühsam. Ohne Scan Ausgeliehenes geht am Kiosk auch ohne Scan zurück.
  */
 class ReturnScans
 {
@@ -45,6 +46,12 @@ class ReturnScans
      */
     public function authorize(DeviceLoan $loan, ?array $units): ?array
     {
+        // Nur was mit Scan ausgeliehen wurde, braucht auch zur Rückgabe einen Scan –
+        // nicht Geräte ohne (abgefallenes) Etikett oder zu groß zum Hochheben
+        if (! $loan->checkout_scanned) {
+            return $units ? array_values(array_unique(array_map('intval', $units))) : null;
+        }
+
         $loan->loadMissing('units', 'device');
         $entry = $this->all()[$loan->device_id] ?? null;
         $outstanding = $loan->outstandingUnitNumbers();
@@ -80,7 +87,8 @@ class ReturnScans
     public function consume(DeviceLoan $loan, ?array $units): void
     {
         $scans = $this->all();
-        if (! isset($scans[$loan->device_id])) {
+        // Ohne Scan ausgeliehen: Ein Scan desselben Geräts bleibt für eine andere Ausleihe
+        if (! $loan->checkout_scanned || ! isset($scans[$loan->device_id])) {
             return;
         }
 
@@ -95,6 +103,24 @@ class ReturnScans
             unset($scans[$loan->device_id]);
         }
 
+        session()->put(self::KEY, $scans);
+    }
+
+    /**
+     * Stand vor einer Sammel-Rückgabe – scheitert sie, gelten die Scans weiter.
+     *
+     * @return array<int, array{at: int, units: array<int, int>}>
+     */
+    public function snapshot(): array
+    {
+        return $this->all();
+    }
+
+    /**
+     * @param  array<int, array{at: int, units: array<int, int>}>  $scans
+     */
+    public function restore(array $scans): void
+    {
         session()->put(self::KEY, $scans);
     }
 

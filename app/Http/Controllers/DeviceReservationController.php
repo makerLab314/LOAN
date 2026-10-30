@@ -9,6 +9,7 @@ use App\Services\LoanService;
 use App\Support\Audit;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class DeviceReservationController extends Controller
@@ -62,7 +63,20 @@ class DeviceReservationController extends Controller
     {
         $this->authorize('cancel', $reservation);
 
-        $reservation->update(['status' => DeviceReservation::STATUS_CANCELLED]);
+        // Unter Sperre erneut prüfen – sonst überschreibt ein gleichzeitiges Ausgeben den Status
+        $cancelled = DB::transaction(function () use ($reservation) {
+            $locked = DeviceReservation::query()->whereKey($reservation->id)->lockForUpdate()->firstOrFail();
+            if (! $locked->isActive()) {
+                return false;
+            }
+
+            return $locked->update(['status' => DeviceReservation::STATUS_CANCELLED]);
+        });
+
+        if (! $cancelled) {
+            return back()->with('error', __('Diese Vormerkung wurde bereits ausgegeben oder widerrufen.'));
+        }
+
         Audit::log('device_reservation.cancelled', $reservation);
 
         return back()->with('success', __('Vormerkung widerrufen.'));

@@ -22,13 +22,14 @@ Route::middleware('guest')->group(function () {
         ->middleware('throttle:password-reset')->name('password.store');
 });
 
-Route::middleware('auth')->group(function () {
+// auth.session überall: Nach einer Passwortänderung gilt auch ein altes Remember-Cookie nicht mehr
+Route::middleware(['auth', 'auth.session'])->group(function () {
     Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])->name('password.confirm');
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store'])->middleware('throttle:6,1');
 
     // Vom Admin vergebenes Passwort ersetzen (siehe RequirePasswordChange)
-    Route::get('password/change', [ForcedPasswordController::class, 'show'])->middleware('auth.session')->name('password.force');
-    Route::put('password/change', [ForcedPasswordController::class, 'update'])->middleware(['auth.session', 'throttle:6,1'])->name('password.force.update');
+    Route::get('password/change', [ForcedPasswordController::class, 'show'])->name('password.force');
+    Route::put('password/change', [ForcedPasswordController::class, 'update'])->middleware('throttle:6,1')->name('password.force.update');
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
