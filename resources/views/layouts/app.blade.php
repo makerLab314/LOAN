@@ -1,6 +1,6 @@
 @php $kiosk = (bool) auth()->user()?->isKiosk(); @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['h-full', 'lite' => $kiosk])
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['h-full', 'lite kiosk' => $kiosk])
       data-theme="{{ auth()->user()?->theme ?? 'system' }}"
       style="--accent: {{ $branding->accent() }}; --accent-fg: {{ $branding->accentForeground() }};">
 <head>
@@ -17,8 +17,8 @@
 <body class="h-full" @if ($kiosk) data-kiosk-idle="120" data-kiosk-home="{{ route('home') }}" @endif>
 <div x-data="shell" class="min-h-full" @keydown.window="onKey">
 
-    {{-- Sidebar (Desktop) --}}
-    <aside class="sidebar fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r lg:flex">
+    {{-- Sidebar (Desktop; bei 1024–1279 px, z. B. Kiosk-Tablet quer, als schmale Symbolleiste) --}}
+    <aside class="sidebar fixed inset-y-0 left-0 z-30 hidden w-20 flex-col border-r lg:flex xl:w-64">
         @include('layouts.partials.nav')
     </aside>
 
@@ -30,10 +30,10 @@
         </aside>
     </div>
 
-    <div class="lg:pl-64">
-        {{-- Topbar --}}
-        <header class="glass sticky top-0 z-20 border-b border-[var(--glass-border)]">
-            <div class="flex h-14 items-center gap-2 px-3 sm:px-6 lg:px-8">
+    <div class="lg:pl-20 xl:pl-64">
+        {{-- Topbar (Kiosk ab Tablet-Breite ohne: Farbschema und Beenden stehen dann in der Seitenleiste) --}}
+        <header @class(['glass sticky top-0 z-20 border-b border-[var(--glass-border)]', 'lg:hidden' => $kiosk])>
+            <div class="flex h-14 items-center gap-2 px-3 sm:px-6 xl:px-8">
                 <button type="button" class="btn btn-ghost btn-icon lg:hidden" @click="openDrawer" aria-label="{{ __('Menü') }}">
                     <x-icon name="menu" class="size-5"/>
                 </button>
@@ -63,7 +63,7 @@
 
         @include('layouts.partials.flash')
 
-        <main class="mx-auto w-full max-w-7xl px-4 pt-6 pb-28 sm:px-6 lg:px-8 lg:pb-10">
+        <main class="mx-auto w-full max-w-7xl px-4 pt-6 pb-28 sm:px-6 lg:pb-10 xl:px-8">
             @yield('content')
         </main>
 

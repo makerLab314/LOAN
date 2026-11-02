@@ -653,5 +653,8 @@
     "Administration": "Administration",
     "Moderation": "Moderation",
     "Raumplanung": "Room planning",
-    "Kiosk": "Kiosk"
+    "Kiosk": "Kiosk",
+    "Hand-Scanner": "Hand scanner",
+    "An, wenn ein Hand-Scanner angeschlossen ist: Das ID-Feld ist dann immer bereit. Aus: Die Bildschirmtastatur erscheint erst beim Antippen.": "On when a hand scanner is connected: the ID field is always ready. Off: the on-screen keyboard only appears when you tap the field.",
+    "Kamera wechseln": "Switch camera"
 }

@@ -1,5 +1,6 @@
 import { postJson } from './http';
 import { createScanner } from './scanner';
+import { handScannerOn } from './handscanner';
 import { el, hidden, icon, translator, parseJson, setTone } from './dom';
 
 /**
@@ -100,7 +101,7 @@ export function mountCheckout() {
         const item = el('li', 'flex gap-3 px-4 py-3 sm:px-5');
         const body = el('div', 'min-w-0 flex-1 space-y-2');
         const head = el('p', 'flex flex-wrap items-center gap-2');
-        head.append(el('span', 'font-medium', device.title), el('span', 'id-chip', device.label));
+        head.append(el('span', 'font-medium kiosk:text-lg', device.title), el('span', 'id-chip', device.label));
         body.append(head);
         item.append(hidden(`items[${index}][device_id]`, device.id), body);
 
@@ -129,7 +130,7 @@ export function mountCheckout() {
                 for (let n = 1; n <= device.total; n += 1) {
                     const busy = device.busy.includes(n);
                     const on = line.units.has(n);
-                    const chip = el('button', `min-w-10 rounded-md border px-1.5 py-1 font-mono text-xs transition ${busy
+                    const chip = el('button', `min-w-10 rounded-md border px-1.5 py-1 font-mono text-xs transition kiosk:min-w-12 kiosk:py-2 kiosk:text-sm ${busy
                         ? 'cursor-not-allowed border-dashed border-line bg-surface-2 text-muted line-through'
                         : (on ? 'border-accent bg-accent text-accent-fg' : 'border-line bg-surface hover:border-accent')}`, `-${n}`);
                     chip.type = 'button';
@@ -185,7 +186,8 @@ export function mountCheckout() {
         if (!code) return;
         codeInput.value = '';
         await lookup(code);
-        codeInput.focus();
+        // Ohne Hand-Scanner nicht neu fokussieren: auf Tablets bliebe sonst die Bildschirmtastatur offen
+        if (handScannerOn()) codeInput.focus();
     });
 
     pickerForm.addEventListener('submit', (event) => {

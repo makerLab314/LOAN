@@ -5,4 +5,4 @@
         <x-icon name="package" class="size-[60%]"/>
     </span>
 @endif
-<span class="truncate">{{ $branding->name() }}</span>
+<span class="brand-name truncate">{{ $branding->name() }}</span>

@@ -41,12 +41,14 @@ export function createScanner(root, onCode) {
     const video = root.querySelector('video');
     const startButton = root.querySelector('[data-scan-start]');
     const stopButton = root.querySelector('[data-scan-stop]');
+    const flipButton = root.querySelector('[data-scan-flip]');
     const status = root.querySelector('[data-scan-status]');
 
     let stream = null;
     let stopZxing = null;
     let busy = false;
     let lastCode = '';
+    let facing = preferredFacing();
 
     const setStatus = (text, tone = 'muted') => {
         status.textContent = text;
@@ -59,7 +61,7 @@ export function createScanner(root, onCode) {
         stream?.getTracks().forEach((t) => t.stop());
         stream = null;
         video.srcObject = null;
-        root.classList.remove('scanning');
+        root.classList.remove('scanning', 'front');
         startButton.hidden = false;
         stopButton.hidden = true;
     };
@@ -98,10 +100,11 @@ export function createScanner(root, onCode) {
                 const formats = await window.BarcodeDetector.getSupportedFormats();
                 const wanted = ['qr_code', 'code_128'].filter((f) => formats.includes(f));
                 if (wanted.length) {
-                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+                    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facing }, audio: false });
                     video.srcObject = stream;
                     await video.play();
                     root.classList.add('scanning');
+                    root.classList.toggle('front', facing === 'user');
                     setStatus('Code in den Rahmen halten…');
                     const detector = new window.BarcodeDetector({ formats: wanted });
                     const loop = async () => {
@@ -122,9 +125,10 @@ export function createScanner(root, onCode) {
             const hints = new Map([[DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128]]]);
             const reader = new BrowserMultiFormatReader(hints);
             root.classList.add('scanning');
+            root.classList.toggle('front', facing === 'user');
             setStatus('Code in den Rahmen halten…');
             const controls = await reader.decodeFromConstraints(
-                { video: { facingMode: 'environment' }, audio: false },
+                { video: { facingMode: facing }, audio: false },
                 video,
                 (result) => { if (result) handle(result.getText()); },
             );
@@ -137,6 +141,12 @@ export function createScanner(root, onCode) {
 
     startButton.addEventListener('click', start);
     stopButton.addEventListener('click', () => { stop(); setStatus('Scanner gestoppt.'); });
+    flipButton?.addEventListener('click', () => {
+        facing = facing === 'user' ? 'environment' : 'user';
+        try { localStorage.setItem(FACING_KEY, facing); } catch (e) { /* privat */ }
+        stop();
+        start();
+    });
     window.addEventListener('pagehide', stop);
 
     // Hand-Scanner (Tastatur-Emulation) tippen in das fokussierte ID-Feld und senden Enter
@@ -165,4 +175,16 @@ async function explain(e) {
         return `Keine Kamera gefunden. Bitte die ID eingeben. (${name})`;
     }
     return `Kamera konnte nicht gestartet werden. Bitte die ID eingeben. (${name})`;
+}
+
+// Vorder- oder Rückkamera, gemerkt je Gerät. Am Kiosk steht das Tablet meist im Ständer:
+// Die Person hält das Etikett vor den Bildschirm, also vor die Vorderkamera.
+const FACING_KEY = 'scanFacing';
+
+function preferredFacing() {
+    try {
+        const stored = localStorage.getItem(FACING_KEY);
+        if (stored === 'user' || stored === 'environment') return stored;
+    } catch (e) { /* privat */ }
+    return document.documentElement.classList.contains('kiosk') ? 'user' : 'environment';
 }

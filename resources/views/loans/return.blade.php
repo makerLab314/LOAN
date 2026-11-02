@@ -32,25 +32,29 @@
             : __('Etiketten scannen oder IDs eingeben – auch mehrere Geräte auf einmal.') }}</x-slot:subtitle>
     </x-page-header>
 
-    <div class="grid gap-6 lg:grid-cols-5" data-return
+    <div class="grid gap-6 lg:grid-cols-2 xl:grid-cols-5" data-return
          data-lookup="{{ route('loans.return-scan.lookup') }}"
          data-initial="{{ $initial->toJson() }}"
          data-i18n="{{ json_encode($i18n) }}">
 
-        <div class="space-y-4 lg:col-span-2">
-            <x-scanner aspect="aspect-[4/3]" :hint="__('Kamera starten und die Etiketten nacheinander in den Rahmen halten.')"/>
+        <div class="space-y-4 xl:col-span-2">
+            {{-- Im Querformat (Tablet) flacher, damit ID-Feld und Liste ohne Scrollen sichtbar bleiben --}}
+            <x-scanner aspect="aspect-[4/3] lg:aspect-video" :hint="__('Kamera starten und die Etiketten nacheinander in den Rahmen halten.')"/>
 
             <form class="card card-body" data-code-form>
-                <label class="label" for="return-code">{{ __('Inventar-ID eingeben') }}</label>
+                <div class="mb-1.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                    <label class="label mb-0" for="return-code">{{ __('Inventar-ID eingeben') }}</label>
+                    <x-hand-scanner/>
+                </div>
                 <div class="flex gap-2">
-                    <input id="return-code" class="input font-mono uppercase" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="KAB-0042-3" maxlength="200" autofocus>
-                    <button class="btn btn-primary"><x-icon name="plus"/>{{ __('Erfassen') }}</button>
+                    <input id="return-code" class="input input-code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="KAB-0042-3" maxlength="200" data-scan-focus>
+                    <button class="btn btn-primary btn-lg"><x-icon name="plus"/>{{ __('Erfassen') }}</button>
                 </div>
                 <p class="hint" data-return-feedback aria-live="polite">{{ __('Die ID steht auf dem Etikett am Gerät. Hand-Scanner tippen sie hier ein.') }}</p>
             </form>
         </div>
 
-        <form method="POST" action="{{ route('loans.return-scan.store') }}" class="space-y-4 lg:col-span-3" data-return-form>
+        <form method="POST" action="{{ route('loans.return-scan.store') }}" class="space-y-4 xl:col-span-3" data-return-form>
             @csrf
             <section class="card">
                 <div class="card-header">

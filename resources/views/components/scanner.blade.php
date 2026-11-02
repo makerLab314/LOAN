@@ -2,7 +2,7 @@
 @props(['hint' => __('Tipp: Die normale Handy-Kamera erkennt die QR-Etiketten auch direkt.'), 'aspect' => 'aspect-square'])
 <section {{ $attributes->merge(['class' => 'card overflow-hidden']) }} data-scanner>
     <div class="relative overflow-hidden {{ $aspect }} bg-black/90">
-        <video class="size-full object-cover" playsinline muted></video>
+        <video class="size-full object-cover [.front_&]:-scale-x-100" playsinline muted></video>
         <div class="pointer-events-none absolute inset-[18%] rounded-2xl border-2 border-white/70 shadow-[0_0_0_9999px_rgba(0,0,0,0.35)]"></div>
         <div class="absolute inset-0 grid place-items-center text-white/80 [.scanning_&]:hidden">
             <div class="text-center">
@@ -10,6 +10,11 @@
                 <p class="mt-2 text-sm">{{ __('Kamera ist aus') }}</p>
             </div>
         </div>
+        {{-- Vorder-/Rückkamera: Am Tablet im Ständer zeigt die Rückkamera oft zur Wand --}}
+        <button type="button" class="btn btn-icon absolute right-2 bottom-2 hidden rounded-full bg-black/50 text-white hover:bg-black/70 [.scanning_&]:inline-flex"
+                data-scan-flip title="{{ __('Kamera wechseln') }}" aria-label="{{ __('Kamera wechseln') }}">
+            <x-icon name="convert" class="size-5"/>
+        </button>
     </div>
     <div class="card-body space-y-3">
         <p class="text-sm text-muted" data-scan-status aria-live="polite">{{ $hint }}</p>

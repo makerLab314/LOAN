@@ -28,7 +28,7 @@
         <x-slot:subtitle>{{ __('Etiketten scannen oder IDs eingeben – auch mehrere Geräte. Name und Zeitraum gelten für alle.') }}</x-slot:subtitle>
     </x-page-header>
 
-    <div class="grid gap-6 lg:grid-cols-5" data-checkout
+    <div class="grid gap-6 lg:grid-cols-2 xl:grid-cols-5" data-checkout
          data-lookup="{{ route('lookup') }}"
          data-devices="{{ $catalog->toJson() }}"
          data-initial="{{ $initial->toJson() }}"
@@ -36,14 +36,18 @@
          data-i18n="{{ json_encode($i18n) }}">
 
         {{-- Erfassen: Kamera, ID, Liste --}}
-        <div class="space-y-4 lg:col-span-2">
-            <x-scanner aspect="aspect-[4/3]" :hint="__('Kamera starten und die Etiketten nacheinander in den Rahmen halten.')"/>
+        <div class="space-y-4 xl:col-span-2">
+            {{-- Im Querformat (Tablet) flacher, damit ID-Feld und Liste ohne Scrollen sichtbar bleiben --}}
+            <x-scanner aspect="aspect-[4/3] lg:aspect-video" :hint="__('Kamera starten und die Etiketten nacheinander in den Rahmen halten.')"/>
 
             <form class="card card-body" data-code-form>
-                <label class="label" for="checkout-code">{{ __('Inventar-ID eingeben') }}</label>
+                <div class="mb-1.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                    <label class="label mb-0" for="checkout-code">{{ __('Inventar-ID eingeben') }}</label>
+                    <x-hand-scanner/>
+                </div>
                 <div class="flex gap-2">
-                    <input id="checkout-code" class="input font-mono uppercase" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="KAB-0042-3" maxlength="200" autofocus>
-                    <button class="btn btn-primary"><x-icon name="plus"/>{{ __('Hinzufügen') }}</button>
+                    <input id="checkout-code" class="input input-code" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="KAB-0042-3" maxlength="200" data-scan-focus>
+                    <button class="btn btn-primary btn-lg"><x-icon name="plus"/>{{ __('Hinzufügen') }}</button>
                 </div>
                 <p class="hint" data-checkout-feedback aria-live="polite">{{ __('Hand-Scanner tippen die ID hier ein – Enter fügt hinzu.') }}</p>
             </form>
@@ -63,7 +67,7 @@
         </div>
 
         {{-- Auswahl + gemeinsame Angaben --}}
-        <form method="POST" action="{{ route('loans.checkout.store') }}" class="space-y-4 lg:col-span-3" data-checkout-form>
+        <form method="POST" action="{{ route('loans.checkout.store') }}" class="space-y-4 xl:col-span-3" data-checkout-form>
             @csrf
             <section class="card">
                 <div class="card-header">

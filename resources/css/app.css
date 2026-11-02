@@ -9,6 +9,8 @@
 
 /* Dark Mode über die Klasse "dark" an <html> (System/Hell/Dunkel wählbar) */
 @custom-variant dark (&:where(.dark, .dark *));
+/* Kiosk-Konto (Klasse "kiosk" an <html>), z. B. kiosk:text-lg */
+@custom-variant kiosk (&:where(.kiosk, .kiosk *));
 
 /* ---------------------------------------------------------------------------
  * Design-Tokens. --accent (+ --accent-fg) setzt das Layout aus den Einstellungen.
@@ -399,6 +401,108 @@
         content: '';
         @apply absolute top-1/2 -left-3 h-5 w-1 -translate-y-1/2 rounded-r-full bg-accent;
         box-shadow: 0 0 12px var(--accent);
+    }
+    /* Schmale Seitenleiste (1024–1279 px, z. B. Kiosk-Tablet quer): Symbol über Kurzbeschriftung */
+    .nav-short {
+        @apply hidden;
+    }
+    @media (width >= 64rem) and (width < 80rem) {
+        .sidebar .nav-link {
+            @apply flex-col justify-center gap-1 px-1 py-2 text-center text-[10.5px] leading-tight;
+        }
+        .sidebar .nav-link svg {
+            @apply size-[22px];
+        }
+        .sidebar .nav-short {
+            @apply block max-w-full truncate;
+        }
+        .sidebar .nav-link.active::before {
+            @apply -left-2;
+        }
+    }
+
+    /* Größere Variante für Scan-Seiten: ID-Feld und Hauptknopf */
+    .btn-lg {
+        @apply px-5 py-3 text-base;
+    }
+    .btn-lg svg {
+        @apply size-5;
+    }
+    .input-code {
+        @apply py-2.5 font-mono text-lg tracking-wide uppercase;
+    }
+
+    /* Schalter (Checkbox als Kippschalter) */
+    .switch {
+        @apply inline-flex cursor-pointer items-center gap-2 text-xs font-medium text-muted select-none;
+    }
+    .switch input {
+        @apply sr-only;
+    }
+    .switch-track {
+        @apply relative h-5 w-9 shrink-0 rounded-full bg-surface-2 transition;
+        box-shadow: inset 0 0 0 1px var(--border);
+    }
+    .switch-track::after {
+        content: '';
+        @apply absolute top-0.5 left-0.5 size-4 rounded-full bg-surface transition-transform;
+        box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
+    }
+    .switch input:checked + .switch-track {
+        background: var(--accent);
+        box-shadow: none;
+    }
+    .switch input:checked + .switch-track::after {
+        @apply translate-x-4;
+    }
+    .switch input:focus-visible + .switch-track {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+    }
+    .switch:has(input:checked) {
+        @apply text-fg;
+    }
+
+    /* Kiosk-Tablet (Samsung Galaxy Tab A 9.7, 1024×768 quer): fingergerechte Bedienelemente.
+       Liegt im Komponenten-Layer, Utilities auf einzelnen Elementen gewinnen weiterhin. */
+    .kiosk .btn {
+        @apply min-h-11 px-4 text-[0.9375rem];
+    }
+    .kiosk .btn-sm {
+        @apply min-h-9 px-3 text-sm;
+    }
+    .kiosk .btn-icon {
+        @apply min-w-11 px-2;
+    }
+    .kiosk .btn-lg {
+        @apply min-h-13 px-6 text-lg;
+    }
+    .kiosk .input {
+        @apply min-h-11 text-base;
+    }
+    .kiosk .input-code {
+        @apply min-h-13 text-xl;
+    }
+    .kiosk .hint {
+        @apply text-sm;
+    }
+    .kiosk .checkbox {
+        @apply size-5;
+    }
+    .kiosk .switch {
+        @apply text-sm;
+    }
+    .kiosk .switch-track {
+        @apply h-6 w-11;
+    }
+    .kiosk .switch-track::after {
+        @apply size-5;
+    }
+    .kiosk .switch input:checked + .switch-track::after {
+        @apply translate-x-5;
+    }
+    .kiosk .nav-link {
+        @apply py-2.5;
     }
 
     .kbd {

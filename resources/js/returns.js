@@ -1,5 +1,6 @@
 import { postJson } from './http';
 import { createScanner } from './scanner';
+import { handScannerOn } from './handscanner';
 import { el, hidden, icon, translator, parseJson, setTone } from './dom';
 
 /**
@@ -94,7 +95,7 @@ export function mountReturns() {
     const loanInfo = (loan, device) => {
         const box = el('div', 'min-w-0');
         const head = el('p', 'flex flex-wrap items-center gap-2');
-        head.append(el('span', 'font-medium', device.title), el('span', 'text-muted', `· ${loan.borrower}`));
+        head.append(el('span', 'font-medium kiosk:text-lg', device.title), el('span', 'text-muted', `· ${loan.borrower}`));
         const meta = el('p', 'text-sm text-muted', t('until', { date: loan.until }));
         if (loan.overdue) meta.append(' ', el('span', 'badge badge-danger', t('overdue')));
         box.append(head, meta);
@@ -109,7 +110,7 @@ export function mountReturns() {
         const options = el('div', 'grid gap-2 sm:grid-cols-2');
         pending.loans.forEach((loan) => {
             // Das Gerät steht schon in der Überschrift – hier zählt, wer es hat
-            const option = el('button', 'card flex items-center justify-between gap-2 p-3 text-left text-sm transition hover:border-accent disabled:opacity-50');
+            const option = el('button', 'card flex items-center justify-between gap-2 p-3 text-left text-sm kiosk:p-4 kiosk:text-base transition hover:border-accent disabled:opacity-50');
             option.type = 'button';
             const info = el('span', 'min-w-0');
             const meta = el('span', 'block text-xs text-muted', t('until', { date: loan.until }));
@@ -167,7 +168,7 @@ export function mountReturns() {
             const set = el('fieldset', 'rounded-lg border border-line p-3');
             set.append(el('legend', 'px-1 text-sm font-medium', t('accessories')), hidden(`returns[${index}][accessories_present]`, 1));
             loan.accessories.forEach((a) => {
-                const row = el('label', 'flex items-center gap-3 py-0.5 text-sm');
+                const row = el('label', 'flex items-center gap-3 py-0.5 text-sm kiosk:py-1.5 kiosk:text-base');
                 const box = el('input', 'checkbox');
                 box.type = 'checkbox';
                 box.name = `returns[${index}][accessories][${a.key}]`;
@@ -213,7 +214,8 @@ export function mountReturns() {
         if (!code) return;
         codeInput.value = '';
         await lookup(code);
-        codeInput.focus();
+        // Ohne Hand-Scanner nicht neu fokussieren: auf Tablets bliebe sonst die Bildschirmtastatur offen
+        if (handScannerOn()) codeInput.focus();
     });
 
     parseJson(root.dataset.initial, []).forEach((entry) => {

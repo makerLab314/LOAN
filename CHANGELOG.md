@@ -4,6 +4,25 @@ Der Abschnitt einer Version landet beim Release automatisch oben in den Release-
 auf GitHub (siehe `.github/workflows/release.yml`). Neue Version: Abschnitt `## vX.Y.Z`
 oben einfügen, dann taggen.
 
+## v2.7.0 (2026-11-02)
+
+Optimiert für das Kiosk-Tablet (Samsung Galaxy Tab A 9.7, SM-T550, 1024×768 quer).
+
+### Neu
+- **Schalter „Hand-Scanner“** am ID-Feld (Gerät finden, Ausleihen, Zurückgeben), gemerkt je Gerät.
+  An: Das ID-Feld hat immer den Fokus, Scanner-Eingaben landen auch dann dort, wenn gerade etwas
+  anderes ausgewählt ist. Aus: kein Autofokus, die Bildschirmtastatur erscheint erst beim Antippen.
+  Ohne Wahl an bei Maus/Trackpad, aus bei Touch.
+- **Kamera wechseln** (Vorder-/Rückkamera) im Scanner, gemerkt je Gerät. Am Kiosk startet die
+  Vorderkamera, gespiegelt angezeigt.
+
+### Geändert
+- Bei 1024–1279 px Breite ist die Seitenleiste eine schmale Symbolleiste mit Kurzbeschriftung.
+- Kiosk: ab Tablet-Breite keine Kopfleiste mehr, Farbschema und „Kiosk beenden“ stehen in der
+  Seitenleiste. Größere Knöpfe, Eingabefelder und Listeneinträge.
+- Ausleihen und Zurückgeben im Querformat: Erfassen und Liste je zur Hälfte, flacheres Kamerabild,
+  größeres ID-Feld.
+
 ## v2.6.0
 
 Sicherheits-Update für den Betrieb im Internet. **Vor dem Update lesen:** Abschnitt

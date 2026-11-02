@@ -14,10 +14,14 @@
                 <div class="card-header"><h2 class="card-title">{{ __('ID eingeben') }}</h2></div>
                 <form method="POST" action="{{ route('lookup') }}" class="card-body space-y-3">
                     @csrf
-                    <x-field :label="__('Inventar-ID')" name="code" :hint="__('z. B. KAB-0042 oder KAB-0042-3. Hand-Scanner tippen die ID hier ein.')">
-                        <input id="code" name="code" class="input font-mono text-lg uppercase" autofocus autocomplete="off" autocapitalize="characters" spellcheck="false" required placeholder="KAB-0042-3">
+                    <x-field name="code" :hint="__('z. B. KAB-0042 oder KAB-0042-3. Hand-Scanner tippen die ID hier ein.')">
+                        <div class="mb-1.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                            <label class="label mb-0" for="code">{{ __('Inventar-ID') }}</label>
+                            <x-hand-scanner/>
+                        </div>
+                        <input id="code" name="code" class="input input-code" data-scan-focus autocomplete="off" autocapitalize="characters" spellcheck="false" required placeholder="KAB-0042-3">
                     </x-field>
-                    <button class="btn btn-primary w-full"><x-icon name="search"/>{{ __('Öffnen') }}</button>
+                    <button class="btn btn-primary btn-lg w-full"><x-icon name="search"/>{{ __('Öffnen') }}</button>
                 </form>
             </section>
 

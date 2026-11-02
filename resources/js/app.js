@@ -188,6 +188,7 @@ if (document.querySelector('[data-scanner][data-lookup]')) import('./scanner').t
 if (document.querySelector('[data-checkout]')) import('./checkout').then((m) => m.mountCheckout());
 if (document.querySelector('[data-return]')) import('./returns').then((m) => m.mountReturns());
 if (document.querySelector('[data-label-picker]')) import('./labels').then((m) => m.mountLabelPicker());
+if (document.querySelector('[data-scan-focus]')) import('./handscanner').then((m) => m.mountHandScanner());
 
 // Installierbar als App (PWA); der Service Worker speichert keine Seiten mit Daten
 if ('serviceWorker' in navigator && window.isSecureContext) {
