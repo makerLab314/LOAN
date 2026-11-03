@@ -104,6 +104,23 @@ class InventoryTest extends TestCase
         $this->get(route('labels.print', $params + ['format' => 'custom']))->assertSessionHasErrors(['custom_w', 'custom_h']);
     }
 
+    public function test_tape_labels_use_chosen_length_and_printable_band(): void
+    {
+        $device = Device::factory()->create(['inventory_number' => 'KAB-0010']);
+        $this->actingAs($this->moderator());
+        $params = ['devices' => [$device->id], 'mode' => 'device', 'code_type' => 'qr', 'format' => 'tape_24'];
+
+        $html = $this->get(route('labels.print', $params))->assertOk()->getContent();
+        $this->assertStringContainsString('size: 60mm 24mm', $html);
+        $this->assertStringContainsString('padding: 3.8mm', $html); // (24 − 18) / 2 + 0,8
+
+        $html = $this->get(route('labels.print', $params + ['tape_length' => 35]))->assertOk()->getContent();
+        $this->assertStringContainsString('size: 35mm 24mm', $html);
+        $this->assertStringContainsString('35 mm lang', $html);
+
+        $this->get(route('labels.print', $params + ['tape_length' => 5]))->assertSessionHasErrors('tape_length');
+    }
+
     public function test_uploaded_images_are_reencoded_without_metadata(): void
     {
         Storage::fake('public');

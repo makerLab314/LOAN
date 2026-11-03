@@ -55,11 +55,18 @@ function mountLabelOptions() {
     const custom = root.querySelector('[data-label-custom]');
     const sheet = root.querySelector('[data-label-custom-sheet]');
     const grid = root.querySelector('[data-label-custom-grid]');
+    const tape = root.querySelector('[data-label-tape]');
+    const tapeLength = root.querySelector('[data-label-tape-length]');
     const fields = () => [...root.querySelectorAll('input[name], select[name]')];
 
     const toggle = () => {
         custom.hidden = format.value !== 'custom';
         grid.hidden = !sheet.checked;
+        // Endlosband: Länge einblenden, Vorgabe des Formats als Platzhalter
+        const length = format.selectedOptions[0]?.dataset.tapeLength;
+        tape.hidden = !length;
+        tapeLength.disabled = !length;
+        tapeLength.placeholder = length || '';
     };
 
     const save = () => {

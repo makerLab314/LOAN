@@ -11,9 +11,11 @@
         $slots = array_merge(array_fill(0, $isRoll ? 0 : $skip, null), $labels);
         $pages = $isRoll ? array_map(fn ($l) => [$l], $slots) : array_chunk($slots, $perPage);
 
+        // Schriftband: Inhalt nur im bedruckbaren Streifen in der Bandmitte
+        $printH = $format['print_h'] ?? $h;
         // Kleine Etiketten (Kabel, Schriftband) bekommen weniger Rand und kleinere Schrift
-        $tiny = $h < 20;
-        $padY = $tiny ? 0.8 : 1.8;
+        $tiny = $printH < 20;
+        $padY = round(($h - $printH) / 2 + ($tiny ? 0.8 : 1.8), 2);
         $padX = $tiny ? 1.2 : 2.2;
         $column = $style['layout'] === 'column';
         $codeSize = $column
@@ -21,7 +23,7 @@
             : min($h - 2 * $padY, $w * ($codeType === 'both' ? 0.34 : 0.42) * $style['code']);
         $codeSize = round(max(6, min($codeSize, $h - 2 * $padY, $w - 2 * $padX)), 2);
         $pt = fn (float $size) => round($size * $style['text'], 2).'pt';
-        $idSize = $tiny ? 7.5 : ($h < 28 ? 9 : 11);
+        $idSize = $printH < 10 ? 6.5 : ($tiny ? 7.5 : ($printH < 28 ? 9 : 11));
     @endphp
     <style>
         @page { size: {{ $format['page'] }}; margin: 0; }
@@ -38,16 +40,22 @@
         .label.empty { visibility: hidden; }
         .cut .label:not(.empty) { outline: 0.2mm dashed #999; outline-offset: -0.1mm; }
         .qr svg { width: {{ $codeSize }}mm; height: {{ $codeSize }}mm; display: block; }
-        .bar svg { height: {{ round(min(9, $h * ($column ? 0.15 : 0.3)), 2) }}mm; width: 100%; display: block; }
+        .bar svg { height: {{ round(min(9, $printH * ($column ? 0.15 : 0.3)), 2) }}mm; width: 100%; display: block; }
         .text { min-width: 0; {{ $column ? 'width: 100%;' : 'flex: 1;' }} display: flex; flex-direction: column; gap: {{ $tiny ? 0.3 : 0.6 }}mm;
                 text-align: {{ $column ? 'center' : $style['align'] }}; align-items: {{ $column || $style['align'] === 'center' ? 'center' : 'stretch' }}; }
         .brand { display: flex; align-items: center; gap: 1mm; }
         .brand img { height: {{ $tiny ? 2.5 : 3.5 }}mm; width: auto; }
         .id { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 700; font-size: {{ $pt($idSize) }}; letter-spacing: .02em; white-space: nowrap; }
-        .title { font-size: {{ $pt($tiny ? 5.5 : ($h < 28 ? 6.5 : 7.5)) }}; line-height: 1.15; max-height: 2.3em; overflow: hidden; }
+        .title { font-size: {{ $pt($tiny ? 5.5 : ($printH < 28 ? 6.5 : 7.5)) }}; line-height: 1.15; max-height: 2.3em; overflow: hidden; }
         .app { font-size: {{ $pt($tiny ? 4.5 : 5.5) }}; color: #555; text-transform: uppercase; letter-spacing: .05em; }
-        .note { font-size: {{ $pt($tiny ? 4.5 : ($h < 28 ? 5.5 : 6.5)) }}; color: #333; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+        .note { font-size: {{ $pt($tiny ? 4.5 : ($printH < 28 ? 5.5 : 6.5)) }}; color: #333; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         .bar { width: 100%; }
+        @if ($printH < $h)
+        {{-- Vorschau: Bandränder, die der Druckkopf nicht erreicht --}}
+        @media screen {
+            .page { background: linear-gradient(#ececec, #ececec) top / 100% {{ ($h - $printH) / 2 }}mm no-repeat, linear-gradient(#ececec, #ececec) bottom / 100% {{ ($h - $printH) / 2 }}mm no-repeat, #fff; }
+        }
+        @endif
         @media print {
             html, body { background: #fff; }
             .toolbar { display: none; }
@@ -59,7 +67,7 @@
 <body @class(['cut' => $style['cut_lines']])>
 <div class="toolbar">
     <button type="button" id="print">{{ __('Drucken') }}</button>
-    <span>{{ trans_choice(':count Etikett|:count Etiketten', count($labels)) }} · {{ $format['label'] }} · {{ __('Druckskalierung auf 100 % stellen.') }}</span>
+    <span>{{ trans_choice(':count Etikett|:count Etiketten', count($labels)) }} · {{ $format['label'] }} · {{ empty($format['tape']) ? __('Druckskalierung auf 100 % stellen.') : __('Alle Etiketten in einem Auftrag drucken (spart Band), z. B. als PDF speichern und per lp senden.') }}</span>
 </div>
 @foreach ($pages as $page)
     <div class="page">

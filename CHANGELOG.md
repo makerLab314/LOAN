@@ -4,6 +4,17 @@ Der Abschnitt einer Version landet beim Release automatisch oben in den Release-
 auf GitHub (siehe `.github/workflows/release.yml`). Neue Version: Abschnitt `## vX.Y.Z`
 oben einfügen, dann taggen.
 
+## v2.8.0 (2026-11-03)
+
+### Neu
+- **P-touch-Endlosband (TZe)** in 24, 18, 12 und 9 mm, z. B. für den Brother PT-P700. Die Länge je
+  Etikett ist frei wählbar (15–200 mm). QR-Code und Text bleiben im bedruckbaren Streifen in der
+  Bandmitte, die Druckansicht zeigt die nicht bedruckbaren Ränder grau.
+
+### Geändert
+- Die Formate „Schriftband 12 mm“ und „Schriftband 24 mm“ heißen jetzt „TZe 12 mm“ und „TZe 24 mm“
+  und halten den Druckbereich des Bandes ein. Gespeicherte Voreinstellungen gelten weiter.
+
 ## v2.7.0 (2026-11-02)
 
 Optimiert für das Kiosk-Tablet (Samsung Galaxy Tab A 9.7, SM-T550, 1024×768 quer).

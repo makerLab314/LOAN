@@ -41,7 +41,7 @@ Everything in one calendar, on any phone, tablet or desktop.
 ### Labels and scanning
 
 - **Labels** with a QR code, a Code 128 barcode, both, or text only.
-- **17 ready-made formats** for A4 sheets (Avery, Zweckform), Brother DK rolls, Dymo rolls and P-touch tape, plus a **custom format** for anything else.
+- **19 ready-made formats** for A4 sheets (Avery, Zweckform), Brother DK rolls, Dymo rolls and P-touch TZe tape (adjustable length), plus a **custom format** for anything else.
 - **Layout options**: code left, right or on top, text and code size, cut lines for cable tags, logo, and a print offset to calibrate your printer.
 - **Scanning** with any phone camera (the QR code opens the device directly), the built-in browser scanner, a USB hand scanner or by typing the ID. Typos like `cbl-42-3` are understood.
 

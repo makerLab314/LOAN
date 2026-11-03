@@ -130,7 +130,11 @@ return [
         'roll_54x25' => ['label' => 'Dymo 54 × 25 mm (11352)', 'group' => 'Etikettendrucker', 'page' => '54mm 25mm', 'cols' => 1, 'rows' => 1, 'w' => 54, 'h' => 25, 'margin_top' => 0, 'margin_left' => 0],
         'roll_57x32' => ['label' => 'Dymo 57 × 32 mm (11354)', 'group' => 'Etikettendrucker', 'page' => '57mm 32mm', 'cols' => 1, 'rows' => 1, 'w' => 57, 'h' => 32, 'margin_top' => 0, 'margin_left' => 0],
         'roll_51x19' => ['label' => 'Dymo 51 × 19 mm (11355) – Kabel', 'group' => 'Etikettendrucker', 'page' => '51mm 19mm', 'cols' => 1, 'rows' => 1, 'w' => 51, 'h' => 19, 'margin_top' => 0, 'margin_left' => 0],
-        'tape_12' => ['label' => 'Schriftband 12 mm, 45 mm lang (z. B. P-touch)', 'group' => 'Etikettendrucker', 'page' => '45mm 12mm', 'cols' => 1, 'rows' => 1, 'w' => 45, 'h' => 12, 'margin_top' => 0, 'margin_left' => 0],
-        'tape_24' => ['label' => 'Schriftband 24 mm, 60 mm lang (z. B. P-touch)', 'group' => 'Etikettendrucker', 'page' => '60mm 24mm', 'cols' => 1, 'rows' => 1, 'w' => 60, 'h' => 24, 'margin_top' => 0, 'margin_left' => 0],
+        // P-touch-Endlosband (TZe, 180 dpi wie PT-P700/P710BT/P750W): Länge frei wählbar (w = Vorgabe),
+        // der Druckkopf erreicht nur die Bandmitte (print_h), der Rest bleibt leer
+        'tape_24' => ['label' => 'TZe 24 mm (z. B. PT-P700)', 'group' => 'P-touch-Schriftband', 'page' => '60mm 24mm', 'cols' => 1, 'rows' => 1, 'w' => 60, 'h' => 24, 'print_h' => 18, 'tape' => true, 'margin_top' => 0, 'margin_left' => 0],
+        'tape_18' => ['label' => 'TZe 18 mm (z. B. PT-P700)', 'group' => 'P-touch-Schriftband', 'page' => '50mm 18mm', 'cols' => 1, 'rows' => 1, 'w' => 50, 'h' => 18, 'print_h' => 16.5, 'tape' => true, 'margin_top' => 0, 'margin_left' => 0],
+        'tape_12' => ['label' => 'TZe 12 mm (z. B. PT-P700)', 'group' => 'P-touch-Schriftband', 'page' => '45mm 12mm', 'cols' => 1, 'rows' => 1, 'w' => 45, 'h' => 12, 'print_h' => 10.5, 'tape' => true, 'margin_top' => 0, 'margin_left' => 0],
+        'tape_9' => ['label' => 'TZe 9 mm (z. B. PT-P700) – Kabel', 'group' => 'P-touch-Schriftband', 'page' => '40mm 9mm', 'cols' => 1, 'rows' => 1, 'w' => 40, 'h' => 9, 'print_h' => 7, 'tape' => true, 'margin_top' => 0, 'margin_left' => 0],
     ],
 ];

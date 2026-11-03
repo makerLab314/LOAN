@@ -656,5 +656,10 @@
     "Kiosk": "Kiosk",
     "Hand-Scanner": "Hand scanner",
     "An, wenn ein Hand-Scanner angeschlossen ist: Das ID-Feld ist dann immer bereit. Aus: Die Bildschirmtastatur erscheint erst beim Antippen.": "On when a hand scanner is connected: the ID field is always ready. Off: the on-screen keyboard only appears when you tap the field.",
-    "Kamera wechseln": "Switch camera"
+    "Kamera wechseln": "Switch camera",
+    "P-touch-Schriftband": "P-touch tape",
+    ":length mm lang": ":length mm long",
+    "Länge je Etikett (mm)": "Length per label (mm)",
+    "Leer = Vorgabe. Der Drucker schneidet nach jedem Etikett ab.": "Empty = default. The printer cuts after each label.",
+    "Alle Etiketten in einem Auftrag drucken (spart Band), z. B. als PDF speichern und per lp senden.": "Print all labels in one job (saves tape), e.g. save as PDF and send it with lp."
 }

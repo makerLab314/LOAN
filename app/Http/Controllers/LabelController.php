@@ -60,6 +60,8 @@ class LabelController extends Controller
             'show_logo' => ['nullable', 'boolean'],
             'offset_x' => ['nullable', 'numeric', 'between:-10,10'],
             'offset_y' => ['nullable', 'numeric', 'between:-10,10'],
+            // Endlosband: Länge je Etikett
+            'tape_length' => ['nullable', 'numeric', 'between:15,200'],
             // Eigenes Format
             'custom_sheet' => ['nullable', 'boolean'],
             'custom_w' => ['exclude_unless:format,custom', 'required', 'numeric', 'between:10,200'],
@@ -73,6 +75,13 @@ class LabelController extends Controller
         ]);
         $copies = (int) ($data['copies'] ?? 1);
         $format = $data['format'] === 'custom' ? $this->customFormat($request, $data) : config('loan.label_formats')[$data['format']];
+        if (! empty($format['tape']) && isset($data['tape_length'])) {
+            $format['w'] = (float) $data['tape_length'];
+            $format['page'] = "{$format['w']}mm {$format['h']}mm";
+        }
+        if (! empty($format['tape'])) {
+            $format['label'] .= ' · '.__(':length mm lang', ['length' => $format['w']]);
+        }
 
         $devices = Device::whereIn('id', $data['devices'])->orderBy('inventory_number')->get();
 

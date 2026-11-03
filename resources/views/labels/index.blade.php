@@ -57,13 +57,20 @@
                         @foreach (collect($formats)->groupBy('group', true) as $group => $items)
                             <optgroup label="{{ __($group) }}">
                                 @foreach ($items as $key => $format)
-                                    <option value="{{ $key }}" @selected($defaults['format'] === $key)>{{ $format['label'] }}</option>
+                                    <option value="{{ $key }}" @selected($defaults['format'] === $key) @if (! empty($format['tape'])) data-tape-length="{{ $format['w'] }}" @endif>{{ $format['label'] }}</option>
                                 @endforeach
                             </optgroup>
                         @endforeach
                         <option value="custom" @selected(old('format') === 'custom')>{{ __('Eigenes Format …') }}</option>
                     </select>
                 </x-field>
+
+                {{-- Endlosband: Länge je Etikett --}}
+                <div data-label-tape hidden>
+                    <x-field :label="__('Länge je Etikett (mm)')" name="tape_length" :hint="__('Leer = Vorgabe. Der Drucker schneidet nach jedem Etikett ab.')">
+                        <input id="tape_length" type="number" name="tape_length" class="input w-28" min="15" max="200" step="1" value="{{ old('tape_length') }}" data-label-tape-length>
+                    </x-field>
+                </div>
 
                 {{-- Eigenes Format: Maße in mm --}}
                 <fieldset class="space-y-3 rounded-xl border border-line p-3" data-label-custom hidden>
