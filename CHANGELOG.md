@@ -4,6 +4,22 @@ Der Abschnitt einer Version landet beim Release automatisch oben in den Release-
 auf GitHub (siehe `.github/workflows/release.yml`). Neue Version: Abschnitt `## vX.Y.Z`
 oben einfügen, dann taggen.
 
+## v2.10.0 (2026-11-04)
+
+### Neu
+- **`tools/ptouch-labels.sh` prüft das PDF**, bevor Band verbraucht wird: A4-Seiten (Browser hat das
+  Papierformat überschrieben), Seitenhöhe ohne passendes TZe-Band oder ein PDF für breiteres Band als
+  eingelegt brechen mit einer Erklärung ab. Bei schmalerem Band oder einem Druckerfehler (z. B.
+  Abdeckung offen) erscheint eine Warnung.
+- **Übersicht vor dem Druck**: Anzahl, Bandbreite und Länge, Bandverbrauch, eingelegtes Band (Breite,
+  Art, Farbe) und die ersten Etiketten mit ID. **Vorschau** öffnet den Streifen als Bild.
+- **Fortschritt** beim Aufbereiten und Drucken mit Animation, aktuellem Etikett und Restzeit, danach
+  eine Erfolgsmeldung mit Bandverbrauch. Im Terminal mit farbigem Fortschrittsbalken.
+
+### Geändert
+- Die TZe-Formate heißen „TZe … · auch Flexi TZe-FX für Kabel“: Flexi-Band hat dieselben Maße.
+- Der Hinweis bei „Länge je Etikett“ erklärt, dass die Länge im PDF steckt (eine Seite je Etikett).
+
 ## v2.9.0 (2026-11-04)
 
 ### Neu

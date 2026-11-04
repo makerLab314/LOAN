@@ -67,7 +67,7 @@
 
                 {{-- Endlosband: Länge je Etikett --}}
                 <div data-label-tape hidden>
-                    <x-field :label="__('Länge je Etikett (mm)')" name="tape_length" :hint="__('Leer = Vorgabe. Der Drucker schneidet nach jedem Etikett ab.')">
+                    <x-field :label="__('Länge je Etikett (mm)')" name="tape_length" :hint="__('Leer = Vorgabe. Die Länge steckt im PDF (eine Seite je Etikett), nach jeder Seite wird abgeschnitten.')">
                         <input id="tape_length" type="number" name="tape_length" class="input w-28" min="15" max="200" step="1" value="{{ old('tape_length') }}" data-label-tape-length>
                     </x-field>
                     <label class="mt-3 flex items-start gap-2 text-sm">

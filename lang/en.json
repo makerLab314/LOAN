@@ -660,7 +660,7 @@
     "P-touch-Schriftband": "P-touch tape",
     ":length mm lang": ":length mm long",
     "Länge je Etikett (mm)": "Length per label (mm)",
-    "Leer = Vorgabe. Der Drucker schneidet nach jedem Etikett ab.": "Empty = default. The printer cuts after each label.",
+    "Leer = Vorgabe. Die Länge steckt im PDF (eine Seite je Etikett), nach jeder Seite wird abgeschnitten.": "Empty = default. The length is stored in the PDF (one page per label); the tape is cut after every page.",
     "Als PDF „Etiketten“ speichern und unter Linux mit „Etiketten drucken“ ausgeben (tools/ptouch-labels.sh).": "Save as PDF named “Etiketten” and print it on Linux with “Etiketten drucken” (tools/ptouch-labels.sh).",
     "Als Kabelfahne": "As cable flag",
     "Etikett, Stück zum Umwickeln, Etikett: einmal um das Kabel legen und die Enden zusammenkleben. Am besten mit Flexi-Band (TZe-FX).": "Label, a piece to wrap, label: wrap it once around the cable and stick the ends together. Works best with flexible tape (TZe-FX).",

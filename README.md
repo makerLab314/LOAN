@@ -222,12 +222,14 @@ Brother offers no Linux driver for the PT-P700, and the CUPS driver in Fedora do
 
 Printing then takes two steps:
 
-1. In LOAN choose a **TZe** format matching the tape in the printer, open the print view and **save it as PDF** in *Downloads*. The file is named `Etiketten.pdf` automatically.
-2. Double-click **Etiketten drucken**. It asks for confirmation, shows progress and prints the newest `Etiketten*.pdf` from *Downloads*, then moves it to *Downloads/Etiketten gedruckt*, so the next double-click won't print it again.
+1. In LOAN choose a **TZe** format matching the width of the tape in the printer (flexible TZe-FX tape uses the same formats), open the print view and **save it as PDF** in *Downloads*. The file is named `Etiketten.pdf` automatically.
+2. Double-click **Etiketten drucken**. It prints the newest `Etiketten*.pdf` from *Downloads*, then moves it to *Downloads/Etiketten gedruckt*, so the next double-click won't print it again. Before printing it shows a summary: number of labels, tape width and length, how much tape it will use, the tape in the printer (width, type, colour) and the first labels by ID. **Preview** opens the strip as an image. While printing, a progress bar shows which label is being printed.
 
-The printer cuts after every label; chain printing wastes the ~25 mm lead-in only once. Text is rendered at four times the printer's 180 dpi and scaled down, so thin strokes of small type stay readable.
+Before using any tape, the script checks the PDF. If the browser saved A4 pages instead of label-sized ones, or the page height matches no TZe width, it stops and explains how to save the PDF (paper size unchanged, margins *None*, scale *Default*). If the PDF is for wider tape than the printer has, it stops. If the PDF is for narrower tape, or the printer reports an error such as an open cover, the summary shows a warning.
 
-In a terminal, `bash tools/ptouch-labels.sh [file.pdf]` does the same. Options: `--streifen` prints one strip with cut marks instead of cutting, `--png` only writes a preview to `streifen.png`, `-y` skips the confirmation.
+The length comes from the PDF: every page is one label, sized to the chosen length. The script renders each page at the printer's 180 dpi, so the image is exactly as long as the page, and sends a cut after it. The printer itself only knows the tape width. The printer cuts after every label; chain printing wastes the ~25 mm lead-in only once. Text is rendered at four times the printer's 180 dpi and scaled down, so thin strokes of small type stay readable.
+
+In a terminal, `bash tools/ptouch-labels.sh [file.pdf]` does the same, with a progress bar in the terminal (`v` at the prompt opens the preview). Options: `--streifen` prints one strip with cut marks instead of cutting, `--png` only writes a preview to `streifen.png`, `-y` skips the confirmation.
 
 **Cable flags:** with **As cable flag**, each label is printed twice with a blank piece in between (*Wrap length*: cable circumference plus a few mm). Wrap the blank piece once around the cable and press the two ends together, adhesive to adhesive: the flag stays flat, holds better than tape on a cable jacket and reads from both sides. Flexible tape (TZe-FX) works best. **Leave the back blank** prints only one side.
 
