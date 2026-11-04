@@ -215,14 +215,23 @@ Brother offers no Linux driver for the PT-P700, and the CUPS driver in Fedora do
    sudo udevadm control --reload
    ```
    `ptouch-print --info` should now show the tape width.
-4. In LOAN choose a **TZe** format matching the tape in the printer, set the length, open the print view and **save it as PDF**.
-5. Print; the printer cuts after every label (chain printing, so the ~25 mm lead-in is wasted only once):
+4. Set up the **Etiketten drucken** launcher once (app overview, desktop and *Open with* for PDFs; Fedora includes `zenity` for its dialogs):
    ```bash
-   bash tools/ptouch-labels.sh etiketten.pdf
+   bash tools/ptouch-labels.sh --install
    ```
-   As a second argument, `--streifen` prints one strip with cut marks instead, and `--png` writes a preview to `streifen.png`.
 
-On 9 mm tape QR codes get too small to scan reliably; use a barcode or text there.
+Printing then takes two steps:
+
+1. In LOAN choose a **TZe** format matching the tape in the printer, open the print view and **save it as PDF** in *Downloads*. The file is named `Etiketten.pdf` automatically.
+2. Double-click **Etiketten drucken**. It asks for confirmation, shows progress and prints the newest `Etiketten*.pdf` from *Downloads*, then moves it to *Downloads/Etiketten gedruckt*, so the next double-click won't print it again.
+
+The printer cuts after every label; chain printing wastes the ~25 mm lead-in only once. Text is rendered at four times the printer's 180 dpi and scaled down, so thin strokes of small type stay readable.
+
+In a terminal, `bash tools/ptouch-labels.sh [file.pdf]` does the same. Options: `--streifen` prints one strip with cut marks instead of cutting, `--png` only writes a preview to `streifen.png`, `-y` skips the confirmation.
+
+**Cable flags:** with **As cable flag**, each label is printed twice with a blank piece in between (*Wrap length*: cable circumference plus a few mm). Wrap the blank piece once around the cable and press the two ends together, adhesive to adhesive: the flag stays flat, holds better than tape on a cable jacket and reads from both sides. Flexible tape (TZe-FX) works best. **Leave the back blank** prints only one side.
+
+The default length on 24 mm tape is 50 mm. On 9 mm tape QR codes get too small to scan reliably; use a barcode or text there.
 
 **Scanning**
 

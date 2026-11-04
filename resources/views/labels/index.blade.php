@@ -70,6 +70,18 @@
                     <x-field :label="__('Länge je Etikett (mm)')" name="tape_length" :hint="__('Leer = Vorgabe. Der Drucker schneidet nach jedem Etikett ab.')">
                         <input id="tape_length" type="number" name="tape_length" class="input w-28" min="15" max="200" step="1" value="{{ old('tape_length') }}" data-label-tape-length>
                     </x-field>
+                    <label class="mt-3 flex items-start gap-2 text-sm">
+                        <input type="checkbox" name="flag" value="1" class="checkbox mt-0.5" data-label-flag>
+                        <span>{{ __('Als Kabelfahne') }}<span class="hint block">{{ __('Etikett, Stück zum Umwickeln, Etikett: einmal um das Kabel legen und die Enden zusammenkleben. Am besten mit Flexi-Band (TZe-FX).') }}</span></span>
+                    </label>
+                    <div class="mt-3 space-y-3 border-l-2 border-line pl-3" data-label-flag-options hidden>
+                        <x-field :label="__('Zum Umwickeln (mm)')" name="flag_wrap" :hint="__('Kabelumfang plus ein paar mm, z. B. 20 mm bei 6 mm Kabel.')">
+                            <input id="flag_wrap" type="number" name="flag_wrap" class="input w-28" min="5" max="100" step="1" value="{{ old('flag_wrap', 20) }}">
+                        </x-field>
+                        <label class="flex items-center gap-2 text-sm">
+                            <input type="checkbox" name="flag_single" value="1" class="checkbox"> {{ __('Rückseite frei lassen') }}
+                        </label>
+                    </div>
                 </div>
 
                 {{-- Eigenes Format: Maße in mm --}}

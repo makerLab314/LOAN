@@ -3,7 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ __('Etiketten') }} · {{ $branding->name() }}</title>
+    {{-- Der Titel ist der Dateiname beim Speichern als PDF: „Etiketten.pdf“ findet tools/ptouch-labels.sh --}}
+    <title>{{ __('Etiketten') }}</title>
     @php
         $w = $format['w']; $h = $format['h'];
         $perPage = $format['cols'] * $format['rows'];
@@ -11,7 +12,15 @@
         $slots = array_merge(array_fill(0, $isRoll ? 0 : $skip, null), $labels);
         $pages = $isRoll ? array_map(fn ($l) => [$l], $slots) : array_chunk($slots, $perPage);
 
+        // Kabelfahne: Etikett, Stück zum Umwickeln, Etikett (oder leer) – gefaltet von beiden Seiten lesbar
+        $flag = $format['flag'] ?? null;
+        if ($flag) {
+            $pages = array_map(fn ($p) => [$p[0], 'wrap', $flag['back'] ? $p[0] : null], $pages);
+        }
+        $pageW = $flag ? 2 * $w + $flag['wrap'] : $w;
+
         // Schriftband: Inhalt nur im bedruckbaren Streifen in der Bandmitte
+        $tape = ! empty($format['tape']);
         $printH = $format['print_h'] ?? $h;
         // Kleine Etiketten (Kabel, Schriftband) bekommen weniger Rand und kleinere Schrift
         $tiny = $printH < 20;
@@ -31,9 +40,9 @@
         html, body { margin: 0; padding: 0; font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; color: #000; background: #e5e5e5; }
         .toolbar { position: sticky; top: 0; z-index: 1; display: flex; flex-wrap: wrap; gap: 12px; align-items: center; padding: 10px 16px; background: #fff; border-bottom: 1px solid #ddd; font-size: 14px; }
         .toolbar button { padding: 8px 14px; border-radius: 8px; border: 0; background: {{ $branding->accent() }}; color: {{ $branding->accentForeground() }}; font-weight: 600; cursor: pointer; }
-        .page { width: {{ $isRoll ? $w.'mm' : '210mm' }}; height: {{ $isRoll ? $h.'mm' : '297mm' }}; margin: 12px auto; background: #fff; overflow: hidden;
+        .page { width: {{ $isRoll ? $pageW.'mm' : '210mm' }}; height: {{ $isRoll ? $h.'mm' : '297mm' }}; margin: 12px auto; background: #fff; overflow: hidden;
                 padding: {{ $format['margin_top'] + $style['offset_y'] }}mm 0 0 {{ $format['margin_left'] + $style['offset_x'] }}mm;
-                display: grid; grid-template-columns: repeat({{ $format['cols'] }}, {{ $w }}mm); grid-auto-rows: {{ $h }}mm;
+                display: grid; grid-template-columns: {{ $flag ? "{$w}mm {$flag['wrap']}mm {$w}mm" : "repeat({$format['cols']}, {$w}mm)" }}; grid-auto-rows: {{ $h }}mm;
                 column-gap: {{ $format['gap_x'] }}mm; row-gap: {{ $format['gap_y'] }}mm; align-content: start; box-shadow: 0 1px 4px rgba(0,0,0,.15); }
         .label { width: {{ $w }}mm; height: {{ $h }}mm; padding: {{ $padY }}mm {{ $padX }}mm; display: flex; align-items: center; gap: {{ $tiny ? 1.2 : 2 }}mm; overflow: hidden;
                  flex-direction: {{ $column ? 'column' : $style['layout'] }}; {{ $column ? 'justify-content: center;' : '' }} }
@@ -46,7 +55,8 @@
         .brand { display: flex; align-items: center; gap: 1mm; }
         .brand img { height: {{ $tiny ? 2.5 : 3.5 }}mm; width: auto; }
         .id { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 700; font-size: {{ $pt($idSize) }}; letter-spacing: .02em; white-space: nowrap; }
-        .title { font-size: {{ $pt($tiny ? 5.5 : ($printH < 28 ? 6.5 : 7.5)) }}; line-height: 1.15; max-height: 2.3em; overflow: hidden; }
+        {{-- Schriftband (180 dpi): normale Strichstärke bricht bei kleiner Schrift weg, daher halbfett --}}
+        .title { font-size: {{ $pt($tiny ? ($tape && $printH >= 15 ? 6.5 : 5.5) : ($printH < 28 ? 6.5 : 7.5)) }}; {{ $tape ? 'font-weight: 600;' : '' }} line-height: 1.15; max-height: 2.3em; overflow: hidden; }
         .app { font-size: {{ $pt($tiny ? 4.5 : 5.5) }}; color: #555; text-transform: uppercase; letter-spacing: .05em; }
         .note { font-size: {{ $pt($tiny ? 4.5 : ($printH < 28 ? 5.5 : 6.5)) }}; color: #333; line-height: 1.15; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
         .bar { width: 100%; }
@@ -56,6 +66,9 @@
             .page { background: linear-gradient(#ececec, #ececec) top / 100% {{ ($h - $printH) / 2 }}mm no-repeat, linear-gradient(#ececec, #ececec) bottom / 100% {{ ($h - $printH) / 2 }}mm no-repeat, #fff; }
         }
         @endif
+        @media screen {
+            .wrap { border-inline: 0.2mm dashed #aaa; }
+        }
         @media print {
             html, body { background: #fff; }
             .toolbar { display: none; }
@@ -67,12 +80,14 @@
 <body @class(['cut' => $style['cut_lines']])>
 <div class="toolbar">
     <button type="button" id="print">{{ __('Drucken') }}</button>
-    <span>{{ trans_choice(':count Etikett|:count Etiketten', count($labels)) }} · {{ $format['label'] }} · {{ empty($format['tape']) ? __('Druckskalierung auf 100 % stellen.') : __('Als PDF speichern und alle Etiketten auf einmal drucken (spart Band), unter Linux mit tools/ptouch-labels.sh.') }}</span>
+    <span>{{ trans_choice(':count Etikett|:count Etiketten', count($labels)) }} · {{ $format['label'] }} · {{ $tape ? __('Als PDF „Etiketten“ speichern und unter Linux mit „Etiketten drucken“ ausgeben (tools/ptouch-labels.sh).') : __('Druckskalierung auf 100 % stellen.') }}</span>
 </div>
 @foreach ($pages as $page)
     <div class="page">
         @foreach ($page as $label)
-            @if ($label === null)
+            @if ($label === 'wrap')
+                <div class="wrap"></div>
+            @elseif ($label === null)
                 <div class="label empty"></div>
             @else
                 <div class="label">

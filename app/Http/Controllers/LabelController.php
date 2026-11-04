@@ -62,6 +62,9 @@ class LabelController extends Controller
             'offset_y' => ['nullable', 'numeric', 'between:-10,10'],
             // Endlosband: Länge je Etikett
             'tape_length' => ['nullable', 'numeric', 'between:15,200'],
+            'flag' => ['nullable', 'boolean'],
+            'flag_wrap' => ['nullable', 'numeric', 'between:5,100'],
+            'flag_single' => ['nullable', 'boolean'],
             // Eigenes Format
             'custom_sheet' => ['nullable', 'boolean'],
             'custom_w' => ['exclude_unless:format,custom', 'required', 'numeric', 'between:10,200'],
@@ -81,6 +84,12 @@ class LabelController extends Controller
         }
         if (! empty($format['tape'])) {
             $format['label'] .= ' · '.__(':length mm lang', ['length' => $format['w']]);
+        }
+        // Kabelfahne: Etikett + Stück zum Umwickeln + Etikett auf einem Abschnitt
+        if (! empty($format['tape']) && $request->boolean('flag')) {
+            $format['flag'] = ['wrap' => (float) ($data['flag_wrap'] ?? 20), 'back' => ! $request->boolean('flag_single')];
+            $format['page'] = (2 * $format['w'] + $format['flag']['wrap'])."mm {$format['h']}mm";
+            $format['label'] .= ' · '.__('Kabelfahne, :wrap mm zum Umwickeln', ['wrap' => $format['flag']['wrap']]);
         }
 
         $devices = Device::whereIn('id', $data['devices'])->orderBy('inventory_number')->get();

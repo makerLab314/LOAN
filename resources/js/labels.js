@@ -57,16 +57,19 @@ function mountLabelOptions() {
     const grid = root.querySelector('[data-label-custom-grid]');
     const tape = root.querySelector('[data-label-tape]');
     const tapeLength = root.querySelector('[data-label-tape-length]');
+    const flag = root.querySelector('[data-label-flag]');
+    const flagOptions = root.querySelector('[data-label-flag-options]');
     const fields = () => [...root.querySelectorAll('input[name], select[name]')];
 
     const toggle = () => {
         custom.hidden = format.value !== 'custom';
         grid.hidden = !sheet.checked;
-        // Endlosband: Länge einblenden, Vorgabe des Formats als Platzhalter
+        // Endlosband: Länge und Kabelfahne einblenden, Vorgabe des Formats als Platzhalter
         const length = format.selectedOptions[0]?.dataset.tapeLength;
         tape.hidden = !length;
-        tapeLength.disabled = !length;
+        tape.querySelectorAll('input').forEach((el) => { el.disabled = !length; });
         tapeLength.placeholder = length || '';
+        flagOptions.hidden = !flag.checked;
     };
 
     const save = () => {

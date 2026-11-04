@@ -661,5 +661,11 @@
     ":length mm lang": ":length mm long",
     "Länge je Etikett (mm)": "Length per label (mm)",
     "Leer = Vorgabe. Der Drucker schneidet nach jedem Etikett ab.": "Empty = default. The printer cuts after each label.",
-    "Als PDF speichern und alle Etiketten auf einmal drucken (spart Band), unter Linux mit tools/ptouch-labels.sh.": "Save as PDF and print all labels at once (saves tape), on Linux with tools/ptouch-labels.sh."
+    "Als PDF „Etiketten“ speichern und unter Linux mit „Etiketten drucken“ ausgeben (tools/ptouch-labels.sh).": "Save as PDF named “Etiketten” and print it on Linux with “Etiketten drucken” (tools/ptouch-labels.sh).",
+    "Als Kabelfahne": "As cable flag",
+    "Etikett, Stück zum Umwickeln, Etikett: einmal um das Kabel legen und die Enden zusammenkleben. Am besten mit Flexi-Band (TZe-FX).": "Label, a piece to wrap, label: wrap it once around the cable and stick the ends together. Works best with flexible tape (TZe-FX).",
+    "Zum Umwickeln (mm)": "Wrap length (mm)",
+    "Kabelumfang plus ein paar mm, z. B. 20 mm bei 6 mm Kabel.": "Cable circumference plus a few mm, e.g. 20 mm for a 6 mm cable.",
+    "Rückseite frei lassen": "Leave the back blank",
+    "Kabelfahne, :wrap mm zum Umwickeln": "cable flag, :wrap mm to wrap"
 }

@@ -4,6 +4,28 @@ Der Abschnitt einer Version landet beim Release automatisch oben in den Release-
 auf GitHub (siehe `.github/workflows/release.yml`). Neue Version: Abschnitt `## vX.Y.Z`
 oben einfügen, dann taggen.
 
+## v2.9.0 (2026-11-04)
+
+### Neu
+- **Kabelfahne** für TZe-Band: Etikett, Stück zum Umwickeln (Länge einstellbar), Etikett – einmal um
+  das Kabel legen und die Enden zusammenkleben. Die Fahne ist von beiden Seiten lesbar; auf Wunsch
+  bleibt die Rückseite frei.
+- **`tools/ptouch-labels.sh`** druckt das Etiketten-PDF unter Linux auf Brother P-touch-Druckern
+  (z. B. PT-P700, für den es keinen Linux-Treiber gibt) über ptouch-print direkt per USB:
+  - `--install` legt den Starter **„Etiketten drucken“** an (App-Übersicht, Schreibtisch, „Öffnen mit“).
+    Ein Doppelklick druckt die neueste `Etiketten*.pdf` aus „Downloads“ mit Rückfrage und Fortschritt
+    und verschiebt sie danach nach „Downloads/Etiketten gedruckt“.
+  - Der Drucker schneidet nach jedem Etikett ab; dank Kettendruck fällt der Vorlauf von ~25 mm nur
+    einmal an. `--streifen` druckt einen Streifen mit Schnittmarken, `--png` nur eine Vorschau.
+  - Schrift wird vierfach fein gerendert und auf die 180 dpi des Druckers heruntergerechnet, dünne
+    Striche brechen nicht mehr weg.
+  - Einrichtung unter Fedora: README, Abschnitt „Labels and scanning“.
+
+### Geändert
+- Die Druckansicht heißt „Etiketten“, beim Speichern als PDF entsteht also `Etiketten.pdf`.
+- Auf Schriftband ist der Gerätename halbfett und auf 24- und 18-mm-Band etwas größer.
+- TZe 24 mm ist standardmäßig 50 statt 60 mm lang.
+
 ## v2.8.0 (2026-11-03)
 
 ### Neu

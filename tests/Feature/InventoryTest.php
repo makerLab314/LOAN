@@ -111,14 +111,37 @@ class InventoryTest extends TestCase
         $params = ['devices' => [$device->id], 'mode' => 'device', 'code_type' => 'qr', 'format' => 'tape_24'];
 
         $html = $this->get(route('labels.print', $params))->assertOk()->getContent();
-        $this->assertStringContainsString('size: 60mm 24mm', $html);
+        $this->assertStringContainsString('size: 50mm 24mm', $html);
         $this->assertStringContainsString('padding: 3.8mm', $html); // (24 − 18) / 2 + 0,8
+        $this->assertStringContainsString('<title>Etiketten</title>', $html);
 
         $html = $this->get(route('labels.print', $params + ['tape_length' => 35]))->assertOk()->getContent();
         $this->assertStringContainsString('size: 35mm 24mm', $html);
         $this->assertStringContainsString('35 mm lang', $html);
 
         $this->get(route('labels.print', $params + ['tape_length' => 5]))->assertSessionHasErrors('tape_length');
+    }
+
+    public function test_tape_labels_as_cable_flag(): void
+    {
+        $device = Device::factory()->create(['inventory_number' => 'KAB-0011']);
+        $this->actingAs($this->moderator());
+        $params = ['devices' => [$device->id], 'mode' => 'device', 'code_type' => 'qr', 'format' => 'tape_24', 'tape_length' => 40, 'flag' => 1];
+
+        // Etikett, 25 mm zum Umwickeln, Etikett
+        $html = $this->get(route('labels.print', $params + ['flag_wrap' => 25]))->assertOk()->getContent();
+        $this->assertStringContainsString('size: 105mm 24mm', $html);
+        $this->assertStringContainsString('grid-template-columns: 40mm 25mm 40mm', $html);
+        $this->assertSame(2, substr_count($html, '<div class="qr">'));
+        $this->assertSame(1, substr_count($html, '<div class="wrap">'));
+
+        $html = $this->get(route('labels.print', $params + ['flag_single' => 1]))->assertOk()->getContent();
+        $this->assertStringContainsString('size: 100mm 24mm', $html); // Vorgabe 20 mm
+        $this->assertSame(1, substr_count($html, '<div class="qr">'));
+
+        // Nur für Schriftband
+        $html = $this->get(route('labels.print', ['format' => 'roll_62x29'] + $params))->assertOk()->getContent();
+        $this->assertStringNotContainsString('<div class="wrap">', $html);
     }
 
     public function test_uploaded_images_are_reencoded_without_metadata(): void
