@@ -198,6 +198,32 @@ Create a user with the **Kiosk** role and sign in with it on a tablet. The kiosk
 - Keep QR codes at about **15 mm** or larger so every phone camera can read them.
 - Not listed? Choose **Custom format** and enter the size from the label packaging.
 
+**Brother P-touch tape printers (e.g. PT-P700) on Linux**
+
+Brother offers no Linux driver for the PT-P700, and the CUPS driver in Fedora does not support it. Print with [ptouch-print](https://git.familie-radermacher.ch/linux/ptouch-print.git) instead, which talks to the printer over USB:
+
+1. Turn off **P-touch Editor Lite** on the printer (hold the button until the green LED goes out), otherwise Linux sees a USB drive.
+2. Install the tools and build ptouch-print (Fedora):
+   ```bash
+   sudo dnf install poppler-utils ImageMagick git cmake gcc make gettext gd-devel libusb1-devel
+   git clone https://git.familie-radermacher.ch/linux/ptouch-print.git
+   cd ptouch-print && ./compile.sh && sudo cp build/ptouch-print /usr/local/bin/
+   ```
+3. Allow the logged-in user to access Brother USB devices, then unplug and replug the printer:
+   ```bash
+   echo 'SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="04f9", TAG+="uaccess"' | sudo tee /etc/udev/rules.d/70-brother-ptouch.rules
+   sudo udevadm control --reload
+   ```
+   `ptouch-print --info` should now show the tape width.
+4. In LOAN choose a **TZe** format matching the tape in the printer, set the length, open the print view and **save it as PDF**.
+5. Print; the printer cuts after every label (chain printing, so the ~25 mm lead-in is wasted only once):
+   ```bash
+   bash tools/ptouch-labels.sh etiketten.pdf
+   ```
+   As a second argument, `--streifen` prints one strip with cut marks instead, and `--png` writes a preview to `streifen.png`.
+
+On 9 mm tape QR codes get too small to scan reliably; use a barcode or text there.
+
 **Scanning**
 
 - The normal **phone camera** reads the QR codes and opens the device page directly.

@@ -661,5 +661,5 @@
     ":length mm lang": ":length mm long",
     "Länge je Etikett (mm)": "Length per label (mm)",
     "Leer = Vorgabe. Der Drucker schneidet nach jedem Etikett ab.": "Empty = default. The printer cuts after each label.",
-    "Alle Etiketten in einem Auftrag drucken (spart Band), z. B. als PDF speichern und per lp senden.": "Print all labels in one job (saves tape), e.g. save as PDF and send it with lp."
+    "Als PDF speichern und alle Etiketten auf einmal drucken (spart Band), unter Linux mit tools/ptouch-labels.sh.": "Save as PDF and print all labels at once (saves tape), on Linux with tools/ptouch-labels.sh."
 }

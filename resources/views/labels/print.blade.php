@@ -67,7 +67,7 @@
 <body @class(['cut' => $style['cut_lines']])>
 <div class="toolbar">
     <button type="button" id="print">{{ __('Drucken') }}</button>
-    <span>{{ trans_choice(':count Etikett|:count Etiketten', count($labels)) }} · {{ $format['label'] }} · {{ empty($format['tape']) ? __('Druckskalierung auf 100 % stellen.') : __('Alle Etiketten in einem Auftrag drucken (spart Band), z. B. als PDF speichern und per lp senden.') }}</span>
+    <span>{{ trans_choice(':count Etikett|:count Etiketten', count($labels)) }} · {{ $format['label'] }} · {{ empty($format['tape']) ? __('Druckskalierung auf 100 % stellen.') : __('Als PDF speichern und alle Etiketten auf einmal drucken (spart Band), unter Linux mit tools/ptouch-labels.sh.') }}</span>
 </div>
 @foreach ($pages as $page)
     <div class="page">
